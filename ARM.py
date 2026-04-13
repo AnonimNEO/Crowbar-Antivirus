@@ -9,7 +9,7 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Интерфейс
-from tkinter import ttk, messagebox, simpledialog
+from tkinter import ttk, Menu, messagebox, simpledialog
 import tkinter as tk
 #Дата и Время
 from datetime import datetime
@@ -27,40 +27,80 @@ import os
 
 from config import *
 from RS import random_string
-from OF import get_current_disc, get_offline_reg_path, loaded_hive_names
+from OF import get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme
 
-global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.2.3 Beta"
+global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
+autorun_master_version = "3.2.8 Beta"
 
-REG_TYPE_MAP = {
-    winreg.REG_SZ: "REG_SZ",
-    winreg.REG_EXPAND_SZ: "REG_EXPAND_SZ",
-    winreg.REG_MULTI_SZ: "REG_MULTI_SZ",
-    winreg.REG_DWORD: "REG_DWORD",
-    winreg.REG_QWORD: "REG_QWORD",
-    winreg.REG_BINARY: "REG_BINARY",
-    winreg.REG_NONE: "REG_NONE"
-}
+def remove_autorun_entry(target_exe):
+    target_exe = target_exe.lower()
 
-#Обратное соответствие
-REG_TYPE_MAP_REV = {v: k for k, v in REG_TYPE_MAP.items()}
+    #Список путей
+    keys = {
+        "HKCU Run": (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run"),
+        "HKLM Run": (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Run"),
+        "HKCU RunOnce": (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\RunOnce"),
+        "HKLM RunOnce": (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\RunOnce"),
+        "Startup User": os.path.expandvars(r"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"),
+        "Startup Common": os.path.expandvars(r"%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup")
+    }
 
-#Список для диалога "Создать"
-CREATABLE_REG_TYPES = [
-    "REG_SZ", "REG_EXPAND_SZ", "REG_MULTI_SZ",
-    "REG_DWORD", "REG_QWORD", "REG_BINARY"
-]
+    #Инициализируем COM для работы с ярлыками
+    try:
+        shell = win32com.client.Dispatch("WScript.Shell")
+    except Exception:
+        shell = None
 
-GUI_ELEMENTS = {
-    "master": None,
-    "notebook": None,
-    "tree": None,
-    "tabs": {},
-    "vsb": None,
-    "current_tab": "Пользовательская",
-    "treeview_data": [],
-    "focus_after_update": None
-}
+    for name, path in keys.items():
+        try:
+            if isinstance(path, tuple):
+                root, subkey = path
+                to_delete = []
+
+                #Сначала находим все подходящие параметры
+                with winreg.OpenKey(root, subkey, 0, winreg.KEY_READ) as key:
+                    num_values = winreg.QueryInfoKey(key)[1]
+                    for i in range(num_values):
+                        v_name, v_val, _ = winreg.EnumValue(key, i)
+                        if target_exe in str(v_val).lower():
+                            to_delete.append(v_name)
+
+                #Удаляем найденные параметры
+                if to_delete:
+                    with winreg.OpenKey(root, subkey, 0, winreg.KEY_SET_VALUE) as key:
+                        for v_name in to_delete:
+                            winreg.DeleteValue(key, v_name)
+                            logger.success(f"ARM - Удален параметр реестра: {v_name} из {name}")
+
+            else: #Обработка каталогов
+                if os.path.exists(path):
+                    for file_name in os.listdir(path):
+                        full_path = os.path.join(path, file_name)
+
+                        #Если это сам исполняемый файл
+                        if full_path.lower() == target_exe:
+                            os.remove(full_path)
+                            logger.success(f"ARM - Удален исполняемый файл из автозагрузки: {file_name}")
+                            continue
+
+                        #Если это ярлык, проверяем его цель
+                        if file_name.lower().endswith(".lnk") and shell:
+                            try:
+                                shortcut = shell.CreateShortCut(full_path)
+                                if shortcut.TargetPath.lower() == target_exe:
+                                    os.remove(full_path)
+                                    logger.success(f"ARM - Удален ярлык автозагрузки: {file_name} -> {target_exe}")
+                            except Exception:
+                                pass
+
+        except PermissionError:
+            logger.error(f"ARM - Недостаточно прав для очистки {name}")
+        except Exception as e:
+            logger.error(f"ARM - Ошибка при очистке {name}: {e}")
+
+    return True
+
+
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -155,7 +195,34 @@ class TaskSchedulerManager:
 
 
 
-def ARM(run_in_recovery, first_run):
+def ARM(run_in_recovery, current_theme):
+    REG_TYPE_MAP = {
+        winreg.REG_SZ: "REG_SZ",
+        winreg.REG_EXPAND_SZ: "REG_EXPAND_SZ",
+        winreg.REG_MULTI_SZ: "REG_MULTI_SZ",
+        winreg.REG_DWORD: "REG_DWORD",
+        winreg.REG_QWORD: "REG_QWORD",
+        winreg.REG_BINARY: "REG_BINARY",
+        winreg.REG_NONE: "REG_NONE"
+    }
+
+    #Обратное соответствие
+    REG_TYPE_MAP_REV = {v: k for k, v in REG_TYPE_MAP.items()}
+
+    #Список для диалога "Создать"
+    CREATABLE_REG_TYPES = ["REG_SZ", "REG_EXPAND_SZ", "REG_MULTI_SZ", "REG_DWORD", "REG_QWORD", "REG_BINARY"]
+
+    ARM_GUI_ELEMENTS = {
+        "master": None,
+        "notebook": None,
+        "tree": None,
+        "tabs": {},
+        "vsb": None,
+        "current_tab": "Пользовательская",
+        "treeview_data": [],
+        "focus_after_update": None
+    }
+
     #Путь к каталогу автозагрузки пользователя
     if run_in_recovery:
         current_disc, found_disc = get_current_disc(run_in_recovery)
@@ -468,7 +535,7 @@ def ARM(run_in_recovery, first_run):
 
 
         #Создаём новый параметр реестра
-        def create_reg_value(hkey_const, subkey_path, name, reg_type_str, gui_elements):
+        def create_reg_value(hkey_const, subkey_path, name, reg_type_str, ARM_GUI_ELEMENTS):
             reg_type = REG_TYPE_MAP_REV.get(reg_type_str)
             if reg_type is None:
                 logger.error(f"ARM - Неизвестный тип реестра: {reg_type_str}")
@@ -493,20 +560,20 @@ def ARM(run_in_recovery, first_run):
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE | winreg.KEY_READ) as key:
                     winreg.SetValueEx(key, name, 0, reg_type, initial_value)
                     logger.success(f"ARM - Создан параметр реестра: {name} с типом {reg_type_str} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
-                    gui_elements["focus_after_update"] = {"type": "name", "value": name}
+                    ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "name", "value": name}
                     return True
             except PermissionError:
                 messagebox.showerror(random_string(), "Недостаточно прав для изменения реестра. Требуются права администратора.")
                 return False
             except Exception as e:
-                logger.error(f"ARM - Ошибка при создании параметра реестра: {name} в {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:\n{e}")
+                logger.error(f"ARM - Ошибка при создании параметра реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
                 messagebox.showerror(random_string(), f'Не удалось создать параметр реестра "{name}".\n{e}')
                 return False
 
 
 
         #Обновляем существующий параметр реестра
-        def update_reg_value(hkey_const, subkey_path, name, new_value, reg_type, item_id, gui_elements):
+        def update_reg_value(hkey_const, subkey_path, name, new_value, reg_type, item_id, ARM_GUI_ELEMENTS):
             if run_in_recovery:
                 final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
             else:
@@ -539,54 +606,54 @@ def ARM(run_in_recovery, first_run):
 
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE) as key:
                     winreg.SetValueEx(key, name, 0, reg_type, value_to_set)
-                    logger.success(f"ARM - Обновлен параметр реестра: {name} в {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}")
-                    gui_elements["focus_after_update"] = {"type": "iid", "value": item_id}
+                    logger.success(f"ARM - Обновлен параметр реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
+                    ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                     return True
 
             except PermissionError:
                 messagebox.showerror(random_string(), "Недостаточно прав для изменения реестра. Требуются права администратора.")
                 return False
             except ValueError as e:
-                logger.error(f"ARM - Ошибка преобразования значения для параметра реестра: {name} в {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:\n{e}")
+                logger.error(f"ARM - Ошибка преобразования значения для параметра реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
                 return False
             except Exception as e:
                 messagebox.showerror(random_string(), f"Не удалось обновить параметр реестра '{name}'.\n{e}")
-                logger.error(f"ARM - Ошибка при обновлении параметра реестра: {name} в {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:\n{e}")
+                logger.error(f"ARM - Ошибка при обновлении параметра реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
                 return False
 
 
 
         #Удаляем параметр реестра
-        def delete_reg_value(hkey_const, subkey_path, name, item_id, gui_elements):
+        def delete_reg_value(hkey_const, subkey_path, name, item_id, ARM_GUI_ELEMENTS):
             if run_in_recovery:
                 final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
             else:
                 final_hkey = hkey_const
                 final_subkey = subkey_path
             try:
-                gui_elements["focus_after_update"] = get_next_item_iid(gui_elements, item_id)
+                ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
 
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE) as key:
                     winreg.DeleteValue(key, name)
-                    logger.success(f"ARM - Удален параметр реестра: {name} из {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}")
+                    logger.success(f"ARM - Удален параметр реестра: {name} из {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
                     return True
             except PermissionError:
                 messagebox.showerror(random_string(), "Недостаточно прав для удаления из реестра. Требуются права администратора.")
-                logger.error(f"ARM - Ошибка доступа при удалении параметра реестра: {name} из {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}")
+                logger.error(f"ARM - Ошибка доступа при удалении параметра реестра: {name} из {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
                 return False
             except Exception as e:
                 messagebox.showerror(random_string(), f"Не удалось удалить параметр реестра '{name}'.\n{e}")
-                logger.error(f"ARM - Ошибка при удалении параметра реестра: {name} из {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:\n{e}")
+                logger.error(f"ARM - Ошибка при удалении параметра реестра: {name} из {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
                 return False
 
 
 
         #Удаляем файл
-        def delete_file(file_path, file_name, item_id, gui_elements):
+        def delete_file(file_path, file_name, item_id, ARM_GUI_ELEMENTS):
             file = Path(file_path)
             try:
                 if file.exists():
-                    gui_elements["focus_after_update"] = get_next_item_iid(gui_elements, item_id)
+                    ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                     file.unlink()
                     logger.success(f"ARM - Удален файл: {file_path}")
                     return True
@@ -784,13 +851,13 @@ def ARM(run_in_recovery, first_run):
 
 
         #Изменяем состояние задачи (Вкл/Выкл)
-        def get_task_startup(task_path_str, enable, item_id, gui_elements):
+        def get_task_startup(task_path_str, enable, item_id, ARM_GUI_ELEMENTS):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
                 if manager.set_task_state_com(task_path_str, enable):
                     state = "включена" if enable else "отключена"
                     logger.success(f'ARM - Задача "{task_path_str}" успешно {state} через COM.')
-                    gui_elements["focus_after_update"] = {"type": "iid", "value": item_id}
+                    ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                     return True
                 return False
             else: 
@@ -821,7 +888,7 @@ def ARM(run_in_recovery, first_run):
                     if save_xml_task(tree, task_path):
                         state = "включена" if enable else "отключена"
                         logger.success(f'ARM - Задача "{task_path.name}" успешно {state} через XML.')
-                        gui_elements["focus_after_update"] = {"type": "iid", "value": item_id}
+                        ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                         return True
                     return False
                 except Exception as e:
@@ -832,19 +899,19 @@ def ARM(run_in_recovery, first_run):
 
 
         #Удаляем задачу из планировщика
-        def delete_task_scheduler_task(task_path_str, task_name, item_id, gui_elements):
+        def delete_task_scheduler_task(task_path_str, task_name, item_id, ARM_GUI_ELEMENTS):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
                 if manager.delete_task_com(task_path_str):
                     logger.success(f'ARM - Задача "{task_path_str}" удалена через COM.')
-                    gui_elements["focus_after_update"] = get_next_item_iid(gui_elements, item_id)
+                    ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                     return True
                 return False
             else: 
                 try:
                     task_path = Path(task_path_str)
                     if task_path.exists():
-                        gui_elements["focus_after_update"] = get_next_item_iid(gui_elements, item_id)
+                        ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                         task_path.unlink()
                         logger.success(f"ARM - XML файл задачи удален: {task_path}")
                         return True
@@ -865,12 +932,12 @@ def ARM(run_in_recovery, first_run):
 
 
         #Обработка смены вкладки
-        def on_tab_change(event, gui_elements, ARM_CORE_GLOBALS):
-            selected_tab = gui_elements["notebook"].tab(gui_elements["notebook"].select(), "text")
-            if selected_tab != gui_elements["current_tab"]:
-                gui_elements["current_tab"] = selected_tab
-                set_treeview_columns(gui_elements)
-                load_current_tab_data(gui_elements, ARM_CORE_GLOBALS)
+        def on_tab_change(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
+            selected_tab = ARM_GUI_ELEMENTS["notebook"].tab(ARM_GUI_ELEMENTS["notebook"].select(), "text")
+            if selected_tab != ARM_GUI_ELEMENTS["current_tab"]:
+                ARM_GUI_ELEMENTS["current_tab"] = selected_tab
+                set_treeview_columns(ARM_GUI_ELEMENTS)
+                load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
@@ -886,8 +953,8 @@ def ARM(run_in_recovery, first_run):
 
 
         #Сортируем столбик по клику на заголовок
-        def sort_treeview_column(gui_elements, col):
-            tree = gui_elements.get("tree")
+        def sort_treeview_column(ARM_GUI_ELEMENTS, col):
+            tree = ARM_GUI_ELEMENTS.get("tree")
             if not tree:
                 return
 
@@ -895,9 +962,9 @@ def ARM(run_in_recovery, first_run):
             if not items:
                 return
 
-            gui_elements.setdefault("sort_direction", {})
-            reverse = gui_elements["sort_direction"].get(col, "asc") == "desc"
-            gui_elements["sort_direction"][col] = "desc" if not reverse else "asc"
+            ARM_GUI_ELEMENTS.setdefault("sort_direction", {})
+            reverse = ARM_GUI_ELEMENTS["sort_direction"].get(col, "asc") == "desc"
+            ARM_GUI_ELEMENTS["sort_direction"][col] = "desc" if not reverse else "asc"
 
             data_to_sort = []
             for item_id in items:
@@ -924,8 +991,8 @@ def ARM(run_in_recovery, first_run):
 
 
         #Обработчик события получения фокуса Treeview
-        def handle_treeview_focus_in(gui_elements):
-            tree = gui_elements.get("tree")
+        def handle_treeview_focus_in(ARM_GUI_ELEMENTS):
+            tree = ARM_GUI_ELEMENTS.get("tree")
             if not tree:
                 return
 
@@ -940,86 +1007,86 @@ def ARM(run_in_recovery, first_run):
 
 
         #Установка столбиков, в зависимости от вкладки
-        def set_treeview_columns(gui_elements):
-            if gui_elements["tree"] and gui_elements["tree"].winfo_exists():
-                gui_elements["tree"].destroy()
+        def set_treeview_columns(ARM_GUI_ELEMENTS):
+            if ARM_GUI_ELEMENTS["tree"] and ARM_GUI_ELEMENTS["tree"].winfo_exists():
+                ARM_GUI_ELEMENTS["tree"].destroy()
 
-            current_frame = gui_elements["tabs"][gui_elements["current_tab"]]
+            current_frame = ARM_GUI_ELEMENTS["tabs"][ARM_GUI_ELEMENTS["current_tab"]]
 
-            if gui_elements["vsb"] and gui_elements["vsb"].winfo_exists():
-                gui_elements["vsb"].pack_forget()
+            if ARM_GUI_ELEMENTS["vsb"] and ARM_GUI_ELEMENTS["vsb"].winfo_exists():
+                ARM_GUI_ELEMENTS["vsb"].pack_forget()
 
-            gui_elements["tree"] = ttk.Treeview(current_frame, selectmode="browse")
-            gui_elements["tree"].pack(side="left", fill="both", expand=True)
+            ARM_GUI_ELEMENTS["tree"] = ttk.Treeview(current_frame, selectmode="browse")
+            ARM_GUI_ELEMENTS["tree"].pack(side="left", fill="both", expand=True)
 
-            gui_elements["vsb"] = ttk.Scrollbar(current_frame, orient="vertical", command=gui_elements["tree"].yview)
-            gui_elements["vsb"].pack(side="right", fill="y")
-            gui_elements["tree"].configure(yscrollcommand=gui_elements["vsb"].set)
+            ARM_GUI_ELEMENTS["vsb"] = ttk.Scrollbar(current_frame, orient="vertical", command=ARM_GUI_ELEMENTS["tree"].yview)
+            ARM_GUI_ELEMENTS["vsb"].pack(side="right", fill="y")
+            ARM_GUI_ELEMENTS["tree"].configure(yscrollcommand=ARM_GUI_ELEMENTS["vsb"].set)
 
-            gui_elements["tree"].bind("<Button-3>", lambda e: handle_right_click(e, gui_elements, ARM_CORE_GLOBALS))
-            gui_elements["tree"].bind("<Key>", lambda e: handle_key_press(e, gui_elements, ARM_CORE_GLOBALS))
-            gui_elements["tree"].bind("<c>", lambda e: handle_menu_key(e, gui_elements, ARM_CORE_GLOBALS))
+            ARM_GUI_ELEMENTS["tree"].bind("<Button-3>", lambda e: handle_right_click(e, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS))
+            ARM_GUI_ELEMENTS["tree"].bind("<Key>", lambda e: handle_key_press(e, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS))
+            ARM_GUI_ELEMENTS["tree"].bind("<c>", lambda e: handle_menu_key(e, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS))
 
-            gui_elements["tree"].bind("<FocusIn>", lambda e: handle_treeview_focus_in(gui_elements))
+            ARM_GUI_ELEMENTS["tree"].bind("<FocusIn>", lambda e: handle_treeview_focus_in(ARM_GUI_ELEMENTS))
 
             columns = []
             headings = {}
 
-            if gui_elements["current_tab"] == "Пользовательская":
+            if ARM_GUI_ELEMENTS["current_tab"] == "Пользовательская":
                 columns = ("Имя Файла", "Дата создания", "Дата Изменения", "Дата Открытия")
                 headings = dict(zip(columns, columns))
-            elif gui_elements["current_tab"] == "Реестр":
+            elif ARM_GUI_ELEMENTS["current_tab"] == "Реестр":
                 columns = ("Имя Параметра", "Значение Параметра", "Тип Параметра", "Путь Параметра")
                 headings = dict(zip(columns, columns))
-            elif gui_elements["current_tab"] == "Системная":
+            elif ARM_GUI_ELEMENTS["current_tab"] == "Системная":
                 columns = ("Имя Параметра", "Значение Параметра", "Тип Параметра", "Путь Параметра")
                 headings = dict(zip(columns, columns))
-            elif gui_elements["current_tab"] == "AppInit_DLLs":
+            elif ARM_GUI_ELEMENTS["current_tab"] == "AppInit_DLLs":
                 columns = ["Имя Параметра", "Битность", "Значение Параметра", "Путь Параметра"]
                 headings = dict(zip(columns, columns))
-            elif gui_elements["current_tab"] == "CmdLine":
+            elif ARM_GUI_ELEMENTS["current_tab"] == "CmdLine":
                 columns = ("Имя Параметра", "Значение Параметра", "Тип Параметра", "Путь Параметра")
                 headings = dict(zip(columns, columns))
-            elif gui_elements["current_tab"] == "Планировщик":
+            elif ARM_GUI_ELEMENTS["current_tab"] == "Планировщик":
                 columns = ("Имя", "Вкл/Выкл", "Путь", "Автор")
                 headings = dict(zip(columns, columns))
 
-            gui_elements["tree"]["columns"] = columns
-            gui_elements["tree"]["show"] = "headings"
+            ARM_GUI_ELEMENTS["tree"]["columns"] = columns
+            ARM_GUI_ELEMENTS["tree"]["show"] = "headings"
 
             for col in columns:
-                gui_elements["tree"].heading(
+                ARM_GUI_ELEMENTS["tree"].heading(
                     col, 
                     text=headings.get(col, col),
-                    command=lambda _col=col: sort_treeview_column(gui_elements, _col)
+                    command=lambda _col=col: sort_treeview_column(ARM_GUI_ELEMENTS, _col)
                 )
-                gui_elements["tree"].column(col, width=100, anchor=tk.W)
+                ARM_GUI_ELEMENTS["tree"].column(col, width=100, anchor=tk.W)
 
             if columns:
-                gui_elements["tree"].column(columns[0], width=150, anchor=tk.W)
-                if gui_elements["current_tab"] == "AppInit_DLLs":
-                        gui_elements["tree"].column(columns[0], width=75, anchor=tk.W)
-                        gui_elements["tree"].column(columns[1], width=15, anchor=tk.W)
-                        gui_elements["tree"].column(columns[2], width=150, anchor=tk.W)
-                        gui_elements["tree"].column(columns[3], width=75, anchor=tk.W)
-                if gui_elements["current_tab"] in ["Реестр", "Системная", "CmdLine"]:
-                        gui_elements["tree"].column(columns[0], width=100, anchor=tk.W)
-                        gui_elements["tree"].column(columns[1], width=250, anchor=tk.W)
-                        gui_elements["tree"].column(columns[2], width=50, anchor=tk.W)
-                        gui_elements["tree"].column(columns[3], width=75, anchor=tk.W)
-                if gui_elements["current_tab"] == "Планировщик":
-                    gui_elements["tree"].column(columns[0], width=175, anchor=tk.W)
-                    gui_elements["tree"].column(columns[1], width=65, anchor=tk.W)
-                    gui_elements["tree"].column(columns[2], width=300, anchor=tk.W)
-                    gui_elements["tree"].column(columns[3], width=50, anchor=tk.W)
+                ARM_GUI_ELEMENTS["tree"].column(columns[0], width=150, anchor=tk.W)
+                if ARM_GUI_ELEMENTS["current_tab"] == "AppInit_DLLs":
+                        ARM_GUI_ELEMENTS["tree"].column(columns[0], width=75, anchor=tk.W)
+                        ARM_GUI_ELEMENTS["tree"].column(columns[1], width=15, anchor=tk.W)
+                        ARM_GUI_ELEMENTS["tree"].column(columns[2], width=150, anchor=tk.W)
+                        ARM_GUI_ELEMENTS["tree"].column(columns[3], width=75, anchor=tk.W)
+                if ARM_GUI_ELEMENTS["current_tab"] in ["Реестр", "Системная", "CmdLine"]:
+                        ARM_GUI_ELEMENTS["tree"].column(columns[0], width=100, anchor=tk.W)
+                        ARM_GUI_ELEMENTS["tree"].column(columns[1], width=250, anchor=tk.W)
+                        ARM_GUI_ELEMENTS["tree"].column(columns[2], width=50, anchor=tk.W)
+                        ARM_GUI_ELEMENTS["tree"].column(columns[3], width=75, anchor=tk.W)
+                if ARM_GUI_ELEMENTS["current_tab"] == "Планировщик":
+                    ARM_GUI_ELEMENTS["tree"].column(columns[0], width=175, anchor=tk.W)
+                    ARM_GUI_ELEMENTS["tree"].column(columns[1], width=65, anchor=tk.W)
+                    ARM_GUI_ELEMENTS["tree"].column(columns[2], width=300, anchor=tk.W)
+                    ARM_GUI_ELEMENTS["tree"].column(columns[3], width=50, anchor=tk.W)
 
 
 
         #Воссанавливываем фокус после обновления данных
-        def restore_focus_after_update(gui_elements):
-            tree = gui_elements["tree"]
-            focus_info = gui_elements["focus_after_update"]
-            gui_elements["focus_after_update"] = None
+        def restore_focus_after_update(ARM_GUI_ELEMENTS):
+            tree = ARM_GUI_ELEMENTS["tree"]
+            focus_info = ARM_GUI_ELEMENTS["focus_after_update"]
+            ARM_GUI_ELEMENTS["focus_after_update"] = None
 
             if focus_info:
                 target_iid = None
@@ -1055,61 +1122,56 @@ def ARM(run_in_recovery, first_run):
 
 
         #Загружаем данные для активной вкладки и заполняем таблицу
-        def load_current_tab_data(gui_elements, ARM_CORE_GLOBALS):
-            tree = gui_elements["tree"]
-            current_tab = gui_elements["current_tab"]
+        def load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
+            tree = ARM_GUI_ELEMENTS["tree"]
+            current_tab = ARM_GUI_ELEMENTS["current_tab"]
 
             for item in tree.get_children():
                 tree.delete(item)
 
             if current_tab == "Пользовательская":
-                gui_elements["treeview_data"] = get_user_startup(ARM_CORE_GLOBALS)
+                ARM_GUI_ELEMENTS["treeview_data"] = get_user_startup(ARM_CORE_GLOBALS)
                 columns = ["Имя Файла", "Дата создания", "Дата Изменения", "Дата Открытия"]
             elif current_tab == "Реестр":
-                gui_elements["treeview_data"] = get_registry_startup(ARM_CORE_GLOBALS)
+                ARM_GUI_ELEMENTS["treeview_data"] = get_registry_startup(ARM_CORE_GLOBALS)
                 columns = ["Имя Параметра", "Значение Параметра", "Тип Параметра", "Путь Параметра"]
             elif current_tab == "Системная":
-                gui_elements["treeview_data"] = get_system_startup(ARM_CORE_GLOBALS)
+                ARM_GUI_ELEMENTS["treeview_data"] = get_system_startup(ARM_CORE_GLOBALS)
                 columns = ["Имя Параметра", "Значение Параметра", "Тип Параметра", "Путь Параметра"]
             elif current_tab == "AppInit_DLLs":
-                gui_elements["treeview_data"] = get_dll_startup(ARM_CORE_GLOBALS)
+                ARM_GUI_ELEMENTS["treeview_data"] = get_dll_startup(ARM_CORE_GLOBALS)
                 columns = ["Имя Параметра", "Битность", "Значение Параметра", "Путь Параметра"]
             elif current_tab == "CmdLine":
-                if first_run:
-                    messagebox.showinfo(random_string(), "В этой вкладке можно сразу включить отображение курсора в CmdLine.")
-                gui_elements["treeview_data"] = get_cmdline_startup(ARM_CORE_GLOBALS)
+                ARM_GUI_ELEMENTS["treeview_data"] = get_cmdline_startup(ARM_CORE_GLOBALS)
                 columns = ["Имя Параметра", "Значение Параметра", "Тип Параметра", "Путь Параметра"]
             elif current_tab == "Планировщик":
-                if first_run:
-                    messagebox.showinfo(random_string(), 'Во вкладке планировщик отображается так много задач, потому что вирусы могли модернизировать задачи, но такое крайне редко, поэтому вы можете отключить отображение задач без графа "создан". Для этого нажмите пункты в верхней панели окна: вид->Показывать только задачи с датой.')
-
                 raw_tasks = get_task_scheduler_startup()
                 
                 if show_only_with_date.get():
-                    gui_elements["treeview_data"] = [
+                    ARM_GUI_ELEMENTS["treeview_data"] = [
                         t for t in raw_tasks 
                         if t.get("Дата создания") and t.get("Дата создания") not in ["", "Ошибка", "01-01-1970 00:00:00"]
                     ]
                 else:
-                    gui_elements["treeview_data"] = raw_tasks
+                    ARM_GUI_ELEMENTS["treeview_data"] = raw_tasks
                     
                 columns = ["Имя", "Вкл/Выкл", "Путь", "Автор"]
             else:
-                gui_elements["treeview_data"] = []
+                ARM_GUI_ELEMENTS["treeview_data"] = []
                 columns = []
 
-            for item_data in gui_elements["treeview_data"]:
+            for item_data in ARM_GUI_ELEMENTS["treeview_data"]:
                 values = [item_data.get(col, "") for col in columns]
                 unique_id = item_data.get("TaskPath") or str(hash(frozenset(item_data.items())))
                 tree.insert("", "end", values=values, tags=("ARM_data",), iid=unique_id, open=True)
 
-            restore_focus_after_update(gui_elements)
+            restore_focus_after_update(ARM_GUI_ELEMENTS)
 
 
 
         #Вспомогательная функция для получения iid ближайшего элемента
-        def get_next_item_iid(gui_elements, current_item_id):
-            tree = gui_elements["tree"]
+        def get_next_item_iid(ARM_GUI_ELEMENTS, current_item_id):
+            tree = ARM_GUI_ELEMENTS["tree"]
             items = list(tree.get_children(""))
             try:
                 current_index = items.index(current_item_id)
@@ -1125,9 +1187,9 @@ def ARM(run_in_recovery, first_run):
 
 
         #Контекстное Меню
-        def show_context_menu(event, gui_elements, ARM_CORE_GLOBALS, item_data, item_id):
-            master = gui_elements["master"]
-            current_tab = gui_elements["current_tab"]
+        def show_context_menu(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS, item_data, item_id):
+            master = ARM_GUI_ELEMENTS["master"]
+            current_tab = ARM_GUI_ELEMENTS["current_tab"]
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
 
             menu = tk.Menu(master, tearoff=0)
@@ -1144,7 +1206,7 @@ def ARM(run_in_recovery, first_run):
                     for reg_type_str in CREATABLE_REG_TYPES:
                         create_menu.add_command(
                             label=f"Параметр {reg_type_str}",
-                            command=lambda type=reg_type_str: prompt_for_new_reg_value(gui_elements, hkey_const, subkey_path, type)
+                            command=lambda type=reg_type_str: prompt_for_new_reg_value(ARM_GUI_ELEMENTS, hkey_const, subkey_path, type)
                         )
                     menu.add_cascade(label="Создать", menu=create_menu)
                     menu.add_separator()
@@ -1157,7 +1219,7 @@ def ARM(run_in_recovery, first_run):
                     menu.add_command(label="Копировать Путь (Ctrl+C)", command=lambda: copy_to_clipboard(master, file_path))
                     menu.add_command(label="Копировать имя файла (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, file_name))
                     menu.add_separator()
-                    menu.add_command(label="Удалить Файл (Delete)", command=lambda: confirm_and_delete_file(gui_elements, file_path, file_name, item_id))
+                    menu.add_command(label="Удалить Файл (Delete)", command=lambda: confirm_and_delete_file(ARM_GUI_ELEMENTS, file_path, file_name, item_id))
 
                 elif current_tab in ["Реестр", "Системная", "AppInit_DLLs", "CmdLine"]:
                     reg_name = item_data["Имя Параметра"]
@@ -1168,12 +1230,12 @@ def ARM(run_in_recovery, first_run):
                     menu.add_separator()
 
                     if item_data.get("value_type") not in [winreg.REG_NONE, None]:
-                        menu.add_command(label="Изменить (E)", command=lambda: open_edit_dialog(gui_elements, item_data, item_id))
+                        menu.add_command(label="Изменить (E)", command=lambda: open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id))
                     else:
                          menu.add_command(label="Изменить (E)", state=tk.DISABLED)
 
                     if current_tab == "Реестр":
-                        menu.add_command(label="Удалить Параметр (Delete)", command=lambda: confirm_and_delete_reg_value(gui_elements, item_data, item_id))
+                        menu.add_command(label="Удалить Параметр (Delete)", command=lambda: confirm_and_delete_reg_value(ARM_GUI_ELEMENTS, item_data, item_id))
 
                 elif current_tab == "Планировщик":
                     task_name = item_data["Имя"]
@@ -1185,13 +1247,13 @@ def ARM(run_in_recovery, first_run):
                     menu.add_separator()
 
                     if is_enabled:
-                        menu.add_command(label="Отключить (O)", command=lambda: confirm_and_set_task_state(gui_elements, task_path_full, task_name, False, item_id))
+                        menu.add_command(label="Отключить (O)", command=lambda: confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, False, item_id))
                         menu.add_command(label="Включить (O)", state=tk.DISABLED)
                     else:
                         menu.add_command(label="Отключить (O)", state=tk.DISABLED)
-                        menu.add_command(label="Включить (O)", command=lambda: confirm_and_set_task_state(gui_elements, task_path_full, task_name, True, item_id))
+                        menu.add_command(label="Включить (O)", command=lambda: confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, True, item_id))
                     menu.add_separator()
-                    menu.add_command(label="Удалить (Delete)", command=lambda: confirm_and_delete_task(gui_elements, task_path_full, task_name, item_id))
+                    menu.add_command(label="Удалить (Delete)", command=lambda: confirm_and_delete_task(ARM_GUI_ELEMENTS, task_path_full, task_name, item_id))
 
             try:
                 menu.tk_popup(event.x_root, event.y_root)
@@ -1201,16 +1263,16 @@ def ARM(run_in_recovery, first_run):
 
 
         #Обработчик ПКМ
-        def handle_right_click(event, gui_elements, ARM_CORE_GLOBALS):
-            item_id = gui_elements["tree"].identify_row(event.y)
-            gui_elements["tree"].selection_set(item_id)
+        def handle_right_click(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
+            item_id = ARM_GUI_ELEMENTS["tree"].identify_row(event.y)
+            ARM_GUI_ELEMENTS["tree"].selection_set(item_id)
             if item_id:
-                selected_values = gui_elements["tree"].item(item_id, 'values')
-                current_cols = gui_elements["tree"]["columns"]
-                item_data = next((data for data in gui_elements["treeview_data"] if [str(data.get(k, "")) for k in current_cols] == list(selected_values)), None)
+                selected_values = ARM_GUI_ELEMENTS["tree"].item(item_id, 'values')
+                current_cols = ARM_GUI_ELEMENTS["tree"]["columns"]
+                item_data = next((data for data in ARM_GUI_ELEMENTS["treeview_data"] if [str(data.get(k, "")) for k in current_cols] == list(selected_values)), None)
             else:
                 item_data = None
-            show_context_menu(event, gui_elements, ARM_CORE_GLOBALS, item_data, item_id)
+            show_context_menu(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS, item_data, item_id)
 
 
 
@@ -1222,8 +1284,8 @@ def ARM(run_in_recovery, first_run):
 
 
         #Диалог редактирования
-        def open_edit_dialog(gui_elements, item_data, item_id):
-            master = gui_elements["master"]
+        def open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id):
+            master = ARM_GUI_ELEMENTS["master"]
             name = item_data["Имя Параметра"]
             current_value = str(item_data.get("Значение Параметра", ""))
             reg_type = item_data["value_type"]
@@ -1241,62 +1303,62 @@ def ARM(run_in_recovery, first_run):
             )
 
             if new_value is not None:
-                if update_reg_value(hkey_const, subkey_path, name, new_value, reg_type, item_id, gui_elements):
-                    load_current_tab_data(gui_elements, ARM_CORE_GLOBALS)
+                if update_reg_value(hkey_const, subkey_path, name, new_value, reg_type, item_id, ARM_GUI_ELEMENTS):
+                    load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
         #Подтверждение и удаление файла
-        def confirm_and_delete_file(gui_elements, file_path, file_name, item_id):
-            if delete_file(file_path, file_name, item_id, gui_elements):
-                load_current_tab_data(gui_elements, ARM_CORE_GLOBALS)
+        def confirm_and_delete_file(ARM_GUI_ELEMENTS, file_path, file_name, item_id):
+            if delete_file(file_path, file_name, item_id, ARM_GUI_ELEMENTS):
+                load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
         #Подтверждение и удаление параметра реестра
-        def confirm_and_delete_reg_value(gui_elements, item_data, item_id):
+        def confirm_and_delete_reg_value(ARM_GUI_ELEMENTS, item_data, item_id):
             name = item_data["Имя Параметра"]
             path = item_data["Путь Параметра"]
             hkey_const = item_data["hkey"]
             subkey_path = item_data["subkey"]
 
             if messagebox.askyesno(random_string(), f"Вы уверены, что хотите удалить параметр реестра:\n'{name}' из {path}?"):
-                if delete_reg_value(hkey_const, subkey_path, name, item_id, gui_elements):
-                    load_current_tab_data(gui_elements, ARM_CORE_GLOBALS)
+                if delete_reg_value(hkey_const, subkey_path, name, item_id, ARM_GUI_ELEMENTS):
+                    load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
         #Диалог для создания нового параметра реестра
-        def prompt_for_new_reg_value(gui_elements, hkey_const, subkey_path, reg_type_str):
-            master = gui_elements["master"]
+        def prompt_for_new_reg_value(ARM_GUI_ELEMENTS, hkey_const, subkey_path, reg_type_str):
+            master = ARM_GUI_ELEMENTS["master"]
             name = simpledialog.askstring(
                 random_string(),
-                f"Введите имя нового параметра реестра ({reg_type_str}) для\n{ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:",
+                f"Введите имя нового параметра реестра ({reg_type_str}) для\n{ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:",
                 parent=master
             )
             if name:
-                if create_reg_value(hkey_const, subkey_path, name, reg_type_str, gui_elements):
-                    load_current_tab_data(gui_elements, ARM_CORE_GLOBALS)
+                if create_reg_value(hkey_const, subkey_path, name, reg_type_str, ARM_GUI_ELEMENTS):
+                    load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
         #Подтверждение и изменение состояния задачи планировщика (Выкл или Вкл)
-        def confirm_and_set_task_state(gui_elements, task_path_full, task_name, enable, item_id):
-            if get_task_startup(task_path_full, enable, item_id, gui_elements):
-                load_current_tab_data(gui_elements, ARM_CORE_GLOBALS)
+        def confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, enable, item_id):
+            if get_task_startup(task_path_full, enable, item_id, ARM_GUI_ELEMENTS):
+                load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
         #Подтверждение и удаление задачи планировщика
-        def confirm_and_delete_task(gui_elements, task_path_full, task_name, item_id):
-            if delete_task_scheduler_task(task_path_full, task_name, item_id, gui_elements):
-                load_current_tab_data(gui_elements, ARM_CORE_GLOBALS)
+        def confirm_and_delete_task(ARM_GUI_ELEMENTS, task_path_full, task_name, item_id):
+            if delete_task_scheduler_task(task_path_full, task_name, item_id, ARM_GUI_ELEMENTS):
+                load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
         #Вспомогательная функция для получения выбранного элемента
-        def get_selected_item_data(gui_elements):
-            tree = gui_elements["tree"]
+        def get_selected_item_data(ARM_GUI_ELEMENTS):
+            tree = ARM_GUI_ELEMENTS["tree"]
             item_id = tree.focus()
             if not item_id:
                 return None, None
@@ -1304,18 +1366,18 @@ def ARM(run_in_recovery, first_run):
             selected_values = tree.item(item_id, 'values')
             current_cols = tree["columns"]
 
-            item_data = next((data for data in gui_elements["treeview_data"] if [str(data.get(k, "")) for k in current_cols] == list(selected_values)), None)
+            item_data = next((data for data in ARM_GUI_ELEMENTS["treeview_data"] if [str(data.get(k, "")) for k in current_cols] == list(selected_values)), None)
             return item_id, item_data
 
 
 
         #Обработчик нажатия клавиш
-        def handle_key_press(event, gui_elements, ARM_CORE_GLOBALS):
-            item_id, item_data = get_selected_item_data(gui_elements)
+        def handle_key_press(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
+            item_id, item_data = get_selected_item_data(ARM_GUI_ELEMENTS)
 
             keysym = event.keysym
-            current_tab = gui_elements["current_tab"]
-            tree = gui_elements["tree"]
+            current_tab = ARM_GUI_ELEMENTS["current_tab"]
+            tree = ARM_GUI_ELEMENTS["tree"]
 
             ctrl_mask = 0x0004
             shift_mask = 0x0001
@@ -1335,49 +1397,49 @@ def ARM(run_in_recovery, first_run):
 
                 if column_index < len(current_columns):
                     column_id = current_columns[column_index]
-                    sort_treeview_column(gui_elements, column_id)
+                    sort_treeview_column(ARM_GUI_ELEMENTS, column_id)
                     return "break"
 
             if not item_data: return
 
             if keysym == "e" and not is_ctrl and current_tab not in ["Пользовательская", "Планировщик"]:
                 if item_data.get("value_type") not in [winreg.REG_NONE, None]:
-                    open_edit_dialog(gui_elements, item_data, item_id)
+                    open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id)
                 return "break"
 
             elif keysym == "o" and not is_ctrl and current_tab == "Планировщик":
                 task_name = item_data["Имя"]
                 task_path_full = item_data["TaskPath"]
                 is_enabled = item_data["Enabled_raw"]
-                confirm_and_set_task_state(gui_elements, task_path_full, task_name, not is_enabled, item_id)
+                confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, not is_enabled, item_id)
                 return "break"
 
             elif keysym == "Delete" and current_tab not in ["Системная", "AppInit_DLLs", "CmdLine"]:
                 if current_tab == "Пользовательская":
-                    confirm_and_delete_file(gui_elements, item_data["Путь Параметра"], item_data["Имя Файла"], item_id)
+                    confirm_and_delete_file(ARM_GUI_ELEMENTS, item_data["Путь Параметра"], item_data["Имя Файла"], item_id)
                 elif current_tab == "Реестр":
-                    confirm_and_delete_reg_value(gui_elements, item_data, item_id)
+                    confirm_and_delete_reg_value(ARM_GUI_ELEMENTS, item_data, item_id)
                 elif current_tab == "Планировщик":
-                    confirm_and_delete_task(gui_elements, item_data["TaskPath"], item_data["Имя"], item_id)
+                    confirm_and_delete_task(ARM_GUI_ELEMENTS, item_data["TaskPath"], item_data["Имя"], item_id)
                 return "break"
 
             elif keysym == "c" and is_ctrl:
                 if is_shift:
                     if current_tab != "Планировщик":
                         name_key = "Имя Файла" if current_tab == "Пользовательская" else "Имя Параметра"
-                        copy_to_clipboard(gui_elements["master"], item_data.get(name_key, ""))
+                        copy_to_clipboard(ARM_GUI_ELEMENTS["master"], item_data.get(name_key, ""))
                 else:
                     path_key = "Путь" if current_tab == "Планировщик" else "Путь Параметра"
-                    copy_to_clipboard(gui_elements["master"], item_data.get(path_key, ""))
+                    copy_to_clipboard(ARM_GUI_ELEMENTS["master"], item_data.get(path_key, ""))
                 return "break"
 
 
 
         #Обработчик клавиши Menu
-        def handle_menu_key(event, gui_elements, ARM_CORE_GLOBALS):
-            item_id, item_data = get_selected_item_data(gui_elements)
+        def handle_menu_key(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
+            item_id, item_data = get_selected_item_data(ARM_GUI_ELEMENTS)
 
-            tree = gui_elements["tree"]
+            tree = ARM_GUI_ELEMENTS["tree"]
             x, y = 0, 0
 
             if item_id:
@@ -1398,69 +1460,125 @@ def ARM(run_in_recovery, first_run):
                     self.y_root = y_root
 
             mock_event = MockEvent(x, y)
-            show_context_menu(mock_event, gui_elements, ARM_CORE_GLOBALS, item_data, item_id)
+            show_context_menu(mock_event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS, item_data, item_id)
             return "break"
 
 
 
         #Обработчик закрытия окна
         def on_closing():
-            GUI_ELEMENTS["master"].destroy()
+            ARM_GUI_ELEMENTS["master"].destroy()
 
 
 
-        ARM = tk.Tk()
-        GUI_ELEMENTS["master"] = ARM
-        ARM.title(random_string())
-        ARM.geometry("650x350")
-        style = ttk.Style(ARM)
-        style.theme_use("clam")
+        def help_arm():
+            messagebox.showinfo(random_string(), 'Во вкладке планировщик отображается так много задач, потому что вирусы могли модернизировать задачи, но такое крайне редко, поэтому вы можете отключить отображение задач без графа "создан". Для этого нажмите пункты в верхней панели окна: вид->Показывать только задачи с датой.')
+
+
+
+        ARM_GUI = tk.Tk()
+        ARM_GUI_ELEMENTS["master"] = ARM_GUI
+        ARM_GUI.title(random_string())
+        ARM_GUI.geometry("650x350")
+
+        apply_global_theme(ARM_GUI, current_theme)
 
         show_only_with_date = tk.BooleanVar(value=False)
 
-        ARM.protocol("WM_DELETE_WINDOW", on_closing) 
+        ARM_GUI.protocol("WM_DELETE_WINDOW", on_closing)
 
-        GUI_ELEMENTS["current_tab"] = "Пользовательская"
-        GUI_ELEMENTS["treeview_data"] = []
-        GUI_ELEMENTS["focus_after_update"] = None
+        ARM_GUI_ELEMENTS["current_tab"] = "Пользовательская"
+        ARM_GUI_ELEMENTS["treeview_data"] = []
+        ARM_GUI_ELEMENTS["focus_after_update"] = None
 
-        menubar = tk.Menu(ARM)
+        menubar = tk.Menu(ARM_GUI)
         view_menu = tk.Menu(menubar, tearoff=0)
         view_menu.add_checkbutton(
             label="Показывать только задачи с датой", 
             variable=show_only_with_date,
-            command=lambda: load_current_tab_data(GUI_ELEMENTS, ARM_CORE_GLOBALS)
+            command=lambda: load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
         )
+
+
+
+        def restart_arm(user_theme):
+            global current_theme
+            current_theme = theme[user_theme]
+            #ARM_GUI.destroy()
+            #ARM(run_in_recovery, current_theme)
+            apply_global_theme(ARM_GUI, current_theme)
+
+        #Пункт "Вид"
         menubar.add_cascade(label="Вид", menu=view_menu)
         
-        menubar.add_cascade(label="О программе", command=about_ARM)
-        ARM.config(menu=menubar)
+        #Пункт "Помощь"
+        menubar.add_cascade(label="Помощь", command=help_arm)
 
-        GUI_ELEMENTS["notebook"] = ttk.Notebook(ARM)
-        GUI_ELEMENTS["notebook"].pack(pady=10, padx=10, fill="both", expand=True)
-        GUI_ELEMENTS["notebook"].bind("<<NotebookTabChanged>>", lambda e: on_tab_change(e, GUI_ELEMENTS, ARM_CORE_GLOBALS))
+        theme_menu = Menu(menubar, tearoff=0)
+        theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_arm("dark"))
+        theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_arm("white"))
+        theme_menu.add_checkbutton(label="Красная", command=lambda: restart_arm("red"))
+        theme_menu.add_checkbutton(label="Зелёная", command=lambda: restart_arm("lime"))
+        theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_arm("black"))
+        theme_menu.add_checkbutton(label="Серая", command=lambda: restart_arm("gray"))
+        theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_arm("orange"))
+
+        #Пункт "Темы"
+        menubar.add_cascade(label="Темы", menu=theme_menu)
+
+        #Пункт "О Программе"
+        menubar.add_cascade(label="О Программе", command=about_ARM)
+        ARM_GUI.config(menu=menubar)
+
+        ARM_GUI.attributes("-topmost", True)
+
+        if run_in_recovery:
+            higher = tk.BooleanVar(value=False)
+        else:
+            higher = tk.BooleanVar(value=True)
+
+        def toggle_topmost(GUI):
+            new_state = not higher.get()
+            higher.set(new_state)
+            GUI.attributes("-topmost", new_state)
+
+        def update_topmost_label(menubar, GUI):
+            status = "вкл" if higher.get() else "выкл"
+            #Индекс command в menubar
+            menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+            GUI.after(200, lambda: update_topmost_label(menubar, GUI))
+
+        menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(ARM_GUI))
+        update_topmost_label(menubar, ARM_GUI)
+
+        ARM_GUI_ELEMENTS["notebook"] = ttk.Notebook(ARM_GUI)
+        ARM_GUI_ELEMENTS["notebook"].pack(pady=10, padx=10, fill="both", expand=True)
+        ARM_GUI_ELEMENTS["notebook"].bind("<<NotebookTabChanged>>", lambda e: on_tab_change(e, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS))
 
         tab_names = ["Пользовательская", "Реестр", "Системная", "AppInit_DLLs", "CmdLine", "Планировщик"]
         for tab_name in tab_names:
-            frame = ttk.Frame(GUI_ELEMENTS["notebook"], padding="5 5 5 5")
-            GUI_ELEMENTS["notebook"].add(frame, text=tab_name)
-            GUI_ELEMENTS["tabs"][tab_name] = frame
+            frame = ttk.Frame(ARM_GUI_ELEMENTS["notebook"], padding="5 5 5 5")
+            ARM_GUI_ELEMENTS["notebook"].add(frame, text=tab_name)
+            ARM_GUI_ELEMENTS["tabs"][tab_name] = frame
 
-        initial_frame = GUI_ELEMENTS["tabs"]["Пользовательская"]
-        GUI_ELEMENTS["tree"] = ttk.Treeview(initial_frame, selectmode="browse")
-        GUI_ELEMENTS["vsb"] = ttk.Scrollbar(initial_frame, orient="vertical", command=GUI_ELEMENTS["tree"].yview)
-        GUI_ELEMENTS["tree"].configure(yscrollcommand=GUI_ELEMENTS["vsb"].set)
-        GUI_ELEMENTS["tree"].pack(side="left", fill="both", expand=True)
-        GUI_ELEMENTS["vsb"].pack(side="right", fill="y")
+        initial_frame = ARM_GUI_ELEMENTS["tabs"]["Пользовательская"]
+        ARM_GUI_ELEMENTS["tree"] = ttk.Treeview(initial_frame, selectmode="browse")
+        ARM_GUI_ELEMENTS["vsb"] = ttk.Scrollbar(initial_frame, orient="vertical", command=ARM_GUI_ELEMENTS["tree"].yview)
+        ARM_GUI_ELEMENTS["tree"].configure(yscrollcommand=ARM_GUI_ELEMENTS["vsb"].set)
+        ARM_GUI_ELEMENTS["tree"].pack(side="left", fill="both", expand=True)
+        ARM_GUI_ELEMENTS["vsb"].pack(side="right", fill="y")
 
-        GUI_ELEMENTS["tree"].bind("<Button-3>", lambda e: handle_right_click(e, GUI_ELEMENTS, ARM_CORE_GLOBALS))
+        ARM_GUI_ELEMENTS["tree"].bind("<Button-3>", lambda e: handle_right_click(e, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS))
 
-        set_treeview_columns(GUI_ELEMENTS)
-        load_current_tab_data(GUI_ELEMENTS, ARM_CORE_GLOBALS)
+        set_treeview_columns(ARM_GUI_ELEMENTS)
+        load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
-        ARM.mainloop()
-
+        ARM_GUI.mainloop()
     except Exception as e:
-        comment = f"В Компоненте ARM произошла неизвестная ошибка!\n{e}"
+        comment = f"В Компоненте AutoRunMaster произошла неизвестная ошибка!\n{e}"
         logger.error(comment)
         messagebox.showerror(random_string(), comment)
+
+if __name__ == "__main__":
+    current_theme = theme[default_theme]
+    ARM(False, current_theme)

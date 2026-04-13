@@ -8,6 +8,8 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
+#Данный Компонент сильно конфликтует (вызывает цикличные импорты, он отключен на неизвестное время)
+
 #Распознание речи
 import speech_recognition as sr
 #Интерфейс
@@ -29,27 +31,27 @@ from E import ask_exit
 #from PM import PM
 from R import R
 
-on_board_pc_version = "0.3.15 Beta"
+on_board_pc_version = "0.3.16 Beta"
 
 #Список Команд
-def execute_command(text, run_in_recovery, first_run):
+def execute_command(text, run_in_recovery):
     if "список всех команд" in text or "помощь" in text or "команды" in text:
         messagebox.showinfo(random_string(), "Доступные Команды:\n1)файловый менеджер - проводник - диспетчер файлов\n2)мастер автозагрузки - мастер автозапуска - автозапуск - автозапуска - управление автозапуском - управление автозагрузкой\n3)менеджер процессов - мастре процессов - процессы - процесы - менеджер процесов - мастер процесов - запусти менеджер процессов - запусти менеджер процесов - запусти мастер процессов - запусти мастер процесов\n4)очистка кэша - очистить кэш - кэш - удалить кэш - запусти удаление кэша - запустить удаление кэша - запусти очистку кэша - запусти удаление кэша\n5)перезапусти пк - перезапусти компьютер - перезапусти ноут - перезапусти ноутбук - перезагрузи пк - перезагрузи компьютер - перезагрузи комп - перезапусти комп - перезагрузи ноут - перезагрузи ноутбук - перезапуск - перезагрузка\n6)монтировка анлокер - анлокер - окно - окошко - открой монтировка анлокер - запусти монтировка анлокер - открой анлокер - запусти анлокер\n7)лоад протект - лоад протектион - лп - запусти лоад протект - запусти лоад протектион - запусти лп - открой лоад протект - открой лоад протектион - открой лп\n8)выйти - выход - завершить работу - остановить работу - закрыться")
 
     #elif "файловый менеджер" in text or "проводник" in text or "диспетчер файлов" in text:
     #    logger.info("OBPC - Запуск Компонента FileManager...")
-    #FM(run_in_recovery, first_run)
+    #FM(run_in_recovery)
 
     #elif "мастер автозагрузки" in text or "мастер автозапуска" in text or "автозапуск" in text or "автозапуска" in text or "управление автозапуском" in text or "управление автозагрузкой" in text:
     #    logger.info("OBPC - Запуск Компонента AutoRunMaster...")
-    #    ARM(run_in_recovery, first_run)
+    #    ARM(run_in_recovery)
 
     #elif "менеджер процессов" in text or "мастре процессов" in text or "процессы" in text or "процесы" in text or "менеджер процесов" in text or "мастер процесов" in text or "запусти менеджер процессов" in text or "запусти менеджер процесов" in text or "запусти мастер процессов" in text or "запусти мастер процесов" in text:
     #    logger.info("OBPC - Запуск Компонента ProcessManager...")
-    #    PM(run_in_recovery, first_run)
+    #    PM(run_in_recovery)
 
     elif "разблокировка" in text or "разблокировка всего" in text or "разблокируй всё" in text or "разблокируй" in text or "разблочь" in text or "разблоч" in text:
-        UA(run_in_recovery, first_run)
+        UA(run_in_recovery)
 
     #elif "очистка кэша" in text or "очистить кэш" in text or "кэш" in text or "удалить кэш" in text or "запусти удаление кэша" in text or "запустить удаление кэша" in text or "запусти очистку кэша" in text or "запусти удаление кэша" in text:
     #    logger.info("OBPC - Запуск очистки кэша...")
@@ -65,11 +67,11 @@ def execute_command(text, run_in_recovery, first_run):
 
     #elif "лоад протект" in text or "лоад протектион" in text or "лп" in text or "запусти лоад протект" in text or "запусти лоад протектион" in text or "запусти лп" in text or "открой лоад протект" in text or "открой лоад протектион" in text or "открой лп" in text:
     #    logger.info("OBPC - Запуск Компонента LoadProtection...")
-    #    LP(run_in_recovery, first_run)
+    #    LP(run_in_recovery)
 
     elif "пугало" in text or "запусти пугало" in text or "открой пугало" in text:
         logger.info("OBPC - Запуск Компонента ScarecrowProtection...")
-        SP(run_in_recovery, first_run)
+        SP(run_in_recovery)
 
     elif "выйти" in text or "выход" in text or "завершить работу" in text or "остановить работу" in text or "закрыться" in text:
         logger.info("OBPC - Выход из программы...")
@@ -77,10 +79,7 @@ def execute_command(text, run_in_recovery, first_run):
 
 
 
-def OBPC(run_in_recovery, first_run):
-    if first_run:
-        messagebox.showinfo(random_string(), "Добро пожаловать в Компонент Голосового Управления.\nДанный Компонент не имеет графического интерфейса, он работает в фоне. Вы можете сказать одну из фраз активации:\nбортовой компьютер, бортовой пк, бортовой комп, монтировка, антивирус, пк, комп, компьютер\nА затем словосочетание:\nсписок всех команд, команды, помощь\n\nчтобы посмотреть доступные команды.")
-
+def OBPC(run_in_recovery):
     recognizer = sr.Recognizer()
     #engine = pyttsx3.init()
 
@@ -95,20 +94,20 @@ def OBPC(run_in_recovery, first_run):
 
                 print("OBPC - Ожидаю одну из фраз активации...")
                 audio = recognizer.listen(source)
-                
+
                 phrase = recognizer.recognize_google(audio, language="ru-RU").lower()
                 logger.info(f"Вы сказали: {phrase}")
 
                 #Правильная проверка наличия любого слова из списка
                 if any(word in phrase for word in activation_words):
                     print("OBPC - Слушаю команду...")
-                    
+
                     #Слушаем саму команду сразу после активации
                     audio_cmd = recognizer.listen(source)
                     text = recognizer.recognize_google(audio_cmd, language="ru-RU").lower()
-                    
+
                     logger.info(f"OBPC - Распознана команда: {text}")
-                    execute_command(text, run_in_recovery, first_run)
+                    execute_command(text, run_in_recovery)
 
         except sr.UnknownValueError:
             pass #Ничего не сказано

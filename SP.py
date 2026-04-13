@@ -9,7 +9,7 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Интерфейс
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, Menu
 import tkinter as tk
 #Логирование Ошибок
 from loguru import logger
@@ -20,13 +20,12 @@ import shutil
 import os
 
 from RS import random_string
+from OF import apply_global_theme
+from config import theme, default_theme
 
-scarecrow_protection_version = "0.3.5 Beta"
+scarecrow_protection_version = "0.3.7 Beta"
 
-def SP(run_in_recovery, first_run, current_disc_r):
-    if first_run:
-        messagebox.showinfo(random_string(), "Данный Компонент позволяет симулировать на вашем компьютере определённое программное обеспечение, которые вирусы стилеры обходят стороной.\n\nЛучше не пытайтесь симулировать или удалять ПО которое у вас установлено, это может привести к поломке сторонней программы.")
-
+def SP(run_in_recovery, current_disc_r, current_theme):
     try:
         if run_in_recovery:
             current_disc = current_disc_r
@@ -242,28 +241,23 @@ def SP(run_in_recovery, first_run, current_disc_r):
         }
 
 
-        class SP:
+        class SPI:
             def __init__(self, master):
                 self.master = master
-                title = random_string()
-                master.title(title)
+                master.title(random_string())
                 master.geometry("300x215")
-                master.resizable(True, True) #Разрешаем изменение размера по обоим направлениям
+                master.resizable(True, True)
 
                 #Фрейм для кнопок
                 self.button_frame = ttk.Frame(master)
                 self.button_frame.pack(side=tk.BOTTOM, pady=10)
 
                 #Кнопки
-                self.run_button = ttk.Button(self.button_frame, text="Симуляция", command=self.run_simulation)
+                self.run_button = tk.Button(self.button_frame, text="Симуляция", command=self.run_simulation)
                 self.run_button.pack(side=tk.LEFT, padx=10)
 
-                self.delete_button = ttk.Button(self.button_frame, text="Удаление", command=self.delete_simulation)
+                self.delete_button = tk.Button(self.button_frame, text="Удаление", command=self.delete_simulation)
                 self.delete_button.pack(side=tk.LEFT, padx=10)
-
-                #Статус
-                #self.cross_label = tk.Label(master, text="❌", font=("Arial", 30), fg=RED)
-                #self.cross_label.pack(pady=1)
 
                 #Фрейм для чекбоксов со скроллбаром
                 self.checkbox_frame = ttk.Frame(master)
@@ -334,7 +328,7 @@ def SP(run_in_recovery, first_run, current_disc_r):
 
 
 
-            def create_registry_key(self, key_path, value_name, value_data, value_type=winreg.REG_SZ):
+            def create_registry_key(self, key_path, value_name, value_data): #value_type=winreg.REG_SZ):
                try:
                     with winreg.CreateKeyEx(winreg.HKEY_LOCAL_MACHINE, key_path, 0, winreg.KEY_ALL_ACCESS) as key:
                         winreg.SetValueEx(key, value_name, 0, value_type, value_data)
@@ -413,11 +407,58 @@ def SP(run_in_recovery, first_run, current_disc_r):
                             logger.info(f"SP - Удаление симуляции для {program} завершено")
                     messagebox.showinfo(random_string(), "Удаление завершено.")
 
-
+        def restart_sp(user_theme):
+            global current_theme
+            current_theme = theme[user_theme]
+            #SP_GUI.destroy()
+            #SP(run_in_recovery, current_disc_r, current_theme)
+            apply_global_theme(SP_GUI, current_theme)
 
         SP_GUI = tk.Tk()
+        apply_global_theme(SP_GUI, current_theme)
         #GUI_SP = SP(SP_GUI)
-        SP(SP_GUI)
+        SPI(SP_GUI)
+
+        #Меню
+        menubar = Menu(SP_GUI)
+        theme_menu = Menu(menubar, tearoff=0)
+        theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_sp("dark"))
+        theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_sp("white"))
+        theme_menu.add_checkbutton(label="Красная", command=lambda: restart_sp("red"))
+        theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_sp("black"))
+        theme_menu.add_checkbutton(label="Серая", command=lambda: restart_sp("gray"))
+        theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_sp("orange"))
+
+        #Пункт "Темы"
+        menubar.add_cascade(label="Темы", menu=theme_menu)
+
+        SP_GUI.attributes("-topmost", True)
+
+        if run_in_recovery:
+            higher = tk.BooleanVar(value=False)
+        else:
+            higher = tk.BooleanVar(value=True)
+
+        def toggle_topmost(GUI):
+            new_state = not higher.get()
+            higher.set(new_state)
+            GUI.attributes("-topmost", new_state)
+
+        def update_topmost_label(menubar, GUI):
+            status = "вкл" if higher.get() else "выкл"
+            #Индекс command в menubar
+            menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+            GUI.after(200, lambda: update_topmost_label(menubar, GUI))
+
+        menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(SP_GUI))
+        update_topmost_label(menubar, SP_GUI)
+
+        SP_GUI.config(menu=menubar)
+
         SP_GUI.mainloop()
     except Exception as e:
         logger.critical(f"В Компоненте ScarecrowProtection произошла неизвестная ошибка!\n{e}")
+
+if __name__ == "__main__":
+    current_theme = theme[default_theme]
+    SP(False, "C:\\", current_theme)

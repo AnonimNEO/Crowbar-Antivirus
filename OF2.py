@@ -8,6 +8,8 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
+#Зачем нужен данный модуль? Из-за UA возникала ошибка цикличного импорта так, что это своего рода заглушка я пока, что не знаю как это исправить. Так что имеем, что имеем.
+
 #Логирование Ошибок
 from loguru import logger
 #Работа с реестром
@@ -43,7 +45,7 @@ class Psutil:
     def virtual_memory(self, *args, **kwargs):
         class MemStub:
             percent = 0.0
-            total = 1024 * 1024 #Имитируем 1МБ ОЗУ, чтобы не падал LP.py
+            total = 1024 * 1024 #Имитируем 1МБ ОЗУ, чтобы не падал RLP.py
 
         return MemStub()
 
@@ -57,7 +59,7 @@ class Psutil:
     def disk_partitions(self, *args, **kwargs):
         return []
 
-    #Заглушка для всех остальных методов, чтобы не вызывать ошибку AttributeError
+    #Заглушка для всех остальных методов, чтобы не вызывать ошибку AttributeError, это поможет устранить только проблему AttributeError.
     def __getattr__(self, name):
         if name in ["sensors_temperatures", "net_io_counters", "process_iter"]:
             return lambda *args, **kwargs: None

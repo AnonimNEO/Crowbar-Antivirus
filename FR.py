@@ -9,19 +9,23 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Интерфейс
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, ttk, Menu
 import tkinter as tk
 #Логирование
 from loguru import logger
 #Работа с файлами
 import shutil
 import os
+import shutil
+import subprocess
 
 from RS import random_string
+from OF import apply_global_theme, get_current_disc
+from config import theme, default_theme
 
-file_replacer_version = "0.2.2 Beta"
+file_replacer_version = "0.2.6 Beta"
 
-def FR():
+def FR(run_in_recovery, current_theme):
     def browse_source(source_var):
         path = filedialog.askopenfilename(title=random_string())
         if path:
@@ -40,40 +44,57 @@ def FR():
 
     def replace_file(source_var, target_var):
         final_src = source_var.get()
-        final_tgt = target_var.get()
+        raw_target = target_var.get()
+
+        current_disc, found_disc = get_current_disc(run_in_recovery)
+
+        if not found_disc:
+            current_disc = "C:\\"
+
+        if raw_target.startswith("C:"):
+            final_tgt = raw_target.replace("C:", current_disc)
+        else:
+            final_tgt = raw_target
 
         if not final_src or not os.path.exists(final_src):
-            messagebox.showerror(random_string(), "Файл-источник не выбран или не найден!")
+            messagebox.showerror(random_string(), "Файл-источник не найден!")
             return
-        if not final_tgt:
-            messagebox.showerror(random_string(), "Путь к цели не указан!")
-            return
-
-        backup_path = final_tgt + ".bak"
 
         try:
+            #Получаем права собственности (для WinRE)
+            #/F - путь к файлу, /A - передать права группе администраторов
+            subprocess.run(f'takeown /f "{final_tgt}" /a', shell=True, check=False)
+            
+            #Даем полные права администраторам
+            #/grant - предоставить права, :F - Full access (полный доступ)
+            subprocess.run(f'icacls "{final_tgt}" /grant administrators:F', shell=True, check=False)
+
             #Создаем бэкап
+            backup_path = final_tgt + ".backup"
             if os.path.exists(final_tgt):
                 shutil.copy2(final_tgt, backup_path)
                 logger.info(f"FR - Создан бэкап: {backup_path}")
 
-            #Копируем новый файл на место старого
+            #Копируем новый файл
             shutil.copy2(final_src, final_tgt)
-            logger.success(f"Заменено: {final_tgt}")
-            messagebox.showinfo(random_string(), f"Файл заменен.\nБэкап создан в том же каталоге")
-        except PermissionError:
-            messagebox.showerror(random_string(), "Запустите программу от имени администратора.")
+            logger.success(f"FR - Успешно заменено: {final_tgt}")
+            messagebox.showinfo(random_string(), f"Файл заменен на диске {current_disc}")
+
         except Exception as e:
-            logger.error(f"FR - Ошибка при замене файла:\n{e}")
-            messagebox.showerror(random_string(), e)
+            logger.error(f"FR - Ошибка:\n{e}")
+            messagebox.showerror(random_string(), f"Не удалось заменить файл:\n{e}")
 
     def restore_file(target_var):
         final_tgt = target_var.get()
+        current_disc, found_disc = get_current_disc(run_in_recovery)
+        if not found_disc:
+            current_disc = "C:\\"
+        final_tgt = final_tgt.replace("C:", f"{current_disc}")
         if not final_tgt:
             messagebox.showwarning(random_string(), "Сначала выберите или укажите путь к файлу!")
             return
         
-        backup_path = final_tgt + ".bak"
+        backup_path = final_tgt + ".backup"
         if not os.path.exists(backup_path):
             messagebox.showwarning(random_string(), f"Бэкап не найден по пути:\n{backup_path}")
             return
@@ -88,9 +109,18 @@ def FR():
                 logger.error(f"FR - Ошибка при восстановлении файла:\n{e}")
                 messagebox.showerror(random_string(), str(e))
 
-    FR = tk.Tk()
-    FR.title(random_string())
-    FR.geometry("400x210")
+    def restart_fr(user_theme):
+        global current_theme
+        current_theme = theme[user_theme]
+        #FR_GUI.destroy()
+        #FR(current_theme)
+        apply_global_theme(FR_GUI, current_theme)
+
+    FR_GUI = tk.Tk()
+    FR_GUI.title(random_string())
+    FR_GUI.geometry("400x235")
+
+    apply_global_theme(FR_GUI, current_theme)
 
     source_path = tk.StringVar()
     target_path = tk.StringVar()
@@ -104,33 +134,70 @@ def FR():
     }
 
     #GUI элементы
-    tk.Label(FR, text="1)На, что заменить:", font=('Segoe UI', 9, 'bold')).pack(anchor="w", padx=10, pady=(10, 0))
-    src_frame = tk.Frame(FR)
+    tk.Label(FR_GUI, text="1)На, что заменить:", bg=current_theme["lbg"], fg=current_theme["lfg"], font=("Segoe UI", 9, "bold")).pack(anchor="w", padx=10, pady=(10, 0))
+    src_frame = tk.Frame(FR_GUI)
     src_frame.pack(fill="x", padx=10)
-    tk.Entry(src_frame, textvariable=source_path).pack(side="left", expand=True, fill="x")
-    tk.Button(src_frame, text="Обзор", command=lambda: browse_source(source_path)).pack(side="right", padx=5)
+    tk.Entry(src_frame, bg=current_theme["lbg"], fg=current_theme["fg"], textvariable=source_path).pack(side="left", expand=True, fill="x")
+    tk.Button(src_frame, text="Обзор", bg=current_theme["bbg"], fg=current_theme["bfg"], activebackground=current_theme["abg"], activeforeground=current_theme["afg"], command=lambda: browse_source(source_path)).pack(side="right", padx=5)
 
-    tk.Label(FR, text="2)Что заменяем:").pack(anchor="w", padx=10, pady=(10, 0))
-    combo_presets = ttk.Combobox(FR, values=list(presets.keys()), state="readonly")
+    tk.Label(FR_GUI, text="2)Что заменяем:", bg=current_theme["lbg"], fg=current_theme["lfg"]).pack(anchor="w", padx=10, pady=(10, 0))
+    combo_presets = ttk.Combobox(FR_GUI, values=list(presets.keys()), state="readonly")
     combo_presets.pack(fill="x", padx=10)
     combo_presets.set("Выберите пресет...")
     combo_presets.bind("<<ComboboxSelected>>", lambda e: on_preset_select(e, combo_presets, target_path, presets))
 
-    tgt_frame = tk.Frame(FR)
+    tgt_frame = tk.Frame(FR_GUI)
     tgt_frame.pack(fill="x", padx=10, pady=5)
-    tk.Entry(tgt_frame, textvariable=target_path).pack(side="left", expand=True, fill="x")
-    tk.Button(tgt_frame, text="Обзор", command=lambda: browse_target(target_path)).pack(side="right", padx=5)
+    tk.Entry(tgt_frame, bg=current_theme["lbg"], fg=current_theme["fg"], textvariable=target_path).pack(side="left", expand=True, fill="x")
+    tk.Button(tgt_frame, text="Обзор", bg=current_theme["bbg"], fg=current_theme["bfg"], activebackground=current_theme["abg"], activeforeground=current_theme["afg"], command=lambda: browse_target(target_path)).pack(side="right", padx=5)
 
     #Кнопки действий
-    btn_frame = tk.Frame(FR)
+    btn_frame = tk.Frame(FR_GUI)
     btn_frame.pack(pady=15)
 
     tk.Button(btn_frame, text="Заменить",
-              command=lambda: replace_file(source_path, target_path), 
-              bg="#ffcccc", width=15, font=('Segoe UI', 9, 'bold')).pack(side="left", padx=10)
+              command=lambda: replace_file(source_path, target_path),
+              bg="red", width=15, font=('Segoe UI', 9, 'bold')).pack(side="left", padx=10)
 
     tk.Button(btn_frame, text="Восстановить",
               command=lambda: restore_file(target_path), 
-              bg="#ccffcc", width=15).pack(side="left", padx=10)
+              bg="lime", width=15).pack(side="left", padx=10)
 
-    FR.mainloop()
+    #Меню
+    menubar = Menu(FR_GUI)
+    theme_menu = Menu(menubar, tearoff=0)
+    theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_fr("dark"))
+    theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_fr("white"))
+    theme_menu.add_checkbutton(label="Красная", command=lambda: restart_fr("red"))
+    theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_fr("black"))
+    theme_menu.add_checkbutton(label="Серая", command=lambda: restart_fr("gray"))
+    theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_fr("orange"))
+
+    #Пункт "Темы"
+    menubar.add_cascade(label="Темы", menu=theme_menu)
+
+    FR_GUI.attributes("-topmost", True) 
+
+    higher = tk.BooleanVar(value=True)
+
+    def toggle_topmost(GUI):
+        new_state = not higher.get()
+        higher.set(new_state)
+        GUI.attributes("-topmost", new_state)
+
+    def update_topmost_label(menubar, GUI):
+        status = "вкл" if higher.get() else "выкл"
+        #Индекс command в menubar
+        menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+        GUI.after(200, lambda: update_topmost_label(menubar, GUI))
+
+    menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(FR_GUI))
+    update_topmost_label(menubar, FR_GUI)
+
+    FR_GUI.config(menu=menubar)
+
+    FR_GUI.mainloop()
+
+if __name__ == "__main__":
+    current_theme = theme[default_theme]
+    FR(current_theme)

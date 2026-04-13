@@ -9,45 +9,35 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Интерфейс
-from tkinter import messagebox, filedialog, simpledialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 #Логирование Ошибок
 from loguru import logger
 #Работа с процессами
 import subprocess
-#Работа с потоками
+#Работа с потоками и процессами
+import multiprocessing
 import threading
 #Работа с реестром
 import winreg
 #Работа с файлами и ОС
 import sys
 import os
-
-from OBPC import OBPC
-from LP import LP
+from io import BytesIO
+#from OBPC import OBPC
 from RS import random_string
 from config import *
 
 global load_bush
-other_komponents_version = "0.6.1 Beta"
+other_components_version = "0.7.1 Beta"
 
 #Глобальные имена загруженных кустов
-loaded_hive_names = {
-    "SYSTEM": "Offline_SYSTEM",
-    "SOFTWARE": "Offline_SOFTWARE",
-    "USER": "Offline_USER"
-}
+loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
 
 #Глобальные имена для загрузки кустов
-HIVE_MAP = {
-    "SYSTEM": "Offline_SYSTEM",
-    "SOFTWARE": "Offline_SOFTWARE",
-    "USER": "Offline_USER"
-}
+HIVE_MAP = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
 
 #Список для отслеживания загруженных кустов
 active_loaded_hives = []
-
-
 
 #Заглушка, библиотеки psutil которая всегда возвращает False/None.
 class Psutil:
@@ -71,7 +61,7 @@ class Psutil:
     def disk_partitions(self, *args, **kwargs):
         return []
 
-    #Заглушка для всех остальных методов, чтобы не вызывать ошибку AttributeError
+    #Заглушка для всех остальных методов, чтобы не вызывать ошибку AttributeError, это поможет устранить только проблему AttributeError.
     def __getattr__(self, name):
         if name in ["sensors_temperatures", "net_io_counters", "process_iter"]:
             return lambda *args, **kwargs: None
@@ -79,75 +69,121 @@ class Psutil:
 
 
 
+def run_component(func, *args):
+    try:
+        process = multiprocessing.Process(target=func, args=args)
+        process.daemon = True
+        process.start()
+        logger.info(f"OF/run_component - Успешно запущен процесс для {func.__name__}")
+    except Exception as e:
+        logger.error(f"OF/run_component - Ошибка при запуске процесса {func.__name__}: {e}")
+
+
 @logger.catch()
-def restart_ma():
-    logger.info("OF/restart_ma - Перезапуск программы...")
+def restart_ca():
+    logger.info("OF/restart_ca - Перезапуск программы...")
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
 
 
-@logger.catch()
-def check_first_run(path="C:\\ProgramData\\first_run", delete=False):
-    if delete:
-        if os.path.exists(path):
-            try:
-                os.rmdir(path)
-                logger.info("OF/check_first_run - Режим обучения будет включен при следующем запуске.")
-            except Exception as e:
-                logger.error(f"OF/check_first_run - Ошибка при включения режима обучения:\n{e}")
-        return False
-
-    if not os.path.exists(path):
-        try:
-            os.makedirs(path, exist_ok=True)
-            return True
-        except Exception as e:
-            logger.error(f"OF/check_first_run - Не удалось создать каталог обучения:\n{e}")
-            return False
-    else:
-        return False
+#def run_obpc(run_in_recovery):
+#    fail_start_obpc = 0
+#    if not start_obpc:
+#        try:
+#            thread_obpc = threading.Thread(target=lambda: OBPC(run_in_recovery))
+#            thread_obpc.daemon = True
+#            thread_obpc.start()
+#        except Exception as e:
+#            logger.critical(f"OF/run_obpc - Ошибка при работе потока Компонента OnBoardPC:\n{e}")
+#            fail_start_obpc += 1
+#            if fail_start_obpc > 3:
+#                messagebox.showerror(random_string(), "Произошла фатальная ошибка при работе с потоком Компонента OnBoardPC!\nПодробнее в лог-файле")
+#                return
+#            logger.info(f"OF/run_obpc - Перезапуск OnBoardPC, попытка №{fail_start_obpc}...")
+#            run_lp(run_in_recovery)
+#    else:
+#        messagebox.showwarning(random_string(), "Компонент Голосовое Управление был запущен при запуске программы.")
 
 
 
+def apply_global_theme(window, current_theme):
+    style = ttk.Style(window)
+    style.theme_use("clam")
 
-def run_lp(run_in_recovery, first_run):
-    fail_start_lp = 0
-    if not start_lp:
-        try:
-            thread_lp = threading.Thread(target=lambda:LP(run_in_recovery, first_run))
-            thread_lp.daemon = True
-            thread_lp.start()
-        except Exception as e:
-            logger.critical(f"OF/run_lp - Ошибка при работе потока Компонента LoadProtection:\n{e}")
-            fail_start_lp += 1
-            if fail_start_lp > 3:
-                messagebox.showerror(random_string(), "Произошла фатальная ошибка при работе с потоком Компонента LoadProtection!\nПодробнее в лог-файле")
-                return
-            logger.info(f"OF/run_lp - Перезапуск LoadProtection, попытка №{fail_start_lp}...")
-            run_lp(run_in_recovery, first_run)
-    else:
-        messagebox.showwarning(random_string(), "Компонент Защита Нагрузки был запущен при запуске программы.")
+    #Настройка стандартных tk-виджетов (включая верхнюю панель/меню)
+    window.option_add("*Background", current_theme["bg"])
+    window.option_add("*Foreground", current_theme["fg"])
+    #Цвет выделения пунктов в верхней панели (меню)
+    window.option_add("*Menu.activeBackground", current_theme["abg"])
+    window.option_add("*Menu.activeForeground", current_theme["afg"])
 
+    #Настройка базового стиля для всех ttk виджетов
+    style.configure(".",
+                    background=current_theme["bg"],
+                    foreground=current_theme["fg"],
+                    fieldbackground=current_theme["bg"],
+                    bordercolor=current_theme["bbg"],
+                    lightcolor=current_theme["bg"],
+                    darkcolor=current_theme["bg"])
 
+    #Таблицы
+    style.configure("Treeview",
+                    background=current_theme["bg"],
+                    foreground=current_theme["fg"],
+                    fieldbackground=current_theme["bg"],
+                    rowheight=25)
 
-def run_obpc(run_in_recovery, first_run):
-    fail_start_obpc = 0
-    if not start_obpc:
-        try:
-            thread_obpc = threading.Thread(target=lambda: OBPC(run_in_recovery, first_run))
-            thread_obpc.daemon = True
-            thread_obpc.start()
-        except Exception as e:
-            logger.critical(f"OF/run_obpc - Ошибка при работе потока Компонента OnBoardPC:\n{e}")
-            fail_start_obpc += 1
-            if fail_start_obpc > 3:
-                messagebox.showerror(random_string(), "Произошла фатальная ошибка при работе с потоком Компонента OnBoardPC!\nПодробнее в лог-файле")
-                return
-            logger.info(f"OF/run_obpc - Перезапуск OnBoardPC, попытка №{fail_start_obpc}...")
-            run_lp(run_in_recovery, first_run)
-    else:
-        messagebox.showwarning(random_string(), "Компонент Голосовое Управление был запущен при запуске программы.")
+    style.map("Treeview",
+              background=[("selected", current_theme["abg"])],
+              foreground=[("selected", current_theme["afg"])])
+
+    style.configure("Treeview.Heading",
+                    background=current_theme["bbg"],
+                    foreground=current_theme["fg"],
+                    relief="flat",
+                    font=("default", 10, "bold"))
+
+    style.map("Treeview.Heading",
+              background=[("active", current_theme["abg"]), ("pressed", current_theme["abg"])],
+              foreground=[("active", current_theme["afg"])])
+
+    #Чекбоксы
+    style.configure("TCheckbutton",
+                    background=current_theme["bg"],
+                    foreground=current_theme["fg"])
+
+    style.map("TCheckbutton",
+              background=[("active", current_theme["bg"])],
+              foreground=[("active", current_theme["abg"])],
+              indicatorcolor=[("selected", current_theme["abg"]), ("active", current_theme["bg"])])
+
+    #Кнопки
+    style.configure("TButton",
+                    background=current_theme["bbg"],
+                    foreground=current_theme["bfg"])
+    style.map("TButton",
+              background=[("active", current_theme["abg"])],
+              foreground=[("active", current_theme["afg"])])
+
+    #Поля ввода
+    style.configure("TEntry",
+                    fieldbackground=current_theme["bg"],
+                    foreground=current_theme["fg"],
+                    bordercolor=current_theme["bbg"])
+
+    #Вкладки
+    style.configure("TNotebook", background=current_theme["bg"], borderwidth=0)
+    style.configure("TNotebook.Tab",
+                    background=current_theme["bbg"],
+                    foreground=current_theme["bfg"],
+                    padding=[10, 2])
+    style.map("TNotebook.Tab",
+              background=[("selected", current_theme["abg"])],
+              foreground=[("selected", current_theme["afg"])])
+
+    #Фон самого главного окна
+    window.configure(bg=current_theme["bg"])
 
 
 
@@ -214,14 +250,17 @@ def get_current_disc(run_in_recovery=False):
 
 #Загрузка кустов реестра
 @logger.catch()
-def load_bush(current_disc):
+def load_bush(current_disc, user=False):
     global active_loaded_hives
-    
-    #Формируем пути к файлам
-    if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\"):
-        user_name = simpledialog.askstring(title=random_string(), prompt=f"Не найден пользователь {default_user_name}\nВведите нужное имя пользователя: ")
+
+    if user:
+        user_name = user
     else:
-        user_name = default_user_name
+        #Формируем пути к файлам
+        if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\"):
+            user_name = simpledialog.askstring(title=random_string(), prompt=f"Не найден пользователь {default_user_name}\nВведите нужное имя пользователя: ")
+        else:
+            user_name = default_user_name
 
     hive_paths = {
         HIVE_MAP["SYSTEM"]: os.path.join(current_disc, "Windows", "System32", "config", "SYSTEM"),
@@ -243,7 +282,7 @@ def load_bush(current_disc):
         try:
             #Загрузка куста реестра
             winreg.LoadKey(winreg.HKEY_LOCAL_MACHINE, name, path)
-            
+
             active_loaded_hives.append(name)
             logger.info(f"OF/load_bush - Куст {name} успешно загружен из {path}")
             success_count += 1
@@ -285,9 +324,9 @@ def get_user_name():
 #Открыть С помощью
 @logger.catch
 def open_with():
-    target_file_path = filedialog.askopenfilename(title="Выберите файл для открытия", filetypes=[("Все файлы", "*.*")])
+    target_file_path = filedialog.askopenfilename(title=random_string(), filetypes=[("Все файлы", "*.*")])
     if target_file_path and os.path.isfile(target_file_path): #Проверка, что файл выбран и существует
-        app_path = filedialog.askopenfilename(title="Выберите программу для открытия файла", filetypes=[("Все файлы", "*.*")])
+        app_path = filedialog.askopenfilename(title=random_string(), filetypes=[("Все файлы", "*.*")])
         if app_path:
             try:
                 subprocess.Popen([app_path, target_file_path])
@@ -314,4 +353,4 @@ def run_command(command):
         process = subprocess.run(command, shell=True)
         return process.returncode
     except Exception as e:
-        logger.error(f"OF/run_command - Ошибка при выполнении команды - {command}")
+        logger.error(f"OF/run_command - Ошибка при выполнении команды - {command}:\n{e}")

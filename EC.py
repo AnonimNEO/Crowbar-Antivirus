@@ -11,15 +11,14 @@
 #Логирование Ошибок
 from loguru import logger
 #Работа с ОС
-from ctypes import wintypes
 import ctypes
-import psutil
+from ctypes import wintypes
 
 from OF import Psutil
 
 edit_criticality_version = "0.3.2 Beta"
 
-#Загрузка необходимых библиотек Windows
+#Загрузка необходимых библиотек Windows на уровне модуля
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 ntdll = ctypes.WinDLL("ntdll", use_last_error=True)
 
@@ -72,10 +71,10 @@ def get_process_name(process_id):
 
 #Попытка получить текущий статус критичности процесса
 def get_process_critical_status(process_id, run_in_recovery):
-    if not run_in_recovery:
-        import psutil
-    elif run_in_recovery:
+    if run_in_recovery:
         psutil = Psutil()
+    else:
+        import psutil
 
     process_handle = None
     try:
@@ -103,7 +102,7 @@ def get_process_critical_status(process_id, run_in_recovery):
         else:
             return None
 
-    except Exception:
+    except Exception as e:
         return None
     finally:
         if process_handle:
@@ -153,7 +152,10 @@ def set_process_critical(process_id, critical):
 
 
 
-def EC(process_id, critical, debug_mode=False):
+def EC(process_id, critical, debug_mode=True):
+    #Работа с процессами
+    import psutil
+
     #Инициализация функций windows API
     define_functions()
 

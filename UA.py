@@ -17,11 +17,12 @@ import winreg
 #Логирование
 from loguru import logger
 
-from OF2 import get_offline_reg_path, loaded_hive_names
+#from OF2 import get_offline_reg_path, loaded_hive_names
+from OF import get_offline_reg_path, loaded_hive_names
 
-unlock_all_version = "1.1.3 Beta"
+unlock_all_version = "1.1.4 Beta"
 
-#Возвращает безопасное 'нулевое' значение для сброса параметра
+#Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
     if reg_type in (winreg.REG_DWORD, winreg.REG_QWORD):
         return 0, reg_type
@@ -101,10 +102,7 @@ def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, run_
 
 
 #Разблокировка всего
-def UA(run_in_recovery, first_run):
-    if first_run:
-        messagebox.showinfo(random_string(), "Данный Компонент не имеет графического интерфейса, он выполнит свою работу в фоне и сообщит при завершении.")
-
+def UA(run_in_recovery):
     try:
         #system_hive = loaded_hive_names.get("SYSTEM", "Offline_SYSTEM")
         software_hive = loaded_hive_names.get("SOFTWARE", "Offline_SOFTWARE")

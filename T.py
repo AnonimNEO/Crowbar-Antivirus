@@ -1,15 +1,6 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
-
 #Обучение
 from tkinter import messagebox
+import tkinter as tk
 #Рисование иконки в трее и вставка картинок
 from PIL import Image, ImageDraw, ImageFont
 #Логирование Ошибок
@@ -20,14 +11,17 @@ from elevate import elevate
 from pystray import MenuItem, Menu
 import pystray
 #Работа с потоками
+from io import BytesIO
+import multiprocessing
 import threading
+import signal
 #Работа со временим
 import time
 #Работа с файлами и ОС
 import os
-#Перезапуск
-import signal
-import sys
+#Рандом
+import random
+
 
 #Глобализируем версии компонентов
 global autorun_master_version, clear_cache_version, exit_version, file_manager_version, load_protection_version, unlocker_version, on_board_pc_version, other_komponents_version, restart_version, random_string_version, run_version, scarecrow_protection_verison
@@ -42,10 +36,10 @@ from EC import edit_criticality_version
 from FM import FM, file_manager_version
 from FR import FR, file_replacer_version
 #from K import knot_version
-from LP import LP, load_protection_version
+from RLP import RLP, real_time_protect_version
 from MU import MU, unlocker_version
-from OBPC import OBPC, on_board_pc_version
-from OF import check_first_run, run_lp, restart_ma, open_with, get_current_disc, load_bush, unload_bush, other_komponents_version
+#from OBPC import OBPC, on_board_pc_version
+from OF import run_component, restart_ca, open_with, get_current_disc, load_bush, other_components_version
 from PM import PM, process_manager_version
 from R import R, restart_version
 from RS import random_string, random_string_version
@@ -55,205 +49,213 @@ from SP import SP, scarecrow_protection_version
 from UA import UA, unlock_all_version
 from UM import UM, users_manager_version
 
-if __name__ != "__main__":
-    logger.critical("T - Попытка запуска программы как стороннего модуля!")
-    restart_ma()
+#Импорт консоли
+from Console import open_console
+
+if __name__ == '__main__':
+    multiprocessing.freeze_support()
+
 
 try:
     elevate()
+    pass
 except Exception as e:
     admin_error = f"T - Ошибка при получении прав администратора:\n{e}"
     logger.critical(admin_error)
     messagebox.showerror(random_string(), admin_error)
 
 #Глобальные Переменные
-global T_log_txt, start_interface
+global T_log_txt, start_interface, run_in_recovery, current_theme
 font_trey = "arial.ttf"
-trey_version = "2.1.0 Beta"
+trey_version = "2.2.2 Beta build 12"
+on_board_pc_version = ""
 
-if not os.path.exists(log_path):
-    os.makedirs(log_path)
-logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="100 KB", compression="zip")
+def Crowbar():
+    global start_obpc, start_lp, start_interface, current_theme, run_in_recovery, current_disc
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="100 KB", compression="zip")
 
-def check_is_recovery():
-    #Проверка через реестр (характерно для среды установки/восстановления)
-    #try:
-    #    import winreg
-    #    # В WinPE этот ключ часто указывает на среду предустановки
-    #    reg_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\Setup", 0, winreg.KEY_READ)
-    #    setup_type, _ = winreg.QueryValueEx(reg_key, "SystemSetupInProgress")
-    #    winreg.CloseKey(reg_key)
-    #    if setup_type == 1:
-    #        return True
-    #except Exception:
-    #    pass
+    def check_is_recovery():
+        if os.path.exists("X:\\Windows\\"):
+            return True
+        return False
 
-    #Проверка по наличию критических файлов
-    if os.path.exists("X:\\Windows\\"):
-        return True
-
-    return False
-
-run_in_recovery = False
-try:
-    #Инициализация переменной
+    run_in_recovery = False
+    current_disc = "C:\\"  # ← ИНИЦИАЛИЗИРУЕМ В НАЧАЛЕ
+    
     try:
-        run_in_recovery = check_is_recovery()
-        if run_in_recovery:
-            logger.warning("T - Запуск в среде восстановления Шindows")
-        else:
-            logger.info("T - Запуск в стандартной среде Шindows")
-    except Exception as e:
-        run_in_recovery = True
-        logger.error(f"T - Ошибка при определении среды:\n{e}")
-
-    if run_in_recovery:
-        current_disc, found_disc = get_current_disc(run_in_recovery)
-        if found_disc:
-            logger.info(f"T - Загрузка кустов реестра с диска {current_disc}...")
-            load_bush(current_disc)
-
-except Exception as e:
-    logger.error(f"T - Критическая ошибка: {e}")
-
-global first_run
-first_run = check_first_run()
-if first_run:
-    messagebox.showinfo(random_string(), 'Похоже, что вы первый раз запустили программу, включен режим обучения (в компонентах включены подсказки).\nОн будет выключен при следующим старте программы\nЧтоб потом включить его снова найдите пункт "Включить режим обучения".')
-
-
-#Основная программа
-try:
-    if not run_in_recovery:
         try:
-            #Создание Иконки
-            def create_image(width, height):
-                icon_trey = Image.new("RGB", (width, height), (255, 0, 0))
-                square = ImageDraw.Draw(icon_trey)
-                square.rectangle(
-                    (width // 2 - 10, height // 2 - 10, width // 2 + 10, height // 2 + 10),
-                    fill=(0, 0, 255)
+            run_in_recovery = check_is_recovery()
+            if run_in_recovery:
+                logger.warning("T - Запуск в среде восстановления Шindows")
+            else:
+                logger.info("T - Запуск в стандартной среде Шindows")
+        except Exception as e:
+            run_in_recovery = True
+            logger.error(f"T - Ошибка при определении среды:\n{e}")
+
+        if run_in_recovery:
+            current_disc, found_disc = get_current_disc(run_in_recovery)
+            if found_disc:
+                logger.info(f"T - Загрузка кустов реестра с диска {current_disc}...")
+                load_bush(current_disc)
+
+    except Exception as e:
+        logger.error(f"T - Критическая ошибка: {e}")
+
+    #Основная программа
+    try:
+        current_theme = theme[default_theme]
+        if not run_in_recovery:
+            try:
+                #Создание Иконки
+                def create_image(width, height):
+                    icon_trey = Image.new("RGB", (width, height), (255, 0, 0))
+                    square = ImageDraw.Draw(icon_trey)
+                    square.rectangle(
+                        (width // 2 - 10, height // 2 - 10, width // 2 + 10, height // 2 + 10),
+                        fill=(0, 0, 255)
+                    )
+
+                    font = None
+                    font_paths = [font_trey, "C:\\Windows\\Fonts\\arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]
+
+                    for path in font_paths:
+                        try:
+                            font = ImageFont.truetype(path, 24)
+                            break
+                        except:
+                            continue
+
+                    if font is None:
+                        font = ImageFont.load_default()
+                        logger.warning("T - Используется шрифт по умолчанию")
+
+                    text = "=]"
+                    text_bbox = square.textbbox((0, 0), text, font=font)
+                    text_width = text_bbox[2] - text_bbox[0]
+                    text_height = text_bbox[3] - text_bbox[1]
+                    text_position = (width // 2 - text_width // 2, height // 2 - text_height // 2)
+                    square.text(text_position, text, fill=(255, 0, 0), font=font)
+
+                    buf = BytesIO()
+                    icon_trey.save(buf, format='PNG')
+                    buf.seek(0)
+                    return Image.open(buf)
+
+                def start_icon():
+                    if run_in_recovery:
+                        logger.warning("T - Режим восстановления: Трей отключен.")
+                        return
+                    try:
+                        icon.visible = True
+                    except Exception as e:
+                        logger.error(f"T - Ошибка трея:\n{e}")
+
+                if run_in_recovery:
+                    current_disc_r, found_disc = get_current_disc(run_in_recovery)
+                else:
+                    current_disc_r = "C:\\"
+
+                #Создаем выпадающий список с функциями Анлокера
+                unlocker_menu = Menu(
+                    MenuItem("Мастер Автозагрузки", lambda:run_component(ARM, run_in_recovery, current_theme)),
+                    MenuItem("Менеджер Процессов", lambda: run_component(PM, run_in_recovery, current_theme)),
+                    MenuItem("Файловый Менеджер", lambda: run_component(FM, run_in_recovery, current_theme)),
+                    MenuItem("Замена Редких Файлов", lambda:run_component(FR, run_in_recovery, current_theme)),
+                    MenuItem("Менеджер Пользователей", lambda:run_component(UM, current_theme)),
+                    MenuItem("Scarecrow Protection", lambda:run_component(SP, run_in_recovery, current_disc_r, current_theme)),
+                    MenuItem("Запустить Очистку Temp", lambda:CC(run_in_recovery)),
+                    MenuItem("Открыть с Помощью", open_with),
+                    MenuItem("Перезапустить ПК", R)
                 )
 
-                font = None
-                #Список путей к шрифту Arial для разных сред
-                font_paths = [font_trey, "C:\\Windows\\Fonts\\arial.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]
+                #Определяем компоненты и запускаем консоль в отдельном потоке
+                def open_console_on_thread():
+                    n = random.randint(128, 2048)
+                    captcha_input = tk.simpledialog.askinteger(random_string(), f"Введите число: {n}")
 
-                for path in font_paths:
+                    if captcha_input == n:
+                        pass
+                    else:
+                        messagebox.showerror(random_string(), "Неправильный ввод капчи.\nКонсоль разработчика не будет запущена.")
+                        return
+
+                    console_globals = {
+                        "run_component": run_component,
+                        "run_in_recovery": run_in_recovery,
+                        "current_theme": current_theme,
+                        "AP": AP,
+                        "ARM": ARM,
+                        "PM": PM,
+                        "FM": FM,
+                        "FR": FR,
+                        "UM": UM,
+                        "SP": SP,
+                        "CC": CC,
+                        "UA": UA,
+                        "Run": Run,
+                        "SAU": SAU,
+                        "RLP": RLP,
+                        "MU": MU,
+                        "icon": icon if "icon" in locals() else None,
+                        "logger": logger,
+                    }
+                    thread = threading.Thread(target=open_console, args=(console_globals,), daemon=True)
+                    thread.start()
+
+                #Меню По ПКМ
+                image = create_image(20, 20)
+                menu = Menu(
+                    MenuItem("Открыть Монтировка Анлокер", lambda:MU(run_in_recovery, current_theme)),
+                    MenuItem("Утилиты", unlocker_menu),
+                    MenuItem("Разблокировка Всего", lambda:UA(run_in_recovery)),
+                    MenuItem("Запустить От Имени Админа", lambda:run_component(Run, current_theme)),
+                    MenuItem("О Программе", lambda:AP(autorun_master_version, clear_cache_version, exit_version, edit_criticality_version, file_manager_version, real_time_protect_version, unlocker_version, other_components_version, process_manager_version, restart_version, random_string_version, run_version, scarecrow_protection_version, settings_and_update_version, trey_version, unlock_all_version, users_manager_version)),
+                    MenuItem("Консоль Разработчика", open_console_on_thread),
+                    MenuItem("Настройки", lambda:run_component(SAU, current_theme)),
+                    MenuItem("Выход", ask_exit)
+                )
+
+                icon = pystray.Icon("Crowbar_Antivirus_Icon", image, "Crowbar Antivirus", menu)
+
+                if start_interface == "icon" or start_interface == "window":
                     try:
-                        font = ImageFont.truetype(path, 24)
-                        break
-                    except:
-                        continue
+                        thread_icon = threading.Thread(target=icon.run)
+                        thread_icon.daemon = True
+                        thread_icon.start()
 
-                if font is None:
-                    font = ImageFont.load_default()
-                    logger.warning("T - Используется шрифт по умолчанию")
+                        start_icon()
+                    except Exception as e:
+                        logger.critical(f"T - Ошибка запуска иконки! Аварийный перезапуск!\n{e}")
 
-                text = "=]"
-                text_bbox = square.textbbox((0, 0), text, font=font)
-                text_width = text_bbox[2] - text_bbox[0]
-                text_height = text_bbox[3] - text_bbox[1]
-                text_position = (width // 2 - text_width // 2, height // 2 - text_height // 2)
-                square.text(text_position, text, fill=(255, 0, 0), font=font)
-                return icon_trey
+                if start_lp:
+                    run_component(RLP)
 
-            def start_icon():
-                if run_in_recovery:
-                    logger.warning("T - Режим восстановления: Трей отключен.")
-                    return 
-                try:
-                    icon.visible = True
-                except Exception as e:
-                    logger.error(f"T - Ошибка трея:\n{e}")
+                if start_interface == "window" or start_interface == "only-windows":
+                    run_component(MU, run_in_recovery, current_theme)
 
-            if run_in_recovery:
-                current_disc_r, found_disc = get_current_disc(run_in_recovery)
-            else:
-                current_disc_r = "C:\\"
+                while True:
+                    time.sleep(1)
+            except Exception as e:
+                logger.warning(f"T - Ошибка при запуске иконки\n{e}")
+                MU(run_in_recovery, current_theme, current_disc)
 
-            #Создаем выпадающий список с функциями Анлокера
-            unlocker_menu = Menu(
-                MenuItem("Файловый Менеджер", lambda:FM(run_in_recovery, first_run)),
-                MenuItem("Мастер Автозагрузки", lambda:ARM(run_in_recovery, first_run)),
-                MenuItem("Замена Setch, Utilman", FR),
-                MenuItem("Менеджер Пользователей", UM),
-                MenuItem("Scarecrow Protection", lambda:SP(run_in_recovery, first_run, current_disc_r)),
-                MenuItem("Запустить Очистку Temp", lambda:CC(run_in_recovery, first_run)),
-                MenuItem("Открыть с Помощью", lambda: open_with(first_run)),
-                MenuItem("Включить режим обучения", lambda: check_first_run(delete=True)),
-                MenuItem("Перезапустить ПК", R)
-            )
+        if run_in_recovery:
+            logger.info("T - Запуск в режиме рекавери...")
+            MU(run_in_recovery, current_theme, current_disc)
 
-            #Меню По ПКМ
-            image = create_image(20, 20)
-            menu = Menu(
-                MenuItem("Открыть Монтировка Анлокер", lambda:MU(run_in_recovery, first_run)),
-                MenuItem("Утилиты", unlocker_menu),
-                MenuItem("Запустить Load Protection", lambda: run_lp(run_in_recovery, first_run)),
-                MenuItem("Менеджер Процессов", lambda:PM(run_in_recovery, first_run)),
-                MenuItem("Разблокировка Всего", lambda:UA(run_in_recovery, first_run)),
-                MenuItem("Запустить От Имени Админа", lambda:Run(first_run)),
-                MenuItem("О Программе", lambda:AP(autorun_master_version, clear_cache_version, exit_version, edit_criticality_version, file_manager_version, load_protection_version, unlocker_version, on_board_pc_version, other_komponents_version, process_manager_version, restart_version, random_string_version, run_version, scarecrow_protection_version, settings_and_update_version, trey_version, unlock_all_version, users_manager_version)),
-                MenuItem("Настройки", lambda: SAU(first_run)),
-                MenuItem("Выход", ask_exit)
-            )
+    except Exception as e:
+        logger.critical(f"В Компоненте Trey произошла неизвестная ошибка!\n{e}")
+        MU(run_in_recovery, current_theme, current_disc)
+    finally:
+        if run_in_recovery:
+            logger.info("T - Завершение работы, выгрузка кустов реестра...")
 
-            icon = pystray.Icon("Mount_Antivirus_Icon", image, "Mount Antivirus", menu)
+        if not run_in_recovery:
+            signal.signal(signal.SIGTERM, restart_ca)
 
-            if start_interface == "icon" or start_interface == "window":
-                #Запускаем иконку в трее в отдельном потоке.
-                try:
-                    thread_icon = threading.Thread(target=icon.run)
-                    thread_icon.daemon = True #Делаем поток демоном, чтобы он завершился при выходе основной программы
-                    thread_icon.start()
-
-                    start_icon()
-                except Exception as e:
-                    logger.critical(f"T - Ошибка запуска иконки! Аварийный перезапуск!\n{e}")
-
-            if start_obpc:
-                #Запускаем Голосовое Управление в отдельном потоке.
-                try:
-                    thread_obpc = threading.Thread(target=lambda: OBPC(run_in_recovery, first_run))
-                    thread_obpc.daemon = True
-                    thread_obpc.start()
-                except Exception as e:
-                    start_obpc = False
-                    logger.critical(f"T - Ошибка при работе потока Компонента OnBoardPC:\n{e}")
-                    messagebox.showerror(random_string(), "Произошла фатальная ошибка при работе с потоком Компонента OnBoardPC!\nПодробнее в лог-файле.\n\nВы можете перезапустить Компонент через соответствующий пункт.")
-
-            if start_lp:
-                #Запускаем LoadProtection в отдельном потоке.
-                try:
-                    thread_lp = threading.Thread(target=lambda: LP(run_in_recovery, first_run))
-                    thread_lp.daemon = True
-                    thread_lp.start()
-                except Exception as e:
-                    start_lp = False
-                    logger.critical(f"OF/run_lp - Ошибка при работе потока Компонента LoadProtection:\n{e}")
-                    messagebox.showerror(random_string(), "Произошла фатальная ошибка при работе с потоком Компонента LoadProtection!\nПодробнее в лог-файле.\n\nВы можете перезапустить Компонент через соответствующий пункт.")
-
-            if start_interface == "window" or start_interface == "only-windows":
-                MU(run_in_recovery, first_run)
-
-            while True:
-                time.sleep(1)
-        except Exception as e:
-            logger.warning(f"T - Ошибка при запуске иконки\n{e}")
-            MU(run_in_recovery, first_run)
-
-    if run_in_recovery:
-        logger.info("T - Запуск в режиме рекавери...")
-        MU(run_in_recovery, first_run)
-
-except Exception as e:
-    logger.critical(f"В Компоненте Trey произошла неизвестная ошибка!\n{e}")
-    MU(run_in_recovery, first_run)
-finally:
-    if run_in_recovery:
-        logger.info("T - Завершение работы, выгрузка кустов реестра...")
-        unload_bush()
-
-    if not run_in_recovery:
-        signal.signal(signal.SIGTERM, restart_ma)
+if __name__ == '__main__':
+    multiprocessing.freeze_support()
+    Crowbar()

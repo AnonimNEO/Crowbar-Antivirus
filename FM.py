@@ -18,8 +18,8 @@ from loguru import logger
 #Получение имени пользователя
 import getpass
 #Получение свойств файла
-import win32api
-import win32con
+#import win32api
+#import win32con
 #Для поиска
 import fnmatch
 #Для получения списка дисков
@@ -29,17 +29,25 @@ import os.path
 import shutil
 import os
 
-from OF import get_current_disc
+from OF import get_current_disc, apply_global_theme
 from RS import random_string
 from config import *
 
 #Глобальная переменная версии
-file_manager_version = "4.8.6 Beta"
+file_manager_version = "4.8.10 Beta"
 
-def FM(run_in_recovery, first_run):
-    if first_run:
-        messagebox.showinfo(random_string(), "Добро пожаловать в Файловый Менеджер!\nДанный Компонент поддерживает:\n1)Полное управление с клавиатуры\n2)Поиск - чтобы его вызвать нажмите на пункт в верхней левой части окна.")
+def FM(run_in_recovery, current_theme):
     try:
+        #Перезапуск для применения темы
+        def restart_fm(user_theme):
+            global current_theme
+            current_theme = theme[user_theme]
+            #FM_GUI.destroy()
+            #FM(run_in_recovery, current_theme)
+            apply_global_theme(FM_GUI, current_theme)
+
+
+
         #Получаем Имени текущего пользователя
         def get_user_name():
             try:
@@ -66,7 +74,7 @@ def FM(run_in_recovery, first_run):
                         "size": 0,
                         "edited": stat.st_mtime,
                         "created": stat.st_ctime,
-                        "type": "Папка",
+                        "type": "Каталог",
                         "is_dir": True,
                         "ext": ""
                     })
@@ -149,10 +157,10 @@ def FM(run_in_recovery, first_run):
 
 
         class FileManagerApp:
-            def __init__(self, FM):
-                self.FM = FM
-                self.FM.title(random_string())
-                self.FM.geometry("700x400")
+            def __init__(self, FM_GUI):
+                self.FM_GUI = FM_GUI
+                self.FM_GUI.title(random_string())
+                self.FM_GUI.geometry("700x400")
 
                 self.user_name = get_user_name()
 
@@ -174,14 +182,14 @@ def FM(run_in_recovery, first_run):
                 self.tabs_data = {}
 
                 #Создание верхней панели
-                self.toolbar_frame = ttk.Frame(FM)
+                self.toolbar_frame = ttk.Frame(FM_GUI)
                 self.toolbar_frame.pack(side="top", fill="x", padx=5, pady=(5, 0))
 
                 self.create_toolbar_buttons()
                 self.create_path_entry()
 
                 #Создание Панели вкладок
-                self.notebook = ttk.Notebook(FM)
+                self.notebook = ttk.Notebook(FM_GUI)
                 self.notebook.pack(side="top", fill="both", expand=True, padx=5, pady=5)
                 self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
 
@@ -193,7 +201,7 @@ def FM(run_in_recovery, first_run):
                 self.add_tab(path=None)
 
                 #Фокусировка на окно
-                self.FM.after(1, self.FM.focus_force)
+                self.FM_GUI.after(1, self.FM_GUI.focus_force)
 
 
 
@@ -234,7 +242,7 @@ def FM(run_in_recovery, first_run):
                 self.path_entry.bind("<Return>", self.on_path_enter)
 
                 #Контекстное меню по ПКМ
-                self.path_menu = Menu(self.FM, tearoff=0)
+                self.path_menu = Menu(self.FM_GUI, tearoff=0)
                 self.path_menu.add_command(label="Копировать путь", command=self.copy_path_to_clipboard)
                 self.path_menu.add_command(label="Вставить", command=self.paste_from_clipboard)
                 self.path_entry.bind("<Button-3>", self.show_path_context_menu)
@@ -243,10 +251,40 @@ def FM(run_in_recovery, first_run):
 
             #Создаём верхнее меню программы
             def create_menu(self):
-                menubar = tk.Menu(self.FM)
+                menubar = tk.Menu(self.FM_GUI)
                 menubar.add_command(label="Поиск", command=self.open_search_dialog)
+                menubar.add_command(label="Помощь", command=self.help_fm)
+                theme_menu = Menu(menubar, tearoff=0)
+                theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_fm("dark"))
+                theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_fm("white"))
+                theme_menu.add_checkbutton(label="Красная", command=lambda: restart_fm("red"))
+                theme_menu.add_checkbutton(label="Зелёная", command=lambda: restart_fm("lime"))
+                theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_fm("black"))
+                theme_menu.add_checkbutton(label="Серая", command=lambda: restart_fm("gray"))
+                theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_fm("orange"))
+
+                #Пункт "Темы"
+                menubar.add_cascade(label="Темы", menu=theme_menu)
                 menubar.add_command(label="О программе", command=self.about_FM)
-                self.FM.config(menu=menubar)
+                self.FM_GUI.config(menu=menubar)
+
+                #FM_GUI.attributes("-topmost", True)
+
+                #higher = tk.BooleanVar(value=True)
+
+                #def toggle_topmost(GUI):
+                #    new_state = not higher.get()
+                #    higher.set(new_state)
+                #    GUI.attributes("-topmost", new_state)
+
+                #def update_topmost_label(menubar, GUI):
+                #    status = "вкл" if higher.get() else "выкл"
+                #    #Индекс command в menubar
+                #    menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+                #    GUI.after(200, lambda: update_topmost_label(menubar, GUI))
+
+                #menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(FM_GUI))
+                #update_topmost_label(menubar, FM_GUI)
 
 
 
@@ -385,7 +423,7 @@ def FM(run_in_recovery, first_run):
                         return
                 
                 if not os.path.exists(path):
-                    messagebox.showerror("Ошибка", f"Путь не найден: {path}")
+                    messagebox.showerror(random_string(), f"Путь не найден: {path}")
                     #Возвращаем старый путь в поле ввода, если ввели неверный
                     self.update_path_entry()
                     return
@@ -415,8 +453,9 @@ def FM(run_in_recovery, first_run):
                     self.update_toolbar_buttons()
                     
                 except Exception as e:
-                    logger.error(f"FM - Ошибка доступа к {path}: {e}")
-                    messagebox.showerror("Ошибка", f"Нет доступа к: {path}")
+                    if current_theme:
+                        logger.error(f"FM - Ошибка доступа к {path}: {e}")
+                        messagebox.showerror(random_string(), f"Нет доступа к: {path}")
 
 
 
@@ -445,7 +484,7 @@ def FM(run_in_recovery, first_run):
                     if item["is_dir"]:
                         tree.item(item["path"], tags=("directory",))
 
-                tree.tag_configure("directory", foreground="#0000AA")
+                tree.tag_configure("directory", foreground=current_theme["abg"])
 
                 #Получаем список ID всех элементов в таблице
                 all_item_ids = tree.get_children()
@@ -511,7 +550,7 @@ def FM(run_in_recovery, first_run):
                     self.load_directory_for_tab(current_tab_id, new_path)
                     
                 #Убираем фокус с поля ввода, чтобы горячие клавиши снова работали
-                self.FM.focus_set()
+                self.FM_GUI.focus_set()
 
 
 
@@ -527,13 +566,13 @@ def FM(run_in_recovery, first_run):
             #Копируем текст в буфер обмена
             def copy_path_to_clipboard(self, all=True):
                 if all:
-                    self.FM.clipboard_clear()
-                    self.FM.clipboard_append(self.path_var.get())
+                    self.FM_GUI.clipboard_clear()
+                    self.FM_GUI.clipboard_append(self.path_var.get())
                 elif not all:
                     try:
                         selected = self.path_entry.selection_get()
-                        self.FM.clipboard_clear()
-                        self.FM.clipboard_append(selected)
+                        self.FM_GUI.clipboard_clear()
+                        self.FM_GUI.clipboard_append(selected)
                     except tk.TclError:
                         pass #Ничего не выделено
 
@@ -542,7 +581,7 @@ def FM(run_in_recovery, first_run):
             #Вставка из буфера обмена
             def paste_from_clipboard(self):
                 try:
-                    clipboard_data = self.FM.clipboard_get()
+                    clipboard_data = self.FM_GUI.clipboard_get()
                     self.path_entry.delete(0, tk.END)
                     self.path_entry.insert(0, clipboard_data)
                 except tk.TclError:
@@ -745,7 +784,7 @@ def FM(run_in_recovery, first_run):
                             os.remove(path)
                     except Exception as e:
                         logger.error(f"FM - Ошибка удаления {path}: {e}")
-                        messagebox.showerror("Ошибка", f"Не удалось удалить {os.path.basename(path)}:\n{e}")
+                        messagebox.showerror(random_string(), f"Не удалось удалить {os.path.basename(path)}:\n{e}")
                 
                 self.on_refresh()
 
@@ -887,10 +926,10 @@ def FM(run_in_recovery, first_run):
                     return
 
                 #Создаём окно свойств
-                prop_win = tk.Toplevel(self.FM)
+                prop_win = tk.Toplevel(self.FM_GUI)
                 prop_win.title(f"Свойства: {os.path.basename(item_path)}")
                 prop_win.geometry("350x450")
-                prop_win.transient(self.FM) #Связываем с главным окном
+                prop_win.transient(self.FM_GUI) #Связываем с главным окном
                 prop_win.grab_set() #Делаем окно модальным
                 prop_win.resizable(True, True) #Разрешим менять размер
 
@@ -1005,20 +1044,20 @@ def FM(run_in_recovery, first_run):
                     title,
                     prompt,
                     initialvalue=initial_value,
-                    parent=self.FM
+                    parent=self.FM_GUI
                 )
 
                 if new_name is None: #Пользователь нажал "Отмена"
                     return None
 
                 if not new_name.strip():
-                    messagebox.showwarning(random_string(), "Имя не может быть пустым.", parent=self.FM)
+                    messagebox.showwarning(random_string(), "Имя не может быть пустым.", parent=self.FM_GUI)
                     return None
 
                 #Проверка на недопустимые символы
                 invalid_chars = '<>:"/\\|?*'
                 if any(char in new_name for char in invalid_chars):
-                    messagebox.showwarning(random_string(), f"Имя содержит недопустимые символы:\n{invalid_chars}", parent=self.FM)
+                    messagebox.showwarning(random_string(), f"Имя содержит недопустимые символы:\n{invalid_chars}", parent=self.FM_GUI)
                     return None
 
                 return new_name
@@ -1035,7 +1074,7 @@ def FM(run_in_recovery, first_run):
                 #Для создания (create_path, create_file) работаем с текущим каталогом
                 if action in ["create_path", "create_file"]:
                     current_dir = data["path"]
-                    old_name = "Новая папка" if action == "create_path" else "Новый файл"
+                    old_name = "каталог" if action == "create_path" else "файл"
                     old_path = None #Нет старого пути для создания
                 else: #Для переименования
                     old_path = self.get_focused_item_path()
@@ -1048,7 +1087,7 @@ def FM(run_in_recovery, first_run):
 
                 #Проверяем, что текущий каталог существует
                 if not os.path.isdir(current_dir):
-                    messagebox.showerror(random_string(), f"Текущий каталог не найден: {current_dir}", parent=self.FM)
+                    messagebox.showerror(random_string(), f"Текущий каталог не найден: {current_dir}", parent=self.FM_GUI)
                     return
 
                 new_name = self.ask_for_name(random_string(), f"Новое имя для:\n{old_name}", initial_value=old_name)
@@ -1062,10 +1101,10 @@ def FM(run_in_recovery, first_run):
                 new_path = os.path.join(current_dir, new_name)
 
                 if action != "rename" and os.path.exists(new_path):
-                    messagebox.showerror(random_string(), f"Файл или папка с именем '{new_name}' уже существует.", parent=self.FM)
+                    messagebox.showerror(random_string(), f"Файл или папка с именем '{new_name}' уже существует.", parent=self.FM_GUI)
                     return
                 elif action == "rename" and old_path != new_path and os.path.exists(new_path):
-                    messagebox.showerror(random_string(), f"Файл или папка с именем '{new_name}' уже существует.", parent=self.FM)
+                    messagebox.showerror(random_string(), f"Файл или папка с именем '{new_name}' уже существует.", parent=self.FM_GUI)
                     return
 
 
@@ -1080,7 +1119,7 @@ def FM(run_in_recovery, first_run):
 
                     except Exception as e:
                         logger.error(f"FM - Ошибка переименования:\n{e}")
-                        messagebox.showerror(random_string(), f"Не удалось переименовать:\n{e}", parent=self.FM)
+                        messagebox.showerror(random_string(), f"Не удалось переименовать:\n{e}", parent=self.FM_GUI)
 
                 elif action == "create_path":
                     try:
@@ -1089,11 +1128,11 @@ def FM(run_in_recovery, first_run):
                         self.on_refresh()
                     except Exception as e:
                         logger.error(f"FM - Ошибка создания каталога\n{e}")
-                        messagebox.showerror(random_string(), f"Не удалось создать каталог:\n{e}", parent=self.FM)
+                        messagebox.showerror(random_string(), f"Не удалось создать каталог:\n{e}", parent=self.FM_GUI)
 
                 elif action == "create_file":
                     #Запрос содержимого
-                    content = simpledialog.askstring(random_string(), f"Введите содержимое для файла:\n{new_name}", parent=self.FM)
+                    content = simpledialog.askstring(random_string(), f"Введите содержимое для файла:\n{new_name}", parent=self.FM_GUI)
 
                     #Если пользователь нажал Отмена или не ввел содержимое
                     if content is None:
@@ -1107,7 +1146,7 @@ def FM(run_in_recovery, first_run):
                         self.on_refresh()
                     except Exception as e:
                         logger.error(f"FM - Ошибка создания файла:\n{e}")
-                        messagebox.showerror(random_string(), f"Не удалось создать файл:\n{e}", parent=self.FM)
+                        messagebox.showerror(random_string(), f"Не удалось создать файл:\n{e}", parent=self.FM_GUI)
 
 
 
@@ -1129,7 +1168,7 @@ def FM(run_in_recovery, first_run):
 
             #Создание Контенкстного меню
             def build_context_menu(self, target_type, target_path):
-                menu = tk.Menu(self.FM, tearoff=0)
+                menu = tk.Menu(self.FM_GUI, tearoff=0)
                 data = self.get_current_tab_data()
 
                 #Общие состояния
@@ -1514,21 +1553,27 @@ def FM(run_in_recovery, first_run):
 
             #Копируем текст в буфер обмена
             def copy_to_clipboard(self, text):
-                self.FM.clipboard_clear()
-                self.FM.clipboard_append(text)
+                self.FM_GUI.clipboard_clear()
+                self.FM_GUI.clipboard_append(text)
 
 
 
-            #О Программе
+            #Пункт "О Программе"
             def about_FM(self):
-                messagebox.showinfo(random_string(), f"Файловый Менеджер {file_manager_version}\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO\nCopyleft 🄯 NEO Organization 2024 - 2025")
+                messagebox.showinfo(random_string(), f"Файловый Менеджер {file_manager_version}\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO\nCopyleft 🄯 NEO Organization 2024 - 2026")
+
+
+
+            #Пункт "Помощь"
+            def help_fm(self):
+                messagebox.showinfo(random_string(), "Добро пожаловать в Файловый Менеджер!\nДанный Компонент поддерживает:\n1)Полное управление с клавиатуры\n2)Поиск - чтобы его вызвать нажмите на пункт в верхней левой части окна.")
 
 
 
             #Окно Поиска
             def open_search_dialog(self):
                 #Создаем окно для диалога
-                self.search_window = tk.Toplevel(self.FM)
+                self.search_window = tk.Toplevel(self.FM_GUI)
                 self.search_window.title(random_string())
                 self.search_window.resizable(False, False)
 
@@ -1594,9 +1639,9 @@ def FM(run_in_recovery, first_run):
                            command=self.search_window.destroy).pack(side="right")
 
                 #Устанавливаем диалог модальным и центрируем
-                self.search_window.transient(self.FM)
+                self.search_window.transient(self.FM_GUI)
                 self.search_window.grab_set()
-                self.FM.wait_window(self.search_window)
+                self.FM_GUI.wait_window(self.search_window)
 
 
 
@@ -1779,21 +1824,28 @@ def FM(run_in_recovery, first_run):
 
 
 
-        FM = tk.Tk()
-        style = ttk.Style(FM)
-        style.theme_use("clam")
+        FM_GUI = tk.Tk()
 
-        app = FileManagerApp(FM)
+        apply_global_theme(FM_GUI, current_theme)
+
+        FileManagerApp(FM_GUI)
 
         #Обработка закрытия окна
         def on_closing():
             if messagebox.askokcancel(random_string(), "Вы уверены, что хотите выйти?"):
-                FM.destroy()
+                FM_GUI.destroy()
 
-        FM.protocol("WM_DELETE_WINDOW", on_closing)
-        FM.mainloop()
+        FM_GUI.protocol("WM_DELETE_WINDOW", on_closing)
+        FM_GUI.mainloop()
 
     except Exception as e:
         comment = f"В FileManager произошла неизвестная ошибка!\n{e}"
         logger.critical(comment)
-        messagebox.showerror(random_string(), comment)
+        FM_GUI.destroy()
+        if "was deleted before its visibility changed" in str(e):
+            messagebox.showwarning(random_string(), "Чтобы запустить второй экземпляр Файлового Мегеджера, сначала закройте окно Анлокера.")
+        else:
+            messagebox.showerror(random_string(), comment)
+
+if __name__ == "__main__":
+    FM(False, theme["dark"])

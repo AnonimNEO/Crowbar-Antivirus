@@ -26,10 +26,8 @@ global log_path, clear_temp_log
 clear_cache_version = "0.6.10 Beta"
 
 @logger.catch
-def CC(run_in_recovery, first_run):
+def CC(run_in_recovery):
     try:
-        if first_run:
-            messagebox.showinfo(random_string(), "Данный Компонент не имеет графического интерфейса, а просто удаляет все файлы в каталоге %Temp%\nА после сообщает где был сохранён лог-файл с результатами очистки.")
         logger.info("CC - Запуск Очистки...")
         #Получаем имя пользователя
         username = getpass.getuser()

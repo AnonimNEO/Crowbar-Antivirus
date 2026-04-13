@@ -9,7 +9,7 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Интерфейс
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, Menu
 import tkinter as tk
 #Работа с пользователями
 import subprocess
@@ -17,10 +17,11 @@ import os
 #Логирование
 from loguru import logger
 
+from OF import apply_global_theme
 from RS import random_string
+from config import *
 
-users_manager_version = "0.1.7 Pre-Alpha"
-
+users_manager_version = "0.1.9 Beta"
 
 def run_net_command(args):
     try:
@@ -39,7 +40,7 @@ class UserManager:
     def __init__(self, master):
         self.master = master
         master.title(random_string())
-        master.geometry("275x285")
+        master.geometry("275x350")
 
         self.users = [] 
         self.current_username = os.getlogin() 
@@ -161,10 +162,37 @@ class UserManager:
 
 
 
-def UM():
+def UM(current_theme):
     try:
-        root = tk.Tk()
-        app = UserManager(root)
-        root.mainloop()
+        UM_GUI = tk.Tk()
+        menubar = Menu(UM_GUI)
+
+        UM_GUI.attributes("-topmost", True) 
+
+        higher = tk.BooleanVar(value=True)
+
+        def toggle_topmost(GUI):
+            new_state = not higher.get()
+            higher.set(new_state)
+            GUI.attributes("-topmost", new_state)
+
+        def update_topmost_label(menubar, GUI):
+            status = "вкл" if higher.get() else "выкл"
+            #Индекс command в menubar
+            menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+            GUI.after(200, lambda: update_topmost_label(menubar, GUI))
+
+        menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(UM_GUI))
+        update_topmost_label(menubar, UM_GUI)
+
+        UM_GUI.config(menu=menubar)
+
+        apply_global_theme(UM_GUI, current_theme)
+        UserManager(UM_GUI)
+        UM_GUI.mainloop()
     except Exception as e:
         logger.critical(f"В Компоненте UsersManager произошла неизвестная ошибка!\n{e}")
+
+if __name__ == "__main__":
+    current_theme = theme[default_theme]
+    UM(current_theme)

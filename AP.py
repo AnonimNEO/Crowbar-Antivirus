@@ -29,7 +29,7 @@ about_program_version = "0.2.21 Beta"
 
 image_references = {}
 
-def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticality_version, file_manager_version, load_protection_version, unlocker_version, on_board_pc_version, other_komponents_version, process_manager_version, restart_version, random_string_version, run_version, scarecrow_protection_version, settings_and_update_version, trey_version, unlock_all_version, users_manager_version):
+def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticality_version, file_manager_version, real_time_protect_version, unlocker_version, other_components_version, process_manager_version, restart_version, random_string_version, run_version, scarecrow_protection_version, settings_and_update_version, trey_version, unlock_all_version, users_manager_version):
     try:
         #Загрузка изображений
         def load_images(master):
@@ -61,17 +61,17 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
                 try:
                     img = Image.open(img_path)
                     #Изменение размера изображения
-                    img.thumbnail((100, 100)) 
+                    img.thumbnail((100, 100))
                     img_tk = ImageTk.PhotoImage(img)
 
                     #Используем image_frame для создания Label
                     label = tk.Label(image_frame, image=img_tk, bg="black")
                     #Сохраняем ссылку на ImageTk.PhotoImage, чтобы избежать сборки мусора
-                    image_references[img_path] = img_tk 
-                    
+                    image_references[img_path] = img_tk
+
                     label.pack(side=tk.LEFT, padx=5)
                     image_labels_container.append(label)
-                    
+
                 except Exception as e:
                     logger.error(f"Не удалось загрузить изображение {image_file}:\n{e}")
                     continue #если одно изображение не загрузилось, продолжаем с другими
@@ -83,24 +83,29 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
         def show_component_versions(event):
             about_program_text = (
                 f"Версии Компонентов:\n"
-                f"Трей: {trey_version}\n"
-                f'Шифрование "Шифр Цезаря": 2.2\n'
-                f"Смена Критичности: {edit_criticality_version}\n"
-                f"Защита Нагрузки: {load_protection_version}\n"
+                f"---Главные Компоненты---\n"
+                f"Ядро программы (трей): {trey_version}\n"
+                f"Защита Нагрузки: {real_time_protect_version}\n"
                 f"Мастер Автозагрузки: {autorun_master_version}\n"
                 f"Менеджер Процессов: {process_manager_version}\n"
                 f"Файловый Менеджер: {file_manager_version}\n"
                 f"Раблокировка всего: {unlock_all_version}\n"
+                f"---Мини Компоненты---\n"
+                f"Главное меню: {unlocker_version}\n"
                 f"Пугало: {scarecrow_protection_version}\n"
                 f"Очистка Кэша: {clear_cache_version}\n"
                 f"Менеджер Пользователей: {users_manager_version}\n"
-                f"Анлокер меню: {unlocker_version}\n"
+                #f"Менеджер Пользователей: данный компонент отсутствует из-за его неработоспособности\n"
                 f"Перезапуск ПК: {restart_version}\n"
                 f"Запуск от имени администратора: {run_version}\n"
+                #f"Голосовое Управление: {on_board_pc_version}\n"
+                f"Голосовое Управление: данный компонент отсутствует из-за его нестабильности\n"
+                f"---Системные Компоненты---\n"
+                f'Шифрование "Шифр Цезаря": 2.2\n'
+                f"Смена Критичности: {edit_criticality_version}\n"
+                f"Прочие Компоненты: {other_components_version}\n"
                 f"Генератор Заголовков: {random_string_version}\n"
-                f"Голосовое Управление: {on_board_pc_version}\n"
                 f"Выход из программы: {exit_version}\n"
-                f"Прочие Компоненты: {other_komponents_version}\n"
                 f"О Программе: {about_program_version}\n"
                 f"Настройки: {settings_and_update_version}"
             )
@@ -123,7 +128,7 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
                 webbrowser.open_new("https://www.donationalerts.com/r/anonimneo")
 
             def open_trade_on_steam(event):
-                webbrowser.open_new("https://steamcommunity.com/tradeoffer/new/?partner=1842324943&token=xPAad4EP") 
+                webbrowser.open_new("https://steamcommunity.com/tradeoffer/new/?partner=1842324943&token=xPAad4EP")
 
             donate_window = tk.Tk()
             donate_window.title(random_string())
@@ -153,7 +158,7 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
         about_window = tk.Tk()
         about_window.title(random_string())
         about_window.configure(bg="black")
-        
+
         #Текст
         label_text = f"Антивирус Монтировка!\nВытащит любой гвоздь из крышки гроба вашего ПК!\n(как минимум попытается, а если не смог - поставь Linux)\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO, Всего строчек кода : {all_line}\nПрограмисты/Задумщики/Художники/Тестировщики : @AnonimNEO\nЛицензия: GPL v3.0 Copyleft 🄯 2024 - 2026\n"
         label = tk.Label(about_window, text=label_text, bg="black", fg="white", font=("ComicSans", 16))
