@@ -386,7 +386,6 @@ def PM(run_in_recovery, current_theme):
 
             PM_GUI_ELEMENTS["treeview_data"] = filter_data_by_search(raw_data, PM_GUI_ELEMENTS["search_query"])
 
-            PM_GUI_ELEMENTS["treeview_data"] = filter_data_by_search(raw_data, PM_GUI_ELEMENTS["search_query"])
             #применяем сортировку перед заполнением таблицы
             PM_GUI_ELEMENTS["treeview_data"] = sort_data(
                 PM_GUI_ELEMENTS["treeview_data"],

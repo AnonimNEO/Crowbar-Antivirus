@@ -16,7 +16,7 @@ from datetime import datetime
 #Работа с реестром
 import winreg as reg
 #Работа с Файлами
-#import win32com.client
+import win32com.client
 import shutil
 import os
 #Работа с Архивами
@@ -36,7 +36,7 @@ from OF import run_command, apply_global_theme
 #Случайные заголовки
 from RS import random_string
 
-settings_and_update_version = "1.1.1 Beta"
+settings_and_update_version = "1.1.2 Beta"
 
 def compiling_crowbar():
     global COMPILING_COMMAND
@@ -146,9 +146,9 @@ def move_all_files(src_folder, dest_folder):
                 shutil.copytree(src_path, dest_path)
             else:
                 shutil.move(src_path, dest_path)
-        print(f"Содержимое {src_folder} перемещено в {dest_folder}.")
+        logger.info(f"SAU - Содержимое {src_folder} перемещено в {dest_folder}.")
     except Exception as e:
-        print(f"Ошибка при перемещении файлов: {e}")
+        logger.info(f"SAU - Ошибка при перемещении файлов:\n{e}")
 
 
 

@@ -14,10 +14,9 @@ import tkinter as tk
 #Логирование
 from loguru import logger
 #Работа с файлами
+import subprocess
 import shutil
 import os
-import shutil
-import subprocess
 
 from RS import random_string
 from OF import apply_global_theme, get_current_disc

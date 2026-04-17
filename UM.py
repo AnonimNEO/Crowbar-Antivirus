@@ -21,7 +21,7 @@ from OF import apply_global_theme
 from RS import random_string
 from config import *
 
-users_manager_version = "0.1.9 Beta"
+users_manager_version = "0.1.10 Beta"
 
 def run_net_command(args):
     try:
@@ -129,12 +129,15 @@ class UserManager:
                 messagebox.showwarning(random_string(), "Заполните все поля.")
                 return
 
-            if run_net_command(["user", username, password, "/add"]):
+            try:
+                run_net_command(["user", username, password, "/add"]):
                 logger.info(f"UM - Пользователь {username} создан.")
                 self.load_users()
                 create_window.destroy()
-            else:
-                messagebox.showerror(random_string(), "Ошибка при создании. Проверьте права администратора.")
+            except Exception as e:
+                comment = f"UM - Ошибка при создании пользователя {username}\n{e}"
+                logger.error(comment)
+                messagebox.showerror(random_string(), comment)
 
         create_button = tk.Button(create_window, text="Создать", command=confirm_creation)
         create_button.pack(pady=10)

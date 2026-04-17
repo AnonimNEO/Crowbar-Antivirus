@@ -178,9 +178,6 @@ def FM(run_in_recovery, current_theme):
                 #Словарь для хранения состояния каждой вкладки
                 self.tabs_data = {}
 
-                #Словарь для хранения состояния каждой вкладки
-                self.tabs_data = {}
-
                 #Создание верхней панели
                 self.toolbar_frame = ttk.Frame(FM_GUI)
                 self.toolbar_frame.pack(side="top", fill="x", padx=5, pady=(5, 0))

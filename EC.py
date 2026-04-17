@@ -16,7 +16,7 @@ from ctypes import wintypes
 
 from OF import Psutil
 
-edit_criticality_version = "0.3.2 Beta"
+edit_criticality_version = "0.3.3 Beta"
 
 #Загрузка необходимых библиотек Windows на уровне модуля
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -165,6 +165,7 @@ def EC(process_id, critical, debug_mode=True):
         if not psutil.pid_exists(process_id):
             if debug_mode:
                 logger.error(f"EC - Процесс {process_name} (pid: {process_id}) не найден!")
+                return
 
         if set_process_critical(process_id, critical):
             logger.success(f"EC - Значение критичности процесса {process_name} (pid: {process_id}) изменено на critical")

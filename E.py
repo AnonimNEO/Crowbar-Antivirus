@@ -19,9 +19,9 @@ import os
 
 from RS import random_string
 
-exit_version = "1.0.15 Beta"
+exit_version = "1.0.16 Beta"
 
-dyrachok_path = "C:\\ProgramData\\dyrachok.txt"
+dyrachok_path = r"C:\ProgramData\dyrachok.txt"
 
 try:
     @logger.catch
@@ -30,9 +30,11 @@ try:
             with open(dyrachok_path, "r") as f:
                 content = f.read()
             if "debil" in content:
+                logger.critical("E - Проверка на дурочка не прошла.")
                 messagebox.showwarning(random_string(), "Вы смотрите тикток!\nПрограмма не будет закрыта.")
                 return False
             else:
+                logger.succes("E - Проверка на дурочка прошла успешно.")
                 return True
         except FileNotFoundError:
             return True
@@ -42,14 +44,23 @@ try:
     @logger.catch
     def tiktok_question():
         if messagebox.askyesno(random_string(), "Смотрите ли вы тикток?"):
-            with open(dyrachok_path, "w") as f:
-                f.write("debil")
-            messagebox.showinfo(random_string(), "Вы смотрите тикток!\nПрограмма не будет закрыта.")
+            try:
+                with open(dyrachok_path, "w") as f:
+                    f.write("debil")
+                messagebox.showinfo(random_string(), "Вы смотрите тикток!\nПрограмма не будет закрыта.")
+            except Exception as e:
+                comment = f"E - Ошибка при выходе\n{e}"
+                logger.critical(comment)
+                messagebox.showerror(random_string(), comment)
+                return False
         else:
             logger.info("Завершение работы программы...")
-            global exit_ma
-            exit_ma = True
             os._exit(0)
+
+
+
+    def bad_capcha():
+        messagebox.showerror(random_string(), "Неправильный ввод капчи.\nПрограмма не будет закрыта.")
 
 
 
@@ -58,9 +69,11 @@ try:
         number_input = tk.simpledialog.askinteger(random_string(), f"Введите результат данного примера: √({n} * {n})")
 
         if number_input == n:
+            logger.info("E - ввод примера верен.")
             tiktok_question()
         else:
-            messagebox.showerror(random_string(), "Неправильный ввод капчи.\nПрограмма не будет закрыта.")
+            logger.critical("E - ввод примера не верен.")
+            bad_capcha()
 
 
 
@@ -69,17 +82,21 @@ try:
         captcha_input = tk.simpledialog.askinteger(random_string(), f"Введите число: {n}")
 
         if captcha_input == n:
+            logger.info("E - ввод числа верен.")
             math_window()
         else:
-            messagebox.showerror(random_string(), "Неправильный ввод капчи.\nПрограмма не будет закрыта.")
+            logger.critical("E - Неправильный ввод числа")
+            bad_capcha()
 
 
 
     def ask_exit():
         if check_access_file():
             if messagebox.askyesno(random_string(), "Вы действительно хотите выйти из данного программного обеспечения?"):
+                logger.info("E - Попытка выхода из программы.")
                 captcha_window()
             else:
+                logger.info("E - Отмена выхода.")
                 messagebox.showerror(random_string(), "Данное программное обеспечение не будет закрыто.")
 
 except Exception as e:

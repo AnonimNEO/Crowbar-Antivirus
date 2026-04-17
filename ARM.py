@@ -29,19 +29,19 @@ from config import *
 from RS import random_string
 from OF import get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme
 
-global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.2.8 Beta"
+#global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
+autorun_master_version = "3.2.9 Beta"
 
 def remove_autorun_entry(target_exe):
     target_exe = target_exe.lower()
-
+    cur_vet = r"Software\Microsoft\Windows\CurrentVersion"
     #Список путей
     keys = {
-        "HKCU Run": (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run"),
-        "HKLM Run": (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Run"),
-        "HKCU RunOnce": (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\RunOnce"),
-        "HKLM RunOnce": (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\RunOnce"),
-        "Startup User": os.path.expandvars(r"%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"),
+        "HKCU Run": (winreg.HKEY_CURRENT_USER, rf"{cur_ver}\Run"),
+        "HKLM Run": (winreg.HKEY_LOCAL_MACHINE, rf"{cur_ver}\Run"),
+        "HKCU RunOnce": (winreg.HKEY_CURRENT_USER, rf"{cur_ver}\RunOnce"),
+        "HKLM RunOnce": (winreg.HKEY_LOCAL_MACHINE, rf"{cur_ver}\RunOnce"),
+        "Startup User": os.path.expandvars(r"C:\Users\All Users\Microsoft\Windows\Start Menu\Programs\StartUp"),
         "Startup Common": os.path.expandvars(r"%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup")
     }
 

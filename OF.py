@@ -28,7 +28,7 @@ from RS import random_string
 from config import *
 
 global load_bush
-other_components_version = "0.7.1 Beta"
+other_components_version = "0.7.2 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -69,6 +69,7 @@ class Psutil:
 
 
 
+@logger.catch()
 def run_component(func, *args):
     try:
         process = multiprocessing.Process(target=func, args=args)
@@ -77,6 +78,7 @@ def run_component(func, *args):
         logger.info(f"OF/run_component - Успешно запущен процесс для {func.__name__}")
     except Exception as e:
         logger.error(f"OF/run_component - Ошибка при запуске процесса {func.__name__}: {e}")
+
 
 
 @logger.catch()
@@ -107,6 +109,7 @@ def restart_ca():
 
 
 
+@logger.catch()
 def apply_global_theme(window, current_theme):
     style = ttk.Style(window)
     style.theme_use("clam")
@@ -223,7 +226,7 @@ def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recov
 
 
 #Получаем диск с установленной шиндовс
-@logger.catch
+@logger.catch()
 def get_current_disc(run_in_recovery=False):
     try:
         if run_in_recovery:
@@ -257,7 +260,7 @@ def load_bush(current_disc, user=False):
         user_name = user
     else:
         #Формируем пути к файлам
-        if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\"):
+        if not os.path.isdir(f"{current_disc}\\Users\\{default_user_name}\\"):
             user_name = simpledialog.askstring(title=random_string(), prompt=f"Не найден пользователь {default_user_name}\nВведите нужное имя пользователя: ")
         else:
             user_name = default_user_name
@@ -310,7 +313,7 @@ def unload_bush():
 
 
 #Получаем Имя текущего пользователя
-@logger.catch
+@logger.catch()
 def get_user_name():
     try:
         user_name = os.getlogin()
@@ -322,7 +325,7 @@ def get_user_name():
 
 
 #Открыть С помощью
-@logger.catch
+@logger.catch()
 def open_with():
     target_file_path = filedialog.askopenfilename(title=random_string(), filetypes=[("Все файлы", "*.*")])
     if target_file_path and os.path.isfile(target_file_path): #Проверка, что файл выбран и существует
@@ -336,7 +339,7 @@ def open_with():
 
 
 
-@logger.catch
+@logger.catch()
 def reg_file(reg_file, reg_code):
     with open(reg_file, "w") as reg:
         reg.write(reg_code)
@@ -347,6 +350,7 @@ def reg_file(reg_file, reg_code):
 
 
 
+@logger.catch()
 def run_command(command):
     try:
         #Запускает команду и ждём её завершения
