@@ -141,7 +141,7 @@ not_ec = False
 not_fm = False
 not_fr = False
 not_rlp = False
-not_mu = False
+not_cm = False
 not_of = False
 not_pm = False
 not_r = False
@@ -212,12 +212,12 @@ except Exception as e:
     logger.critical(f"T - Ошибка импорта Компонента RealTimeProtection\n{e}")
 
 try:
-    from MU import MU, unlocker_version
+    from CM import CM, unlocker_version
 except Exception as e:
-    not_mu = True
-    def MU(a=None, b=None, c=None):
+    not_cm = True
+    def CM(a=None, b=None, c=None):
         pass
-    logger.critical(f"T - Ошибка импорта Компонента MountUnlocker\n{e}")
+    logger.critical(f"T - Ошибка импорта Компонента CrowbarMenu\n{e}")
 
 try:
     from OF import run_component, restart_ca, open_with, get_current_disc, load_bush, other_components_version
@@ -366,7 +366,7 @@ except Exception as e:
 #Глобальные Переменные
 global T_log_txt, start_interface, run_in_recovery, current_theme
 font_trey = "arial.ttf"
-trey_version = "2.3.1 Beta build 12"
+trey_version = "2.3.2 Beta build 12"
 on_board_pc_version = ""
 
 def Crowbar():
@@ -511,7 +511,7 @@ def Crowbar():
                         "Run": Run,
                         "SAU": SAU,
                         "RLP": RLP,
-                        "MU": MU,
+                        "CM": CM,
                         "icon": icon if "icon" in locals() else None,
                         "logger": logger,
                     }
@@ -521,7 +521,7 @@ def Crowbar():
                 #Меню По ПКМ
                 image = create_image(20, 20)
                 menu = Menu(
-                    create_menu_item(not_mu, "Открыть Монтировка Анлокер", lambda: MU(run_in_recovery, current_theme), "MU"),
+                    create_menu_item(not_cm, "Открыть Монтировка Анлокер", lambda: CM(run_in_recovery, current_theme), "CM"),
                     MenuItem("Утилиты", unlocker_menu),
                     create_menu_item(not_ua, "Разблокировка Всего", lambda: UA(run_in_recovery), "UA"),
                     create_menu_item(not_run, "Запустить От Имени Админа", lambda: run_component(Run, current_theme), "Run"),
@@ -547,21 +547,21 @@ def Crowbar():
                     run_component(RLP)
 
                 if start_interface == "window" or start_interface == "only-windows":
-                    run_component(MU, run_in_recovery, current_theme)
+                    run_component(CM, run_in_recovery, current_theme)
 
                 #while True:
                 #    time.sleep(1)
             except Exception as e:
                 logger.warning(f"T - Ошибка при запуске иконки\n{e}")
-                MU(run_in_recovery, current_theme, current_disc)
+                CM(run_in_recovery, current_theme, current_disc)
 
         if run_in_recovery:
             logger.info("T - Запуск в режиме рекавери...")
-            MU(run_in_recovery, current_theme, current_disc)
+            CM(run_in_recovery, current_theme, current_disc)
 
     except Exception as e:
         logger.critical(f"В Компоненте Trey произошла неизвестная ошибка!\n{e}")
-        MU(run_in_recovery, current_theme, current_disc)
+        CM(run_in_recovery, current_theme, current_disc)
     finally:
         if run_in_recovery:
             logger.info("T - Завершение работы, выгрузка кустов реестра...")
