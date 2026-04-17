@@ -464,7 +464,6 @@ def Crowbar():
                     current_disc_r = "C:\\"
 
                 def create_menu_item(condition, enabled_text, enabled_func, component_name):
-                    """Создает MenuItem в зависимости от условия доступности компонента"""
                     if condition:
                         disabled_text = f"[!] Компонент {component_name} недоступен."
                         return MenuItem(disabled_text, lambda: None)
@@ -549,8 +548,8 @@ def Crowbar():
                 if start_interface == "window" or start_interface == "only-windows":
                     run_component(CM, run_in_recovery, current_theme)
 
-                #while True:
-                #    time.sleep(1)
+                while True:
+                    time.sleep(1)
             except Exception as e:
                 logger.warning(f"T - Ошибка при запуске иконки\n{e}")
                 CM(run_in_recovery, current_theme, current_disc)
