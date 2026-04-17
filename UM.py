@@ -130,7 +130,7 @@ class UserManager:
                 return
 
             try:
-                run_net_command(["user", username, password, "/add"]):
+                run_net_command(["user", username, password, "/add"])
                 logger.info(f"UM - Пользователь {username} создан.")
                 self.load_users()
                 create_window.destroy()
