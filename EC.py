@@ -15,8 +15,10 @@ import ctypes
 from ctypes import wintypes
 
 from OF import Psutil
+from languages import localizations, current_localization
 
-edit_criticality_version = "0.3.3 Beta"
+edit_criticality_version = "0.4.0 Beta"
+l = localizations[current_localization]
 
 #Загрузка необходимых библиотек Windows на уровне модуля
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -119,7 +121,7 @@ def set_process_critical(process_id, critical):
 
         if not process_handle:
             process_name = get_process_name(process_id)
-            logger.error(f"EC - Не удалось открыть процесс {process_name} (pid: {process_id}). Код ошибки: {ctypes.get_last_error()}")
+            logger.error(f"EC - {l["open_process_error"]} {process_name} (pid: {process_id}). {l["error_code"]}: {ctypes.get_last_error()}")
             return False
 
         #Значение 1 для True (критический), 0 для False (некритический)
@@ -136,15 +138,15 @@ def set_process_critical(process_id, critical):
         kernel32.CloseHandle(process_handle)
 
         if result == STATUS_SUCCESS:
-            status = "установлена" if critical else "снята"
-            logger.success(f"EC - Критичность процесса {process_id} {status} (целевое: {critical})")
+            status = l["installed"] if critical else l["removed"]
+            logger.success(f"EC - {l["process_critical"]} {process_id} {status} ({l["target"]}: {critical})")
             return True
         else:
-            logger.error(f"EC - Ошибка при изменения критичности. Код ошибки: {hex(result)}")
+            logger.error(f"EC - {l["edit_critical_error"]}. {l["error_code"]}: {hex(result)}")
             return False
 
     except Exception as e:
-        logger.error(f"EC - Неизвестная ошибка при изменении критичности:\n{e}")
+        logger.error(f"EC - {l["edit_critical_unknown_error"]}:\n{e}")
         return False
     finally:
         if process_handle:
@@ -164,13 +166,13 @@ def EC(process_id, critical, debug_mode=True):
         #Проверяем существование процесса
         if not psutil.pid_exists(process_id):
             if debug_mode:
-                logger.error(f"EC - Процесс {process_name} (pid: {process_id}) не найден!")
+                logger.error(f"EC - {l["process"]} {process_name} (pid: {process_id}) {l["not_found"]}!")
                 return
 
         if set_process_critical(process_id, critical):
-            logger.success(f"EC - Значение критичности процесса {process_name} (pid: {process_id}) изменено на critical")
+            logger.success(f"EC - {l["criticality_status"]} {process_name} (pid: {process_id}) {l["changed_to"]} {critical}")
         else:
-            logger.error(f"EC - Значение критичности процесса {process_name} (pid: {process_id}) не было изменено")
+            logger.error(f"EC - {l["criticality_status"]} {process_name} (pid: {process_id}) {l["no_changed"]}")
 
     except Exception as e:
-        logger.critical(f"В Компоненте EditCriticality произошла неизвестная ошибка:\n{e}")
+        logger.critical(f"{l["ec_critical_error"]}:\n{e}")

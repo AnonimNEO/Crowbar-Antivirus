@@ -30,23 +30,25 @@ import threading
 
 #Чтение конфига
 import config
-from config import theme, default_theme
+from config import theme, default_theme, program_authentication_clyth
+from languages import localizations, current_localization
 #Запуск команд
 from OF import run_command, apply_global_theme
 #Случайные заголовки
 from RS import random_string
 
-settings_and_update_version = "1.1.2 Beta"
+settings_and_update_version = "1.2.0 Beta"
+l = localizations[current_localization]
 
 def compiling_crowbar():
     global COMPILING_COMMAND
-    logger.info(f"Запуск Компиляции...\nЗапуск команды: {COMPILING_COMMAND}")
+    logger.info(f"{l["launch"]} {l["compilations"]}...\n{l["launch"]} {l["commands"]}: {COMPILING_COMMAND}")
     result = run_command(COMPILING_COMMAND)
     if result == 0:
-        logger.info("Компиляция Компонента Trey завершена!")
+        logger.success(l["t_compilation_is_finish"])
         return True
     else:
-        logger.error(f"Команда завершилась с кодом: {result}")
+        logger.error(f"{l["command_end_with_code"]}: {result}")
         return False
 
 
@@ -75,12 +77,11 @@ def save_settings(settings_data, config_comments=None):
                 #Добавляем пустую строку для лучшей читаемости
                 config_file.write("\n")
 
-        logger.info("SAU - Настройки успешно сохранены в config.py")
+        logger.success(f"SAU - {l["setting_saved_in"]} config.py")
         return True
     except Exception as e:
-        comment = f"Ошибка при сохранении настроек:\n{e}"
-        logger.error(f"SAU - {comment}")
-        messagebox.showerror(random_string(), comment)
+        logger.exception(f"SAU - {l["settings_save_error"]}", e)
+        messagebox.showerror(random_string(), l["settings_save_error"])
         return False
 
 
@@ -94,18 +95,17 @@ def backup_settings(export=False):
 
         shutil.copy("config.py", backup_filepath)
 
-        logger.info(f"SAU - Резервная копия настроек создана по пути: {backup_filepath}")
+        logger.info(f"SAU - {l["settings_backup_created_ob_path"]}: {backup_filepath}")
 
         if export:
-            messagebox.showinfo(random_string(), f"Экспорт прошёл успешно, сохранено в {backup_filepath}")
+            messagebox.showinfo(random_string(), f"{l["settings_export_success"]} {backup_filepath}")
 
         return backup_filepath
     except Exception as e:
-        comment = f"Ошибка при создании резервной копии:\n{e}"
-        logger.error(f"SAU - {comment}")
-        messagebox.showerror(random_string(), comment)
+        logger.exception(f"SAU - {l["settings_backup_created_error"]}", e)
+        messagebox.showerror(random_string(), l["settings_backup_created_error"])
         if export:
-            messagebox.showerror(random_string(), f"Ошибка при экспорте настроек:\n{e}")
+            messagebox.showerror(random_string(), f"{l["settings_export_error"]}:\n{e}")
         return 0
 
 
@@ -114,24 +114,22 @@ def backup_settings(export=False):
 def extract_archive(ARCHIVE_PATH):
     try:
         if not os.path.exists(ARCHIVE_PATH):
-            comment = f"Архив {ARCHIVE_PATH} не найден.\nПерекомпиляция не возможна."
-            logger.error(f"SAU - {comment}")
+            comment = f"SAU - {l["archive"]} {ARCHIVE_PATH} {l["not_found"]}.\n{l["not_compilation"]}."
+            logger.error(comment)
             messagebox.showerror(random_string(), comment)
             return False
 
         with zipfile.ZipFile(ARCHIVE_PATH, "r") as zip_ref:
             zip_ref.extractall("", pwd=ARCHIVE_PASSWORD)
-        logger.info(f"SAU - Архив {ARCHIVE_PATH} успешно распакован")
+        logger.info(f"SAU - {l["archive"]} {ARCHIVE_PATH} {l["success_unpacked"]}")
         return True
     except zipfile.BadZipFile:
-        comment = f"Неверный формат архива или поврежденный архив."
-        logger.error(f"SAU - {comment}")
-        messagebox.showerror(random_string(), comment)
+        logger.error(f"SAU - {l["bad_archive"]}")
+        messagebox.showerror(random_string(), l["bad_archive"])
         return False
     except Exception as e:
-        comment = f"Ошибка при распаковке архива:\n{e}"
-        logger.error(f"SAU - {comment}")
-        messagebox.showerror(random_string(), comment)
+        logger.exception(f"SAU - {l["unpacked_archive_error"]}", e)
+        messagebox.showerror(random_string(), l["unpacked_archive_error"])
         return False
 
 
@@ -146,14 +144,14 @@ def move_all_files(src_folder, dest_folder):
                 shutil.copytree(src_path, dest_path)
             else:
                 shutil.move(src_path, dest_path)
-        logger.info(f"SAU - Содержимое {src_folder} перемещено в {dest_folder}.")
+        logger.info(f"SAU - {l["content"]} {src_folder} {l["moved"]} {l["in"]} {dest_folder}.")
     except Exception as e:
-        logger.info(f"SAU - Ошибка при перемещении файлов:\n{e}")
+        logger.exception(f"SAU - {l["moved_error"]}", e)
 
 
 
 def copy_files():
-    new_image_path = simpledialog.askstring(title=random_string(), prompt="Введите каталог куда переместить изображения\nНичего не вводите если изображения уже в нужном каталоге\n(например вы просто обновляете программу)")
+    new_image_path = simpledialog.askstring(title=random_string(), prompt=l["enter_path_to_image"])
 
     copy = 1
     if not new_image_path or new_image_path == None:
@@ -163,15 +161,19 @@ def copy_files():
         if copy == 1:
             move_all_files("info_image\\", new_image_path)
     except PermissionError:
-        messagebox.warning(random_string(), f"Недостаточно прав для копирования изображений\nв каталог - {new_image_path}")
+        comment = f"{l["permission_error"]} {l["for_copy_image"]} - {new_image_path}"
+        logger.warning(f"SAU - {comment}", e)
+        messagebox.warning(random_string(), f"{comment}\n{e}")
     except FileNotFoundError:
-        messagebox.warning(random_string(), "Ненайдены файлы для копирования")
+        messagebox.warning(random_string(), f"{l["file_not_found"]} {l["for_copy_file"]}")
     except Exception as e:
-        messagebox.error(random_string(), "Ошибка при копировании изображений\nВозможно вы ввели неправильные данные, вы можете сами переместить файлы они находятся в каталоге с программой.")
+        comment = f"SAU - {l["copy_error"]} {l["copy_file_error"]}"
+        logger.exception(comment, e)
+        messagebox.error(random_string(), comment)
         return False
 
     global path_to_copy
-    path_to_copy = simpledialog.askstring(title=random_string(), prompt="Введите каталог куда переместить исполняемый файл\nвместе с именем файла, обязательно с расширением .exe!")
+    path_to_copy = simpledialog.askstring(title=random_string(), prompt=l["enter_exe_name"])
 
     if not path_to_copy or path_to_copy == None:
         return False
@@ -179,13 +181,17 @@ def copy_files():
     try:
         shutil.copy(f"{PROGRAM_NAME}.exe", path_to_copy)
     except PermissionError:
-        messagebox.showwarning(random_string(), f"Недостаточно прав для копирования файла {PROGRAM_NAME}.exe")
+        comment = f"SAU - {l["permission_error"]} {l["file_not_found"]} {l["for_copy"]} {PROGRAM_NAME}.exe"
+        logger.error(comment, e)
+        messagebox.showwarning(random_string(), comment)
         return False
     except FileNotFoundError:
-        messagebox.showwarning(random_string(), f"Ненайден файл {PROGRAM_NAME}.exe для копирования")
+        comment = f"SAU - {l["file_not_found"]} {PROGRAM_NAME}.exe"
+        logger.error(comment, e)
+        messagebox.showwarning(random_string(), comment)
         return False
     except Exception as e:
-        messagebox.showerror(random_string(), f"Ошибка при копировании {PROGRAM_NAME}.exe\nВозможно вы ввели неправильные данные, вы можете сами перместить файлы они находятся в каталоге с программой.")
+        messagebox.showerror(random_string(), f"{l["copy_error"]} {PROGRAM_NAME}.exe\n{l["copy_exe_error"]}.")
         return False
 
     return True
@@ -208,9 +214,9 @@ def create_lnk(target_path, shortcut_name):
         shortcut.WorkingDirectory = os.path.dirname(target_path) #Рабочий каталог ярлыка
         shortcut.save() #Сохраняем ярлык
 
-        logger.info(f"SAU - Ярлык успешно создан на рабочем столе.")
+        logger.info(f"SAU - {l["create_lnk_success"]}.")
     except Exception as e:
-        logger.error(f"SAU - Ошибки при создании ярлыка:\n{e}")
+        logger.exception(f"SAU - {l["create_lnk_error"]}", e)
 
 
 
@@ -225,11 +231,11 @@ def add_to_autorun(target_path):
 
         #Закрываем ключ реестра
         reg.CloseKey(registry_key)
-        logger.info(f"Значение Userinit успешно изменено на C:\\Windows\\System32\\userinit.exe, {target_path}")
+        logger.info(f"{l["meaning"]} Userinit {l["successfully_changed_to"]} C:\\Windows\\System32\\userinit.exe, {target_path}")
 
         return True
     except Exception as e:
-        logger.error(f"SAU - Ошибка при добавлении программы в автозагрузку:\n{e}")
+        logger.exception(f"SAU - {l["add_to_autorun_error"]}", e)
         return False
 
 
@@ -249,11 +255,11 @@ def preparing_for_recompilation(settings_data, config_comments):
     try:
         if os.path.exists("T.py"):
             os.rename("T.py", f"{PROGRAM_NAME}.py")
-            logger.info(f"SAU - T.py переименован в -> {PROGRAM_NAME}.py")
+            logger.info(f"SAU - T.py {l["renamed"]} -> {PROGRAM_NAME}.py")
         else:
-            logger.warning("SAU - Файл T.py не найден для переименования")
+            logger.error(f"SAU - {l["file"]} T.py {l["not_found"]} {l["renamed"]}.")
     except Exception as e:
-        raise Exception(f"SAU - Ошибка при переименовании файла:\n{e}")
+        raise Exception(f"SAU - {l["error"]} {l["when_renaming"]} {l["file2"]}:\n{e}")
 
     if not compiling_crowbar():
         return False
@@ -263,9 +269,9 @@ def preparing_for_recompilation(settings_data, config_comments):
 
     create_lnk(path_to_copy, random_string())
 
-    if messagebox.askyesno(random_string(), "Добавить программу в автозагрузку?"):
+    if messagebox.askyesno(random_string(), l["add_program_to_autorun"]):
         if not add_to_autorun(path_to_copy):
-            messagebox.showerror(random_string(), f"Произошла ошибка во время добавления программы в автозагрузку.")
+            messagebox.showerror(random_string(), f"{l["add_program_to_autorun_error"]}\n{e}")
 
     return True
 
@@ -274,7 +280,7 @@ def preparing_for_recompilation(settings_data, config_comments):
 #Проверка является ли путь строкой
 def validate_path(path):
     if not isinstance(path, str):
-        return False, "Путь должен быть строкой."
+        return False, l["path_must_string"]
     return True, ""
 
 
@@ -286,26 +292,26 @@ def validate_int_with_limit(value, max_value):
         if 1 <= num <= max_value:
             return True, ""
         else:
-            return False, f"Число должно быть от 1 до {max_value}."
+            return False, f"{l["number_must_be_1_to"]} {max_value}."
     except ValueError:
-        return False, "Введите число!"
+        return False, l["enter_number"]
 
 
 
 #Проверка правильного синтаксиса списков
 def validate_string_list(value):
     if not isinstance(value, str):
-        return False, "Значение должно быть строкой."
+        return False, l["enter_string"]
 
     s = value.strip()
     if not s:
-        return False, "Поле не может быть пустым."
+        return False, l["field_cannot_be_empty"]
 
     #Проверка базовых скобок
     if not ((s.startswith("[") and s.endswith("]")) or
             (s.startswith("(") and s.endswith(")")) or
             (s.startswith("{") and s.endswith("}"))):
-        return False, 'Используйте: ["а"], ("а",), {1,2} или {"k":"v"}'
+        return False, f'{l["use"]}: ["а"], ("а",), {1,2}, {"k":"v"}'
 
     try:
         #Пытаемся безопасно превратить строку в объект Python
@@ -314,19 +320,19 @@ def validate_string_list(value):
         #Проверяем, что результат — один из ожидаемых коллекций
         if isinstance(parsed, (list, tuple, set, dict)):
             return True, ""
-        return False, "Должен быть список, кортеж, множество или словарь."
+        return False, l["must_list"]
 
     except (SyntaxError, ValueError) as e:
-        return False, f"Ошибка синтаксиса: {e}"
+        return False, f"{l["syntaxis_error"]}: {e}"
     except Exception as e:
-        return False, f"Некорректный формат: {e}"
+        return False, f"{l["invalid_format"]}: {e}"
 
 
 
 #Проверка на то что значение является строкой
 def validate_string(value):
     if not isinstance(value, str):
-        return False, "Значение должно быть строкой!"
+        return False, l["enter_string"]
     return True, ""
 
 
@@ -334,9 +340,9 @@ def validate_string(value):
 #Проверка на то что значение является словарём
 def validate_dict_config(value):
     if not isinstance(value, dict):
-        return False, "Значение должно быть словарем!"
+        return False, l["must_be_dictionary"]
     if "type" not in value:
-        return False, "Словарь должен содержать ключ 'type'!"
+        return False, f"{l["dictionary_must_contain_key"]} 'type'!"
     return True, ""
 
 
@@ -377,7 +383,7 @@ def create_input_widget(frame, variable_name, variable_type, default_value, row_
                 var.set(path)
 
         #Кнопка "Обзор" занимает столбец 2
-        browse_button = ttk.Button(frame, text="Обзор", command=browse_path)
+        browse_button = ttk.Button(frame, text=l["review"], command=browse_path)
         browse_button.grid(row=row_num, column=2, padx=3, pady=1)
 
     elif variable_type == "str_list":
@@ -446,9 +452,9 @@ def read_config(user_config=False):
                         #Сбрасываем текущий комментарий после того, как он был использован
                         current_comment = ""
     except FileNotFoundError:
-        logger.error("SAU - Файл config.py не найден для чтения комментариев.")
+        logger.error(f"SAU - {l["file"]} config.py")
     except Exception as e:
-        logger.error(f"SAU - Ошибка при чтении комментариев из config.py:\n{e}")
+        logger.exception(f"SAU - {l["read_comments_error"]} config.py", e)
 
     return comments
 
@@ -499,7 +505,7 @@ def crowbar_settings(current_theme):
 
     #Создаем вкладки
     general_tab = ttk.Frame(notebook)
-    notebook.add(general_tab, text=f"SettingsAndUpdate - {settings_and_update_version}")
+    notebook.add(general_tab, text=f"{l["pac"]} - {program_authentication_clyth}")
 
     #Раздел для общих настроек
     general_frame = ttk.Frame(general_tab)
@@ -574,32 +580,15 @@ def crowbar_settings(current_theme):
         try:
             if os.path.isdir(path):
                 shutil.rmtree(path)
-                logger.info(f"SAU - Удалён каталог: {path}")
+                logger.info(f"SAU - {l["delete_dir"]}: {path}")
             else:
                 os.remove(path)
-                logger.info(f"SAU - Удалён файл: {path}")
+                logger.info(f"SAU - {file_delete}: {path}")
 
             return True
         except Exception as e:
-            logger.error(f"SAU - Ошибка удаления {path}:\n{e}")
-            messagebox.showerror(random_string(), f"Не удалось удалить {path}:\n{e}")
-
-
-
-    #Удаляем объект
-    def delete_item(path):
-        try:
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-                logger.info(f"SAU - Удалён каталог: {path}")
-            else:
-                os.remove(path)
-                logger.info(f"SAU - Удалён файл: {path}")
-
-            return True
-        except Exception as e:
-            logger.error(f"SAU - Ошибка удаления {path}:\n{e}")
-            messagebox.showerror(random_string(), f"Не удалось удалить {path}:\n{e}")
+            logger.exception(f"SAU - {l["delete_error"]} {path}", e)
+            messagebox.showerror(random_string(), f"{l["delete_error"]} {path}:\n{e}")
 
 
 
@@ -621,7 +610,7 @@ def crowbar_settings(current_theme):
 
             if not value and var_type != "bool":
                 is_valid = False
-                error_message = "Поле не может быть пустым!"
+                error_message = l["field_cannot_be_empty"]
             
             elif var_type == "int":
                 is_valid, error_message = validate_int_with_limit(value, 99)
@@ -636,8 +625,9 @@ def crowbar_settings(current_theme):
                         settings_data[var_name] = ast.literal_eval(value.strip())
                     except Exception as e:
                         is_valid = False
-                        error_message = f"Ошибка парсинга: {e}"
-                
+                        error_message = f"{l["parsing_error"]}: {e}"
+                        logger.exception(error_message)
+
             elif var_type == "str_path":
                 is_valid, error_message = validate_path(value)
                 if is_valid:
@@ -656,10 +646,10 @@ def crowbar_settings(current_theme):
                 valid = False
 
         if not valid:
-            messagebox.showerror(random_string(), "Исправьте ошибки в полях (отмечены красным)!")
+            messagebox.showerror(random_string(), l["fix_problem_in_fields"])
             return
 
-        if not messagebox.askyesno(random_string(), "Требуется перекомпиляция!\nПродолжить?"):
+        if not messagebox.askyesno(random_string(), l["recompilation_required_continue"]):
             return
 
         #Блокируем интерфейс
@@ -668,50 +658,51 @@ def crowbar_settings(current_theme):
         def run_compilation():
             try:
                 #Бэкап
-                SAU_GUI.after(0, lambda: [compilation_label.config(text="Создание резервной копии..."), progress_bar.config(value=10)])
-                if not backup_settings(): raise Exception("Ошибка бэкапа")
+                SAU_GUI.after(0, lambda: [compilation_label.config(text=l["create_backup"]), progress_bar.config(value=10)])
+                if not backup_settings(): raise Exception(l["create_backup_error"])
 
                 #Сохранение настроек
-                SAU_GUI.after(0, lambda: [compilation_label.config(text="Сохранение настроек..."), progress_bar.config(value=25)])
-                if not save_settings(settings_data, config_comments_to_save): raise Exception("Ошибка сохранения")
+                SAU_GUI.after(0, lambda: [compilation_label.config(text=l["save_settings"]), progress_bar.config(value=25)])
+                if not save_settings(settings_data, config_comments_to_save): raise Exception(l["save_settings_error"])
 
                 #Распаковка исходного кода
-                SAU_GUI.after(0, lambda: [compilation_label.config(text="Распаковка исходников..."), progress_bar.config(value=40)])
-                if not extract_archive(ARCHIVE_PATH): raise Exception("Ошибка распаковки архива")
+                SAU_GUI.after(0, lambda: [compilation_label.config(text=l["unpacking_source_code"]), progress_bar.config(value=40)])
+                if not extract_archive(ARCHIVE_PATH): raise Exception(l["unpacking_source_code_error"])
 
-                SAU_GUI.after(0, lambda: [compilation_label.config(text="Подготовка файлов..."), progress_bar.config(value=50)])
+                SAU_GUI.after(0, lambda: [compilation_label.config(text=l["preparing_files"]), progress_bar.config(value=50)])
                 if os.path.exists("T.py"):
                     if os.path.exists(f"{PROGRAM_NAME}.py"):
                         os.remove(f"{PROGRAM_NAME}.py")
                     os.rename("T.py", f"{PROGRAM_NAME}.py")
-                    logger.info(f"SAU - Файл успешно переименован в {PROGRAM_NAME}.py")
+                    logger.info(f"SAU - {l["file"]} {l["success"]} {l["renamed"]} {PROGRAM_NAME}.py")
                 else:
                     #Если файла T.py нет, проверяем, вдруг он уже называется как нужно
                     if not os.path.exists(f"{PROGRAM_NAME}.py"):
-                        raise Exception("Файл T.py не найден в архиве!")
+                        raise Exception(f"{l["file"]} T.py {l["not_found"]} {l["in"]} {l["archive"]}!")
 
                 #Компиляция
-                SAU_GUI.after(0, lambda: [compilation_label.config(text="Компиляция в EXE..."), progress_bar.config(value=60)])
-                if not compiling_crowbar(): raise Exception("Ошибка при компиляции")
+                SAU_GUI.after(0, lambda: [compilation_label.config(text=f"{l["compilation"]} {l["in"]} EXE..."), progress_bar.config(value=60)])
+                if not compiling_crowbar(): raise Exception(f"{l["error"]} {l["during_recompilation"]}")
                 #Копирование файлов
-                SAU_GUI.after(0, lambda: [compilation_label.config(text="Копирование файлов..."), progress_bar.config(value=90)])
+                SAU_GUI.after(0, lambda: [compilation_label.config(text=l["copying_files"]), progress_bar.config(value=90)])
 
                 def finalize():
                     if copy_files():
                         create_lnk(path_to_copy, random_string())
                         progress_bar.config(value=100)
-                        compilation_label.config(text="Добавление в автозагрузку...")
-                        if messagebox.askyesno(random_string(), "Добавить в автозагрузку?"):
+                        compilation_label.config(text=l["adding_to_autorun"])
+                        if messagebox.askyesno(random_string(), l["add_program_to_autorun"]):
                             add_to_autorun(path_to_copy)
-                        compilation_label.config(text="Успешно завершено!")
-                        messagebox.showinfo(random_string(), "Установка успешно завершена!")
+                        comment = f"{l["success"]} {l["completed"]}"
+                        compilation_label.config(text=comment)
+                        messagebox.showinfo(random_string(), comment)
                     set_ui_state("normal")
 
                 SAU_GUI.after(0, finalize)
 
             except Exception as e:
-                messagebox.showerror(random_string(), f"Критическая ошибка:\n{e}")
-                compilation_label.config(text="Ошибка процесса")
+                messagebox.showerror(random_string(), f"{l["error"]} {l["during_recompilation"]}:\n{e}")
+                compilation_label.config(text=f"{l["error"]} {l["during_recompilation"]}")
                 progress_bar.config(value=0)
                 set_ui_state("normal")
 
@@ -719,7 +710,7 @@ def crowbar_settings(current_theme):
         threading.Thread(target=run_compilation, daemon=True).start()
 
     def delete_cache():
-        if not messagebox.askyesno(random_string(), "Вы уверены, что хотите удалить весь кэш и временные .py файлы?"):
+        if not messagebox.askyesno(random_string(), l["delete_compiling_cache"]):
             return
 
         global config_log_path
@@ -728,7 +719,7 @@ def crowbar_settings(current_theme):
         
         #Расширения-исключения
         protected_extensions = (".txt", ".log", ".exe")
-        
+
         current_dir = os.getcwd()
         deleted_count = 0
 
@@ -752,17 +743,17 @@ def crowbar_settings(current_theme):
                     if delete_item(item): 
                         deleted_count += 1
 
-            comment = f"Очистка завершена.\nУдалено объектов: {deleted_count}"
+            comment = f"{l["clean_completed_deleted_objects"]}: {deleted_count}"
             logger.info(f"SAU - {comment}")
-            messagebox.showinfo(random_string(), )
+            messagebox.showinfo(random_string(), comment)
         except Exception as e:
-            logger.error(f"SAU - Ошибка при очистке кэша:\n{e}")
-            messagebox.showerror(random_string(), "Произошла ошибка при очистке. Подробности в лог файле.")
+            logger.exception(f"SAU - {l["clean_cache_error"]}", e)
+            messagebox.showerror(random_string(), l["clean_cache_error"])
 
     status_frame = ttk.Frame(frame)
     status_frame.pack(fill="x", side=tk.BOTTOM, pady=5)
 
-    compilation_label = ttk.Label(status_frame, text="Готов к работе")
+    compilation_label = ttk.Label(status_frame, text=l["ready"])
     compilation_label.pack(side=tk.TOP, anchor="w", padx=5)
 
     progress_bar = ttk.Progressbar(status_frame, orient="horizontal", mode="determinate")
@@ -781,36 +772,36 @@ def crowbar_settings(current_theme):
         try:
             os.startfile(os.getcwd())
         except Exception as e:
-            logger.error(f"Не удалось открыть каталог: {e}")
+            logger.exception(f"{l["open_error"]} {l["dir"]}", e)
 
     def open_log_file():
         try:
             if os.path.exists(config_log_path):
                 os.startfile(config_log_path)
             else:
-                messagebox.showwarning(random_string(), "Файл лога еще не создан.")
+                messagebox.showwarning(random_string(), f"{l["not_found"]} {l["log"]}")
         except Exception as e:
-            logger.error(f"Не удалось открыть лог: {e}")
+            logger.error(f"{l["open_error"]} {l["log"]}: {e}")
 
     button_frame = ttk.Frame(frame)
     button_frame.pack(pady=5)
 
-    export_button = ttk.Button(button_frame, text="Экспорт", command=lambda:backup_settings(export=True))
+    export_button = ttk.Button(button_frame, text=l["export"], command=lambda:backup_settings(export=True))
     export_button.grid(row=0, column=0, padx=3, pady=2)
     
-    import_button = ttk.Button(button_frame, text="Импорт", command=lambda:read_config(True))
+    import_button = ttk.Button(button_frame, text=l["import"], command=lambda:read_config(True))
     import_button.grid(row=0, column=1, padx=3, pady=2)
 
-    delete_cache_button = ttk.Button(button_frame, text="Удалить Кэш", command=delete_cache)
+    delete_cache_button = ttk.Button(button_frame, text=l["delete_cache"], command=delete_cache)
     delete_cache_button.grid(row=0, column=2, padx=3, pady=2)
 
-    apply_button = ttk.Button(button_frame, text="Применить", command=apply_settings)
+    apply_button = ttk.Button(button_frame, text=l["apply"], command=apply_settings)
     apply_button.grid(row=0, column=3, padx=3, pady=2)
 
-    open_dir_button = ttk.Button(button_frame, text="Открыть каталог", command=open_current_dir)
+    open_dir_button = ttk.Button(button_frame, text=f"{l["open"]} {l["dir"]}", command=open_current_dir)
     open_dir_button.grid(row=1, column=0, columnspan=2, padx=3, pady=2, sticky="ew")
 
-    open_log_button = ttk.Button(button_frame, text="Открыть лог файл", command=open_log_file)
+    open_log_button = ttk.Button(button_frame, text=f"{l["open"]} {l["log"]}", command=open_log_file)
     open_log_button.grid(row=1, column=2, columnspan=2, padx=3, pady=2, sticky="ew")
 
     #Сохраняем ссылки для управления состоянием
@@ -826,14 +817,14 @@ def crowbar_settings(current_theme):
     SAU_GUI.mainloop()
 
 def SAU(current_theme):
-    if messagebox.askyesno(random_string(), "Учтите, что изменение параметров невозможно без перекомпиляции программы!\nТакже данный Компонент будет использован для обновления программы с собственной настройкой.\n\nРекомендуем сделать экспорт настроек (тем самым сделать резервную копию настроек), перед изменениями\n\nВы хотите продолжить?."):
+    if messagebox.askyesno(random_string(), l["sau_start_text"]):
         global PROGRAM_NAME, ARCHIVE_PASSWORD
         SETTINGS_BACKUP_PREFIX = "settings_backup"
         #ARCHIVE_PATH = "crowbar_code.zip"
         ARCHIVE_PASSWORD = b"0000"
-        PROGRAM_NAME = simpledialog.askstring(title=random_string(), prompt="Введите желаемое название исполняемого файла,\nБЕЗ расширения файла!")
+        PROGRAM_NAME = simpledialog.askstring(title=random_string(), prompt=l["enter_program_name"])
         if not os.path.isfile("icon\\T_icon.ico"):
-            messagebox.showinfo(random_string(), "Не найдена иконка программы, если хотите указать собственную Нажмите ОК и в появившеемся окне выберите иконку, если нет то нажмите ОК и в открывшемся окне выберите Отмена")
+            messagebox.showinfo(random_string(), l["icon_not_found"])
             ICON_PATH = filedialog.askopenfilename(title=random_string(), filetypes=[("Иконка программы", "*.ico*")])
             if ICON_PATH:
                 COMPILING_COMMAND = f"python -m nuitka --follow-imports --standalone --windows-console-mode=disable --onefile --enable-plugin=tk-inter --windows-icon-from-ico={ICON_PATH} --lto=no --mingw64 {PROGRAM_NAME}.py"
@@ -841,7 +832,6 @@ def SAU(current_theme):
                 COMPILING_COMMAND = f"python -m nuitka --follow-imports --standalone --windows-console-mode=disable --onefile --enable-plugin=tk-inter --lto=no --mingw64 {PROGRAM_NAME}.py"
         else:
             COMPILING_COMMAND = f"python -m nuitka --follow-imports --standalone --windows-console-mode=disable --onefile --enable-plugin=tk-inter --windows-icon-from-ico=icon\\T_icon.ico --lto=no --mingw64 {PROGRAM_NAME}.py"
-        config_log_path = "Crowbar_Setup_Log.txt"
 
         global ARCHIVE_PATH
         ARCHIVE_PATH = filedialog.askopenfilename(title=random_string(), filetypes=[("Zip Архивы", "*.zip*")])
@@ -849,12 +839,14 @@ def SAU(current_theme):
         try:
             crowbar_settings(current_theme)
         except Exception as e:
-            logger.critical(f"Во время установки произошла неизвестная ошибка:\n{e}")
+            logger.exception(l["sau_critical_error"], e)
     else:
         return
 
 if __name__ == "__main__":
-    logger.add(config_log_path, format="{time} {level} {message}", rotation="10 MB", compression="zip")
+    config_log_path = simpledialog.askstring(title=random_string(), prompt=l["enter_log_name"])
+    if config_log_path:
+        logger.add(config_log_path, format="{time} {level} {message}", rotation="10 MB", compression="zip")
     current_theme = theme[default_theme]
     from elevate import elevate
     elevate()

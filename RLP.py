@@ -8,8 +8,138 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-#ПРОТОТИП НЕДОСТУПЕН, ТАК КАК ОН КРАЙНЕ НЕ СТАБИЛКЕ, ОЖИДАЙТЕ ОБНОВЛЕНИЯ
-#ЗАГЛУШКА
-real_time_protect_version = "недоступен, ожидайте обновление"
-def RLP(a=None,b=None,c=None):
+from tkinter import messagebox
+from RS import random_string
+from loguru import logger
+import psutil
+
+#from EC import get_process_critical_status
+def get_process_critical_status(a=None,b=None,c=None):
     pass
+
+real_time_protect_version = "0.1.0 Pre-Alpha"
+
+#Действие с процессами
+def action_process(action, process_ids):
+    if not isinstance(process_ids, (list, tuple)):
+        process_ids = [process_ids]
+
+    for pid in process_ids:
+        try:
+            proc = psutil.Process(int(pid))
+
+            if action == "kill":
+                proc.terminate()
+            elif action == "suspend":
+                proc.suspend()
+            elif action == "resume":
+                proc.resume()
+            elif action == "edit_critical_to_false":
+                EC(int(pid), False)
+            elif action == "edit_critical_to_true":
+                EC(int(pid), True)
+
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+        except Exception as e:
+            logger.critical(f"RLP - Ошибка при {action} для PID {pid}:\n{e}")
+
+#Получаем имя процесса
+def get_process_name(process_id):
+    process = psutil.Process(process_id)
+    return process.name()
+
+#Получаем информацию о процессе
+def get_process_info(proc, run_in_recovery):
+    try:
+        status = "Заморожен" if proc.status() == psutil.STATUS_STOPPED else "Запущен"
+
+        #РЕАЛИЗОВАТЬ ПРОВЕРКУ НА АДМИНИСТРАТОРА
+        is_elevated = False
+
+        return {
+            "PID": proc.pid,
+            "Имя Процесса": proc.name(),
+            "Путь к файлу": proc.exe() if proc.exe() else "Н/Д",
+            "Пользователь": proc.username() if proc.username() else "Н/Д",
+            "Критичность": get_process_critical_status(proc.pid, run_in_recovery),
+            "Статус": status,
+            "Администратор": is_elevated,
+        }
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        return None
+    except Exception as e:
+        process_name = get_process_name(proc.pid)
+        logger.error(f"PM - Ошибка при получении информации о процессе {process_name} (pid:{proc.pid}):\n{e}")
+        return None
+
+#Получаем список процессов
+def get_process_list(list_type, run_in_recovery):
+    all_processes = []
+    for proc in psutil.process_iter(["pid", "name", "exe", "username", "status"]):
+        info = get_process_info(proc, run_in_recovery)
+        if info:
+            all_processes.append(info)
+
+    if list_type == "all_list":
+        return all_processes
+    elif list_type == "critical_list":
+        return [p for p in all_processes if p["Критичность"]]
+    elif list_type == "suspend_list":
+        return [p for p in all_processes if p["Статус"] == "Заморожен"]
+    return []
+
+def RLP(run_in_recovery,b=None,c=None):
+    SUSPEND_PROCESS = []
+    system_name_process = (
+        ("cmd.exe", r"C:\Windows\System32\cmd.exe"),
+        ("notepad.exe", r"C:\Windows\notepad.exe"),
+        ("calc.exe", r"C:\Windows\System32\calc.exe"),
+        ("explorer.exe", r"C:\Windows\explorer.exe"),
+        ("powershell.exe", r"C:\Windows\System32\powershell.exe"),
+        ("taskmgr.exe", r"C:\Windows\System32\taskmgr.exe"),
+        ("regedit.exe", r"C:\Windows\regedit.exe"),
+        ("mspaint.exe", r"C:\Windows\System32\mspaint.exe"),
+    )
+    system_exception = [r"C:\Users\Adminus\Desktop\calc.exe"]
+
+    if run_in_recovery:
+        messagebox.showwarning(random_string(), "RealTimeProtect невозможно запустить в среде восстановления")
+
+    def warning_dialog(cause, p):
+        if cause == "fake_system":
+            cause_text = f'Процесс {p["Имя Процесса"]}({p["PID"]}), притворяется системным.\nТак как его файл расположен в: {p["Путь к файлу"]}'
+
+    def stop_process(cause, p):
+        action_process("suspend", p["PID"])
+        SUSPEND_PROCESS.append(p["PID"])
+        warning_dialog(cause, p)
+
+    def check_system_process(PROCESS_LIST):
+        logger.info("RLP - Проверка системных процессов...")
+        for p in PROCESS_LIST:
+            p_name = p["Имя"]
+            p_exe = p["Путь к файлу"]
+
+            for sys_name, sys_exe in system_name_process:
+                if p_name == sys_name:
+                    if p_exe != sys_exe:
+                        stop_process(p)
+
+    def filter_process_for_exception(PROCESS_LIST):
+        for p in PROCESS_LIST:
+            for except_sys_name in system_exception:
+                if p["Путь к файлу"] == except_sys_name:
+                    PROCESS_LIST.remove(p)
+
+        return PROCESS_LIST
+
+    while True:
+        PROCESS_LIST = get_process_list("all_list", run_in_recovery)
+
+        PROCESS_LIST = filter_process_for_exception(PROCESS_LIST)
+
+        check_system_process(PROCESS_LIST)
+
+if __name__ == "__main__":
+    RLP(run_in_recovery=False)

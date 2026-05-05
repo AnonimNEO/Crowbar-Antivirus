@@ -18,14 +18,16 @@ import subprocess
 import os
 import re
 
-from OF import apply_global_theme
 from RS import random_string
-from config import theme, default_theme
+from OF import pac, apply_global_theme
+from config import theme, default_theme, program_authentication_clyth
+from languages import localizations, current_localization
 
-run_version = "1.0.5 beta"
+run_version = "1.1.0 Beta"
 run_width_window = 400
 run_height_window = 200
 run_size_window = f"{run_width_window}x{run_height_window}"
+l = localizations[current_localization]
 
 class ApplicationLauncher:
     def __init__(self, RUN_GUI):
@@ -36,19 +38,19 @@ class ApplicationLauncher:
 
         #Пресеты
         self.presets = [
-            {"name": "---Стандартные утилиты---", "command": ""},
-            {"name": "редактор реестра", "command": "regedit.exe"},
-            {"name": "диспетчер задач", "command": "taskmgr.exe"},
-            {"name": "блокнот", "command": "notepad.exe"},
-            {"name": "проводник", "command": "explorer.exe"},
-            {"name": "командная строка", "command": "cmd.exe"},
-            {"name": "PowerShell", "command": "powershell.exe"},
-            {"name": "---Команды---", "command": ""},
+            {"name": f"---{l["standard"]} {l["utilities"]}---", "command": ""},
+            {"name": l["regedit"], "command": "regedit.exe"},
+            {"name": l["taskmgr"], "command": "taskmgr.exe"},
+            {"name": l["notepad"], "command": "notepad.exe"},
+            {"name": l["explorer"], "command": "explorer.exe"},
+            {"name": l["cmd"], "command": "cmd.exe"},
+            {"name": l["powershell"], "command": "powershell.exe"},
+            {"name": f"---{l["commands"]}---", "command": ""},
             {"name": "SFC /SCANNOW", "command": "SFC /SCANNOW"},
-            {"name": "Отменить перезагрузки/выключение", "command": "shutdown /a"},
-            {"name": "Перезагрузить ПК", "command": "shutdown /r"},
-            {"name": "Выключить ПК", "command": "shutdown /s"},
-            {"name": "завершить сеанс", "command": "shutdown /l"}
+            {"name": l["cancel_reboot"], "command": "shutdown /a"},
+            {"name": l["reboot_pc"], "command": "shutdown /r"},
+            {"name": l["shutdown_pc"], "command": "shutdown /s"},
+            {"name": l["end_session"], "command": "shutdown /l"}
         ]
 
         self.mode = tk.StringVar(value="professional")
@@ -77,19 +79,19 @@ class ApplicationLauncher:
         menu_frame.pack(side=tk.TOP, fill=tk.X)
         menu_frame.pack_propagate(False)
 
-        label = tk.Label(menu_frame, text="Режим:", font=("Default", 10))
+        label = tk.Label(menu_frame, text=l["mode"], font=("Default", 10))
         label.pack(side=tk.LEFT, padx=10, pady=8)
 
         mode_combo = ttk.Combobox(
             menu_frame,
             textvariable=self.mode,
-            values=["профессиональный", "упрощённый"],
+            values=[l["professional"], l["simplified"]],
             state="readonly",
             width=20
         )
         mode_combo.pack(side=tk.LEFT, padx=5, pady=8)
         mode_combo.bind("<<ComboboxSelected>>", lambda e: self.switch_mode(
-            "professional" if self.mode.get() == "профессиональный" else "simplified"
+            "professional" if self.mode.get() == l["professional"] else l["simplified"]
         ))
 
 
@@ -105,7 +107,7 @@ class ApplicationLauncher:
 
         ok_button = tk.Button(
             input_frame,
-            text="OK",
+            text=l["ok"],
             command=self.run_command,
             width=5,
             font=("Default", 11)
@@ -227,18 +229,18 @@ class ApplicationLauncher:
             if self.is_command_or_dir(command):
                 #Это команда
                 subprocess.Popen(command, shell=True)
-                logger.info(f"Run - запуск команды: {command}")
+                logger.info(f"Run - {l["launch"]} {l["commands"]}: {command}")
             else:
                 #Это путь к файлу
                 if os.path.exists(command):
                     os.startfile(command)
-                    logger.info(f"Run - запуск файла: {command}")
+                    logger.info(f"Run - {l["launch"]} {l["file2"]}: {command}")
                 else:
-                    comment = f"Run - Не найден файл: {command}"
+                    comment = f"Run - {l["not_found"]} {l["file"]}: {command}"
                     logger.error(comment)
                     self.log(comment)
         except Exception as e:
-            comment = f"Run - Ошибка при запуске файла:\n{e}"
+            comment = f"Run - {l["start_error"]} {l["file2"]}:\n{e}"
             logger.error(comment)
             self.log(comment)
 
@@ -251,14 +253,13 @@ class ApplicationLauncher:
         try:
             subprocess.Popen(command, shell=True)
         except Exception as e:
-            comment = f"Run - Ошибка при выполнении команды {command}:\n{e}"
-            logger.error(comment)
-            self.log(comment)
+            logger.exception(l["start_command_error"], e)
+            self.log(l["start_command_error"])
 
 
 
     def on_window_resize(self, event=None):
-        if self.mode.get() == "упрощённый":
+        if self.mode.get() == l["simplified"]:
             #Динамическое изменение размера шрифта в зависимости от размера окна
             width = self.RUN_GUI.winfo_width()
             height = self.RUN_GUI.winfo_height()
@@ -284,22 +285,23 @@ def Run(current_theme):
     def restart_run(user_theme):
         global current_theme
         current_theme = theme[user_theme]
+        apply_global_theme(RUN_GUI, current_theme)
 
     menubar = tk.Menu(RUN_GUI)
 
     #Меню
     menubar = Menu(RUN_GUI)
     theme_menu = Menu(menubar, tearoff=0)
-    theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_run("dark"))
-    theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_run("white"))
-    theme_menu.add_checkbutton(label="Красная", command=lambda: restart_run("red"))
-    theme_menu.add_checkbutton(label="Зелёная", command=lambda: restart_run("lime"))
-    theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_run("black"))
-    theme_menu.add_checkbutton(label="Серая", command=lambda: restart_run("gray"))
-    theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_run("orange"))
+    theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_run("dark"))
+    theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_run("white"))
+    theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_run("red"))
+    theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_run("lime"))
+    theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_run("black"))
+    theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_run("gray"))
+    theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_run("orange"))
 
     #Пункт "Темы"
-    menubar.add_cascade(label="Темы", menu=theme_menu)
+    menubar.add_cascade(label=l["themes"], menu=theme_menu)
 
     RUN_GUI.attributes("-topmost", True) 
 
@@ -311,13 +313,15 @@ def Run(current_theme):
         GUI.attributes("-topmost", new_state)
 
     def update_topmost_label(menubar, GUI):
-        status = "вкл" if higher.get() else "выкл"
+        status = l["on2"] if higher.get() else l["off2"]
         #Индекс command в menubar
-        menubar.entryconfig(2, label=f"Поверх всех окон: {status}")
+        menubar.entryconfig(2, label=f"{l["topmost"]}: {status}")
         GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-    menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(RUN_GUI))
+    menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(RUN_GUI))
     update_topmost_label(menubar, RUN_GUI)
+
+    menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
 
     RUN_GUI.config(menu=menubar)
 

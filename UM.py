@@ -7,40 +7,42 @@
 #Или в файле COPYING.txt в архиве с установщиком
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
-
 #Интерфейс
-from tkinter import ttk, messagebox, Menu
+from tkinter import ttk, messagebox, Menu, simpledialog
 import tkinter as tk
 #Работа с пользователями
 import subprocess
 import os
+import threading
 #Логирование
 from loguru import logger
 
-from OF import apply_global_theme
+from languages import localizations, current_localization
+from OF import pac, apply_global_theme
 from RS import random_string
 from config import *
 
-users_manager_version = "0.1.10 Beta"
+users_manager_version = "0.3.0 Beta"
+l = localizations[current_localization]
 
 def run_net_command(args):
     try:
         subprocess.run(["net"] + args, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
         return True
     except subprocess.CalledProcessError as e:
-        logger.error(f"UM - Команда net завершилась с ошибкой:\n{e.stderr}")
+        logger.error(f"UM - {l["net_error"]}:\n{e.stderr}")
         return False
     except Exception as e:
-        logger.exception(f"UM - Системная ошибка при выполнении команды.\n{e}")
+        logger.exception(f"UM - {l["system_command_error"]}.", e)
         return False
 
 
 
 class UserManager:
-    def __init__(self, master):
-        self.master = master
-        master.title(random_string())
-        master.geometry("275x350")
+    def __init__(self, UM_GUI):
+        self.UM_GUI = UM_GUI
+        UM_GUI.title(random_string())
+        UM_GUI.geometry("400x350")
 
         self.users = [] 
         self.current_username = os.getlogin() 
@@ -48,22 +50,23 @@ class UserManager:
         self.create_widgets()
         self.load_users()
 
-
-
     def create_widgets(self):
-        self.tree = ttk.Treeview(self.master, columns=("username",), show="headings")
-        self.tree.heading("username", text="Имя пользователя")
+        self.tree = ttk.Treeview(self.UM_GUI, columns=("username",), show="headings")
+        self.tree.heading("username", text=l["user_name"])
         self.tree.column("username", width=275)
         self.tree.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
 
-        button_frame = tk.Frame(self.master)
+        button_frame = tk.Frame(self.UM_GUI)
         button_frame.pack(pady=5)
 
-        self.create_button = tk.Button(button_frame, text="Создать пользователя", command=self.create_user)
+        self.create_button = tk.Button(button_frame, text=l["create_user"], command=self.create_user)
         self.create_button.pack(side=tk.LEFT, padx=5)
 
-        self.delete_button = tk.Button(button_frame, text="Удалить выбранных", command=self.delete_users)
+        self.delete_button = tk.Button(button_frame, text=l["delete_users"], command=self.delete_users)
         self.delete_button.pack(side=tk.LEFT, padx=5)
+
+        self.reset_password_button = tk.Button(button_frame, text=l["change_password"], command=self.reset_password)
+        self.reset_password_button.pack(side=tk.LEFT, padx=5)
 
 
 
@@ -95,8 +98,8 @@ class UserManager:
             self.update_tree()
 
         except Exception as e:
-            logger.exception("UM - Ошибка при загрузке списка пользователей")
-            messagebox.showerror(random_string(), f"Не удалось загрузить пользователей:\n{e}")
+            logger.exception(f"UM - {l["get_user_list_error"]}", e)
+            messagebox.showerror(random_string(), f"{l["get_user_list_error"]}:\n{e}")
 
 
 
@@ -109,15 +112,15 @@ class UserManager:
 
 
     def create_user(self):
-        create_window = tk.Toplevel(self.master)
+        create_window = tk.Toplevel(self.UM_GUI)
         create_window.title(random_string())
         create_window.geometry("150x150")
 
-        tk.Label(create_window, text="Имя пользователя:").pack(pady=2)
+        tk.Label(create_window, text=l["user_name"]).pack(pady=2)
         username_entry = tk.Entry(create_window)
         username_entry.pack(pady=2)
 
-        tk.Label(create_window, text="Пароль:").pack(pady=2)
+        tk.Label(create_window, text=l["password"]).pack(pady=2)
         password_entry = tk.Entry(create_window, show="*")
         password_entry.pack(pady=2)
 
@@ -126,20 +129,20 @@ class UserManager:
             password = password_entry.get().strip()
 
             if not username or not password:
-                messagebox.showwarning(random_string(), "Заполните все поля.")
+                messagebox.showwarning(random_string(), l["enter_all_data"])
                 return
 
             try:
                 run_net_command(["user", username, password, "/add"])
-                logger.info(f"UM - Пользователь {username} создан.")
+                logger.success(f"UM - {l["user"][0:-1]} {username} {l["success_create"]}.")
                 self.load_users()
                 create_window.destroy()
             except Exception as e:
-                comment = f"UM - Ошибка при создании пользователя {username}\n{e}"
-                logger.error(comment)
+                comment = f"UM - {l["create_user_error"]} {username}"
+                logger.exception(comment, e)
                 messagebox.showerror(random_string(), comment)
 
-        create_button = tk.Button(create_window, text="Создать", command=confirm_creation)
+        create_button = tk.Button(create_window, text=l["create_user"], command=confirm_creation)
         create_button.pack(pady=10)
 
 
@@ -147,21 +150,79 @@ class UserManager:
     def delete_users(self):
         selected_items = self.tree.selection()
         if not selected_items:
-            messagebox.showwarning(random_string(), "Выберите пользователя.")
+            messagebox.showwarning(random_string(), l["select_user"])
             return
 
         for item in selected_items:
             username = self.tree.item(item, "values")[0]
             if username.lower() == self.current_username.lower():
-                messagebox.showwarning(random_string(), f"Нельзя удалить себя ({username}).")
+                messagebox.showwarning(random_string(), f"{l["cant_delete_self"]} ({username})!\n{l["what_did_you"]}!")
                 continue
 
             if run_net_command(["user", username, "/delete"]):
-                logger.info(f"UM - Пользователь {username} удален.")
+                logger.info(f"UM - {l["user"]} {username} {l["deleted"]}.")
             else:
-                logger.error(f"UM - Ошибка при удалении пользователя {username}.")
+                comment = f"{l["delete_user_error"]} {username}."
+                logger.error(f"UM - {comment}")
+                messagebox.showerror(random_string(), comment)
 
         self.load_users()
+
+
+
+    def reset_password(self):
+        selected_items = self.tree.selection()
+        if not selected_items:
+            messagebox.showwarning(random_string(), l["select_user"])
+            return
+
+        #Диалог для ввода нового пароля
+        password_dialog = tk.Toplevel(self.UM_GUI)
+        password_dialog.title(random_string())
+        password_dialog.geometry("250x120")
+        password_dialog.transient(self.UM_GUI)
+        password_dialog.grab_set()
+
+        tk.Label(password_dialog, text=l["enter_new_password"]).pack(pady=10)
+        password_entry = tk.Entry(password_dialog, show="*")
+        password_entry.pack(pady=5, padx=10, fill=tk.X)
+
+        def confirm_reset():
+            new_password = password_entry.get().strip()
+            
+            if not new_password:
+                messagebox.showwarning(random_string(), f"{l["password"]} {l["not_empty"]}")
+                return
+
+            password_dialog.destroy()
+
+            for item in selected_items:
+                username = self.tree.item(item, "values")[0]
+
+                thread = threading.Thread(target=self._do_reset_password, args=(username, new_password))
+                thread.daemon = True
+                thread.start()
+
+        confirm_button = tk.Button(password_dialog, text=l["reset"], command=confirm_reset)
+        confirm_button.pack(pady=10)
+
+        password_entry.focus()
+        password_entry.bind("<Return>", lambda e: confirm_reset())
+
+
+
+    def _do_reset_password(self, username, new_password):
+        try:
+            if run_net_command(["user", username, new_password]):
+                logger.info(f"UM - {l["password_for_user"]} {username} {l["reset2"]}.")
+            else:
+                comment = f"{l["change_password_error"]} {username}."
+                logger.error(f"UM - {comment}")
+                messagebox.showerror(random_string(), comment)
+        except Exception as e:
+            comment = f"{l["change_password_error"]} {username}"
+            logger.exception(f"UM - {comment}", e)
+            messagebox.showerror(random_string(), comment)
 
 
 
@@ -180,13 +241,15 @@ def UM(current_theme):
             GUI.attributes("-topmost", new_state)
 
         def update_topmost_label(menubar, GUI):
-            status = "вкл" if higher.get() else "выкл"
+            status = l["on2"] if higher.get() else l["off2"]
             #Индекс command в menubar
-            menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+            menubar.entryconfig(1, label=f"{l["topmost"]}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(UM_GUI))
+        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(UM_GUI))
         update_topmost_label(menubar, UM_GUI)
+
+        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
 
         UM_GUI.config(menu=menubar)
 
@@ -194,8 +257,7 @@ def UM(current_theme):
         UserManager(UM_GUI)
         UM_GUI.mainloop()
     except Exception as e:
-        logger.critical(f"В Компоненте UsersManager произошла неизвестная ошибка!\n{e}")
-
+        logger.exception(l["um_critical_error"], e)
 if __name__ == "__main__":
     current_theme = theme[default_theme]
     UM(current_theme)

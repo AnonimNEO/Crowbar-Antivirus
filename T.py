@@ -8,8 +8,12 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
+#Локализация
+from languages import localizations, current_localization
+l = localizations[current_localization]
+
 import ctypes
-import random
+import time
 import sys
 import os
 
@@ -42,10 +46,7 @@ except Exception as e:
             #Если логгер уже имеет обработчики, не добавляем новые
             if not self.logger.handlers:
                 handler = logging.StreamHandler(sys.stdout)
-                formatter = logging.Formatter(
-                    "%(asctime)s | %(levelname)-8s | %(message)s",
-                    datefmt="%d-%m-%Y %H:%M:%S"
-                )
+                formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%d-%m-%Y %H:%M:%S")
                 handler.setFormatter(formatter)
                 self.logger.addHandler(handler)
 
@@ -75,29 +76,29 @@ except Exception as e:
 
     logger = Loggers()
 
-    logger.critical(f"T - Ошибка импорта loguru! Используется замена\n{e}")
+    logger.exception(f"T - {l["import_error"]} loguru! {l["replacement_is_used"]}", e)
 
 #Интерфейс
 try:
-    from tkinter import messagebox
+    from tkinter import messagebox, simpledialog
     import tkinter as tk
 except Exception as e:
     not_tkinter = True
-    logger.critical(f"T - Ошибка импорта tkinter\n{e}")
+    logger.exception(f"T - {l["import_error"]} tkinter", e)
 
 try:
     #Рисование иконки в трее и вставка картинок
     from PIL import Image, ImageDraw, ImageFont
 except Exception as e:
     not_pillow = True
-    logger.critical(f"T - Ошибка импорта Pillow\n{e}")
+    logger.exception(f"T - {l["import_error"]} Pillow", e)
 
 #Получение прав Администратора
 try:
     from elevate import elevate
 except Exception as e:
     not_elevate = True
-    logger.critical(f"T - Ошибка импорта elevate\n{e}")
+    logger.exception(f"T - {l["import_error"]} elevate", e)
 
 #Движок иконки в трее
 try:
@@ -105,32 +106,32 @@ try:
     import pystray
 except Exception as e:
     not_pystray = True
-    logger.critical(f"T - Ошибка импорта pystray\n{e}")
+    logger.exception(f"T - {l["import_error"]} pystray", e)
 
 #Работа с потоками
 try:
     from io import BytesIO
 except Exception as e:
     not_bytesio = True
-    logger.critical(f"T - Ошибка импорта BytesIO\n{e}")
+    logger.exception(f"T - {l["import_error"]} BytesIO", e)
 
 try:
     import multiprocessing
 except Exception as e:
     not_multiprocessing = True
-    logger.critical(f"T - Ошибка импорта multiprocessing\n{e}")
+    logger.exception(f"T - {l["import_error"]} multiprocessing", e)
 
 try:
     import threading
 except Exception as e:
     not_threading = True
-    logger.critical(f"T - Ошибка импорта threading\n{e}")
+    logger.exception(f"T - {l["import_error"]} threading", e)
 
 try:
     import signal
 except Exception as e:
     not_signal = True
-    logger.critical(f"T - Ошибка импорта signal\n{e}")
+    logger.exception(f"T - {l["import_error"]} signal", e)
 
 not_ap = False
 not_arm = False
@@ -138,6 +139,7 @@ not_cc = False
 not_config = False
 not_e = False
 not_ec = False
+not_fe = False
 not_fm = False
 not_fr = False
 not_rlp = False
@@ -159,81 +161,108 @@ try:
     from AP import AP
 except Exception as e:
     not_ap = True
-    logger.critical(f"T - Ошибка импорта Компонента AboutImage\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} AboutImage", e)
 
 try:
     from ARM import ARM, autorun_master_version
 except Exception as e:
     not_arm = True
-    logger.critical(f"T - Ошибка импорта Компонента AutoRunMaster\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} AutoRunMaster", e)
 
 try:
     from CC import CC, clear_cache_version
 except Exception as e:
     not_cc = True
-    logger.critical(f"T - Ошибка импорта Компонента ClearCache\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} ClearCache", e)
+
+try:
+    from CC22 import CC22
+except Exception as e:
+    not_cc2 = True
+    def CC22():
+        return "error"
+    logger.exception(f"T - {l["component_import_error"]} CC22", e)
 
 try:
     from config import *
+    import config
 except Exception as e:
     not_config = True
-    logger.critical(f"T - Ошибка импорта конфига!\n{e}")
+    logger.exception(f"T - {l["import_error"]} config!", e)
 
 try:
-    from E import ask_exit, exit_version
+    from E import E, exit_version
 except Exception as e:
     not_e = True
-    def ask_exit():
+    def E():
         pass
-    logger.critical(f"T - Ошибка импорта Компонента Exit\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} Exit", e)
 
 try:
-    from EC import edit_criticality_version
+    from EC import EC, edit_criticality_version
 except Exception as e:
     not_ec = True
-    logger.critical(f"T - Ошибка импорта Компонента EditCritical\n{e}")
+    def EC():
+        pass
+    logger.exception(f"T - {l["component_import_error"]} EditCritical", e)
+
+try:
+    from FE import FE, file_editor_version
+except Exception as e:
+    not_fe = True
+    logger.exception(f"T - {l["component_import_error"]} FileEditor", e)
 
 try:
     from FM import FM, file_manager_version
 except Exception as e:
     not_fm = True
-    logger.critical(f"T - Ошибка импорта Компонента FileManager\n{e}")
+    logger.critical(f"T - {l["component_import_error"]} FileManager", e)
 
 try:
     from FR import FR, file_replacer_version
 except Exception as e:
     not_fr = True
-    logger.critical(f"T - Ошибка импорта Компонента FileReplacer\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} FileReplacer", e)
+
+try:
+    from GFA import GFA, get_full_access_version
+except Exception as e:
+    def GFA():
+        pass
+    logger.exception(f"T - {l["component_import_error"]} GetFullAccess", e)
 
 try:
     from RLP import RLP, real_time_protect_version
 except Exception as e:
     not_rlp = True
-    logger.critical(f"T - Ошибка импорта Компонента RealTimeProtection\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} RealTimeProtection", e)
 
 try:
-    from CM import CM, unlocker_version
+    from CM import CM, crowbar_menu_version
 except Exception as e:
     not_cm = True
+    crowbar_menu_version = "error"
     def CM(a=None, b=None, c=None):
         pass
-    logger.critical(f"T - Ошибка импорта Компонента CrowbarMenu\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} MountUnlocker", e)
 
 try:
-    from OF import run_component, restart_ca, open_with, get_current_disc, load_bush, other_components_version
+    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, other_function_version
 except Exception as e:
     not_of = True
     def restart_ca():
         pass
     def open_with():
         pass
-    logger.critical(f"T - Ошибка импорта Компонента OtherFunction\n{e}")
+    def pac():
+        messagebox.showerror(random_string(), f"{l["pac"]} {l["not_available"]}!")
+    logger.exception(f"T - {l["component_import_error"]} OtherFunction", e)
 
 try:
     from PM import PM, process_manager_version
 except Exception as e:
     not_pm = True
-    logger.critical(f"T - Ошибка импорта Компонента ProcessManager\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} ProcessManager", e)
 
 try:
     from R import R, restart_version
@@ -241,7 +270,7 @@ except Exception as e:
     not_r = True
     def R():
         pass
-    logger.critical(f"T - Ошибка импорта Компонента Restart\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} Restart", e)
 
 try:
     from RS import random_string, random_string_version
@@ -249,128 +278,130 @@ except Exception as e:
     def random_string():
         return "error"
     not_rs = True
-    logger.critical(f"T - Ошибка импорта Компонента RandomString\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} RandomString", e)
 
 try:
     from Run import Run, run_version
 except Exception as e:
     not_run = True
-    logger.critical(f"T - Ошибка импорта Компонента Run\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} Run", e)
 
 try:
     from SAU import SAU, settings_and_update_version
 except Exception as e:
     not_sau = True
-    logger.critical(f"T - Ошибка импорта Компонента SettingsAndUpdate\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} SettingsAndUpdate", e)
 
 try:
     from SP import SP, scarecrow_protection_version
 except Exception as e:
     not_sp = True
-    logger.critical(f"T - Ошибка импорта Компонента ScarecrowProtection\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} ScarecrowProtection", e)
 
 try:
-    from UA import UA, unlock_all_version
+    from UA import UA, check_and_restore_fonts_if_needed, unlock_all_version
 except Exception as e:
     not_ua = True
-    logger.critical(f"T - Ошибка импорта Компонента UnlockAll\n{e}")
+    def check_and_restore_fonts_if_needed(a=None):
+        pass
+    logger.exception(f"T - {l["component_import_error"]} UnlockAll", e)
 
 try:
     from UM import UM, users_manager_version
 except Exception as e:
     not_um = True
-    logger.critical(f"T - Ошибка импорта Компонента UserManager\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} UserManager", e)
 
 #Импорт консоли разработчика
 try:
-    from Console import open_console
+    from Console import open_console, crowbar_console_version
 except Exception as e:
     not_console = True
-    logger.critical(f"T - Ошибка импорта Компонента Console\n{e}")
+    logger.exception(f"T - {l["component_import_error"]} Console", e)
+
+#from CASH import CASH
 
 try:
-    if not_pystray and not_mu and not not_tkinter:
-        def check_component(is_broken):
-            return "не доступен" if is_broken else "доступен"
+    if not_pystray and not_cm and not not_tkinter:
+        #def check_component(is_broken):
+        #    return "не доступен" if is_broken else "доступен"
 
         broken_components = []
         if not_ap:
-            broken_components.append(f"Компонент AP: не доступен")
+            broken_components.append(f"{l["component"]} AP: {l["not_available"]}")
         if not_arm:
-            broken_components.append(f"Компонент ARM: не доступен")
+            broken_components.append(f"{l["component"]} ARM: {l["not_available"]}")
         if not_cc:
-            broken_components.append(f"Компонент CC: не доступен")
-        if not_config:
-            broken_components.append(f"config: не доступен")
+            broken_components.append(f"{l["component"]} CC: {l["not_available"]}")
         if not_e:
-            broken_components.append(f"Компонент E: не доступен")
+            broken_components.append(f"{l["component"]} E: {l["not_available"]}")
         if not_ec:
-            broken_components.append(f"Компонент EC: не доступен")
+            broken_components.append(f"{l["component"]} EC: {l["not_available"]}")
         if not_fm:
-            broken_components.append(f"Компонент FM: не доступен")
+            broken_components.append(f"{l["component"]} FM: {l["not_available"]}")
         if not_fr:
-            broken_components.append(f"Компонент FR: не доступен")
+            broken_components.append(f"{l["component"]} FR: {l["not_available"]}")
         if not_rlp:
-            broken_components.append(f"Компонент RLP: не доступен")
-        if not_mu:
-            broken_components.append(f"Компонент MU: не доступен")
+            broken_components.append(f"{l["component"]} RLP: {l["not_available"]}")
+        if not_cm:
+            broken_components.append(f"{l["component"]} CM: {l["not_available"]}")
         if not_of:
-            broken_components.append(f"Компонент OF: не доступен")
+            broken_components.append(f"{l["component"]} OF: {l["not_available"]}")
         if not_pm:
-            broken_components.append(f"Компонент PM: не доступен")
+            broken_components.append(f"{l["component"]} PM: {l["not_available"]}")
         if not_r:
-            broken_components.append(f"Компонент R: не доступен")
+            broken_components.append(f"{l["component"]} R: {l["not_available"]}")
         if not_rs:
-            broken_components.append(f"Компонент RS: не доступен")
+            broken_components.append(f"{l["component"]} RS: {l["not_available"]}")
         if not_run:
-            broken_components.append(f"Компонент Run: не доступен")
+            broken_components.append(f"{l["component"]} Run: {l["not_available"]}")
         if not_sau:
-            broken_components.append(f"Компонент SAU: не доступен")
+            broken_components.append(f"{l["component"]} SAU: {l["not_available"]}")
         if not_sp:
-            broken_components.append(f"Компонент SP: не доступен")
+            broken_components.append(f"{l["component"]} SP: {l["not_available"]}")
         if not_ua:
-            broken_components.append(f"Компонент UA: не доступен")
+            broken_components.append(f"{l["component"]} UA: {l["not_available"]}")
         if not_um:
-            broken_components.append(f"Компонент UM: не доступен")
+            broken_components.append(f"{l["component"]} UM: {l["not_available"]}")
         if not_console:
-            broken_components.append(f"Компонент Console: не доступен")
+            broken_components.append(f"{l["component"]} Console: {l["not_available"]}")
         if not_loguru:
-            broken_components.append(f"Библиотека loguru: не доступна")
+            broken_components.append(f"{l["library"]} loguru: {l["not_available2"]}")
         if not_tkinter:
-            broken_components.append(f"Библиотека tkinter: не доступна")
+            broken_components.append(f"{l["library"]} tkinter: {l["not_available2"]}")
         if not_pillow:
-            broken_components.append(f"Библиотека pillow: не доступна")
+            broken_components.append(f"{l["library"]} pillow: {l["not_available2"]}")
         if not_elevate:
-            broken_components.append(f"Библиотека elevate: не доступна")
+            broken_components.append(f"{l["library"]} elevate: {l["not_available2"]}")
         if not_pystray:
-            broken_components.append(f"Библиотека pystray: не доступна")
+            broken_components.append(f"{l["library"]} pystray: {l["not_available2"]}")
         if not_bytesio:
-            broken_components.append(f"Библиотека bytesio: не доступна")
+            broken_components.append(f"{l["library"]} bytesio: {l["not_available2"]}")
         if not_multiprocessing:
-            broken_components.append(f"Библиотека multiprocessing: не доступна")
+            broken_components.append(f"{l["library"]} multiprocessing: {l["not_available2"]}")
         if not_threading:
-            broken_components.append(f"Библиотека threading: не доступна")
+            broken_components.append(f"{l["library"]} threading: {l["not_available2"]}")
         if not_signal:
-            broken_components.append(f"Библиотека signal: не доступна")
-        
+            broken_components.append(f"{l["library"]} signal: {l["not_available2"]}")
+
         critical_error = (
-            "Ядро программы не может быть запущено, обнаружены критические повреждения программы!\n"
-            "Повреждения:\n" +
+            f"{l["critical_fail_detect"]}.\n"
+            f"{l["damage"]}:\n" +
             "\n".join(broken_components)
         )
         messagebox.showerror(random_string(), critical_error)
 except Exception as e:
-    logger.error(f"T - ошибка при проверке критических повреждений\n{e}")
-
+    logger.exception(f"T - ошибка при проверке критических повреждений", e)
 
 #Глобальные Переменные
 global T_log_txt, start_interface, run_in_recovery, current_theme
-font_trey = "arial.ttf"
-trey_version = "2.3.2 Beta build 12"
-on_board_pc_version = ""
+font_trey = "Default"
+trey_version = "2.4.1 Beta"
+on_board_pc_version = l["not_stable"]
 
 def Crowbar():
-    global start_obpc, start_lp, start_interface, current_theme, run_in_recovery, current_disc
+    global start_lp, start_interface, current_theme, run_in_recovery, current_disc
+
     if not os.path.exists(log_path):
         os.makedirs(log_path)
     logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="100 KB", compression="zip")
@@ -378,40 +409,33 @@ def Crowbar():
     current_disc = None
 
     def check_is_recovery():
-        #Проверка на безопасный режим
-        #try:
-        #    import winreg
-        #    reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
-        #    key = winreg.OpenKey(reg, r'System\CurrentControlSet\Control\SafeBoot')
-        #    is_safe_mode = True
-        #except Exception:
-        #    pass
-
-        #Проверка на среду восстановления
         if os.environ.get("WINPE") == "1":
             return True
-
         return False
 
     try:
         try:
             run_in_recovery = check_is_recovery()
             if run_in_recovery:
-                logger.warning("T - Запуск в среде восстановления Шindows")
+                logger.warning(f"T - {l["run_in_recovery"]}")
             else:
-                logger.info("T - Запуск в стандартной среде Шindows")
+                logger.info(f"T - {l["run_in_normal"]}")
         except Exception as e:
             run_in_recovery = True
-            logger.error(f"T - Ошибка при определении среды:\n{e}")
+            logger.exception(f"T - {l["environment_error"]}", e)
 
         if run_in_recovery:
             current_disc, found_disc = get_current_disc(run_in_recovery)
             if found_disc:
-                logger.info(f"T - Загрузка кустов реестра с диска {current_disc}...")
+                logger.info(f"T - {l["load_bush"]} {current_disc}...")
                 load_bush(current_disc)
 
     except Exception as e:
-        logger.error(f"T - Критическая ошибка: {e}")
+        comment = f"T -{runtime_error}"
+        logger.exception(comment, e)
+        messagebox.showerror(random_string(), f"{comment}:\n{e}")
+
+    check_and_restore_fonts_if_needed(run_in_recovery)
 
     #Основная программа
     try:
@@ -427,13 +451,13 @@ def Crowbar():
                     square = ImageDraw.Draw(icon_trey)
                     square.rectangle((width // 2 - 10, height // 2 - 10, width // 2 + 10, height // 2 + 10), fill=(0, 0, 255))
 
-                    font_paths = "C:\\Windows\\Fonts\\arial.ttf"
+                    font_paths = r"C:\Windows\Fonts\arial.ttf"
 
                     font = ImageFont.truetype(font_paths, 24)
 
                     if font is None:
                         font = ImageFont.load_default()
-                        logger.warning("T - Используется шрифт по умолчанию")
+                        logger.warning(f"T - {l["use_default_font"]}.")
 
                     text = "=]"
                     text_bbox = square.textbbox((0, 0), text, font=font)
@@ -451,83 +475,117 @@ def Crowbar():
 
                 def start_icon():
                     if run_in_recovery:
-                        logger.warning("T - Режим восстановления: Трей отключен.")
+                        #logger.warning("T - Режим восстановления: Трей отключен.")
                         return
                     try:
                         icon.visible = True
                     except Exception as e:
-                        logger.error(f"T - Ошибка трея:\n{e}")
+                        logger.exception(f"T - {l["trey_error"]}", e)
 
                 if run_in_recovery:
                     current_disc_r, found_disc = get_current_disc(run_in_recovery)
                 else:
                     current_disc_r = "C:\\"
 
+                #Создаём меню в зависимости от условия доступности компонента
                 def create_menu_item(condition, enabled_text, enabled_func, component_name):
                     if condition:
-                        disabled_text = f"[!] Компонент {component_name} недоступен."
+                        disabled_text = f"[!] {l["component"]} {component_name} {l["not_available"]}""."
                         return MenuItem(disabled_text, lambda: None)
                     else:
                         return MenuItem(enabled_text, enabled_func)
 
                 unlocker_menu = Menu(
-                    create_menu_item(not_arm, "Мастер Автозагрузки", lambda: run_component(ARM, run_in_recovery, current_theme), "ARM"),
-                    create_menu_item(not_pm, "Менеджер Процессов", lambda: run_component(PM, run_in_recovery, current_theme), "PM"),
-                    create_menu_item(not_fm, "Файловый Менеджер", lambda: run_component(FM, run_in_recovery, current_theme), "FM"),
-                    create_menu_item(not_fr, "Замена Редких Файлов", lambda: run_component(FR, run_in_recovery, current_theme), "FR"),
-                    create_menu_item(not_um, "Менеджер Пользователей", lambda: run_component(UM, current_theme), "UM"),
-                    create_menu_item(not_sp, "Scarecrow Protection", lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme), "SP"),
-                    create_menu_item(not_cc, "Запустить Очистку Temp", lambda: CC(run_in_recovery), "CC"),
-                    create_menu_item(not_of, "Открыть с Помощью", open_with, "OF"),
-                    create_menu_item(not_r, "Перезапустить ПК", R, "R")
+                    create_menu_item(not_arm, l["ARM"], lambda: run_component(ARM, run_in_recovery, current_theme), "ARM"),
+                    create_menu_item(not_pm, l["PM"], lambda: run_component(PM, run_in_recovery, current_theme), "PM"),
+                    create_menu_item(not_fm, l["FM"], lambda: run_component(FM, run_in_recovery, current_theme), "FM"),
+                    create_menu_item(not_fr, l["FR"], lambda: run_component(FR, run_in_recovery, current_theme), "FR"),
+                    create_menu_item(not_um, l["UM"], lambda: run_component(UM, current_theme), "UM"),
+                    create_menu_item(not_fe, l["FE"], lambda: run_component(FE), "FE"),
+                    create_menu_item(not_sp, l["SP"], lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme), "SP"),
+                    create_menu_item(not_cc, l["CC"], lambda: CC(run_in_recovery), "CC"),
+                    create_menu_item(not_of, l["open_with"], open_with, "OF"),
+                    create_menu_item(not_r, l["R"], R, "R")
                 )
 
-
-                #Определяем компоненты и запускаем консоль в отдельном потоке
                 def open_console_on_thread():
-                    n = random.randint(128, 2048)
-                    captcha_input = tk.simpledialog.askinteger(random_string(), f"Введите число: {n}")
-
-                    if captcha_input == n:
-                        pass
-                    else:
-                        messagebox.showerror(random_string(), "Неправильный ввод капчи.\nКонсоль разработчика не будет запущена.")
-                        return
-
                     console_globals = {
                         "run_component": run_component,
                         "run_in_recovery": run_in_recovery,
                         "current_theme": current_theme,
                         "AP": AP,
                         "ARM": ARM,
-                        "PM": PM,
+                        "CC": CC,
+                        "CC22": CC22,
+                        "CM": CM,
+                        "config": config,
+                        "EC": EC,
+                        "FE": FE,
                         "FM": FM,
                         "FR": FR,
-                        "UM": UM,
-                        "SP": SP,
-                        "CC": CC,
-                        "UA": UA,
+                        "GFA": GFA,
+                        #OF
+                        "Psutil": Psutil,
+                        "run_component": run_component,
+                        "apply_global_theme": apply_global_theme,
+                        "get_offline_reg_path": get_offline_reg_path,
+                        "get_current_disc": get_current_disc,
+                        "load_bush": load_bush,
+                        "unload_bush": unload_bush,
+                        "get_user_name": get_user_name,
+                        "open_with": open_with,
+                        "reg_path": reg_file,
+                        "run_command": run_command,
+                        "PM": PM,
+                        "RLP": RLP,
+                        "RS": random_string,
                         "Run": Run,
                         "SAU": SAU,
-                        "RLP": RLP,
-                        "CM": CM,
+                        "SP": SP,
+                        "UA": UA,
+                        "UM": UM,
                         "icon": icon if "icon" in locals() else None,
                         "logger": logger,
                     }
-                    thread = threading.Thread(target=open_console, args=(console_globals,), daemon=True)
-                    thread.start()
+                    console_thread = threading.Thread(target=open_console, args=(console_globals,), daemon=True)
+                    console_thread.start()
 
                 #Меню По ПКМ
                 image = create_image(20, 20)
                 menu = Menu(
-                    create_menu_item(not_cm, "Открыть Монтировка Анлокер", lambda: CM(run_in_recovery, current_theme), "CM"),
-                    MenuItem("Утилиты", unlocker_menu),
-                    create_menu_item(not_ua, "Разблокировка Всего", lambda: UA(run_in_recovery), "UA"),
-                    create_menu_item(not_run, "Запустить От Имени Админа", lambda: run_component(Run, current_theme), "Run"),
-                    create_menu_item(not_ap, "О Программе", lambda: AP(autorun_master_version, clear_cache_version, exit_version, edit_criticality_version, file_manager_version, real_time_protect_version, unlocker_version, other_components_version, process_manager_version, restart_version, random_string_version, run_version, scarecrow_protection_version, settings_and_update_version, trey_version, unlock_all_version, users_manager_version), "AP"),
-                    create_menu_item(not_console, "Консоль Разработчика", open_console_on_thread, "Console"),
-                    create_menu_item(not_sau, "Настройки", lambda: run_component(SAU, current_theme), "SAU"),
-                    create_menu_item(not_e, "Выход", ask_exit, "Exit")
+                    create_menu_item(not_cm, f"{l["open"]} {l["CM"]}", lambda: CM(run_in_recovery, current_theme), "CM"),
+                    MenuItem(l["utilities"], unlocker_menu),
+                    create_menu_item(not_ua, l["UA"], lambda: UA(run_in_recovery), "UA"),
+                    create_menu_item(not_run, l["Run"], lambda: run_component(Run, current_theme), "Run"),
+                    create_menu_item(not_ap, l["AP"], lambda: AP(
+                        autorun_master_version,
+                        anti_xyina_version,
+                        clear_cache_version,
+                        crowbar_menu_version,
+                        crowbar_console_version,
+                        exit_version,
+                        edit_criticality_version,
+                        file_editor_version,
+                        file_manager_version,
+                        file_replacer_version,
+                        get_full_access_version,
+                        on_board_pc_version,
+                        other_function_version,
+                        process_manager_version,
+                        restart_version,
+                        real_time_protect_version,
+                        random_string_version,
+                        run_version,
+                        settings_and_update_version,
+                        scarecrow_protection_version,
+                        trey_version,
+                        unlock_all_version,
+                        users_manager_version
+                    ), "AP"),
+                    create_menu_item(not_console, l["Console"], open_console_on_thread, "Console"),
+                    create_menu_item(not_sau, l["SAU"], lambda: run_component(SAU, current_theme), "SAU"),
+                    create_menu_item(not_config, f"{l["pac"]} - {program_authentication_clyth}", pac, "config"),
+                    create_menu_item(not_e, l["E"], E, "Exit")
                 )
 
                 icon = pystray.Icon("Crowbar_Antivirus_Icon", image, "Crowbar Antivirus", menu)
@@ -540,30 +598,32 @@ def Crowbar():
 
                         start_icon()
                     except Exception as e:
-                        logger.critical(f"T - Ошибка запуска иконки! Аварийный перезапуск!\n{e}")
-
+                        logger.exception(f"T - {l["icon_start_error"]}!", e)
                 if start_lp:
                     run_component(RLP)
 
                 if start_interface == "window" or start_interface == "only-windows":
                     run_component(CM, run_in_recovery, current_theme)
 
+                #if start_hcas:
+                #    hcas_thread = threading.Thread(target=CASH, args=(run_in_recovery,), daemon=True)
+                #    hcas_thread.start()
+
                 while True:
                     time.sleep(1)
             except Exception as e:
-                logger.warning(f"T - Ошибка при запуске иконки\n{e}")
+                logger.exception(f"T - {l["icon_start_error"]}!", e)
                 CM(run_in_recovery, current_theme, current_disc)
 
         if run_in_recovery:
-            logger.info("T - Запуск в режиме рекавери...")
             CM(run_in_recovery, current_theme, current_disc)
 
     except Exception as e:
-        logger.critical(f"В Компоненте Trey произошла неизвестная ошибка!\n{e}")
+        logger.exception(l["t_critical_error"], e)
         CM(run_in_recovery, current_theme, current_disc)
     finally:
         if run_in_recovery:
-            logger.info("T - Завершение работы, выгрузка кустов реестра...")
+            logger.infof(f"T - {l["unload_bush"]}")
 
         if not run_in_recovery:
             signal.signal(signal.SIGTERM, restart_ca)
@@ -572,21 +632,20 @@ if __name__ == "__main__":
     try:
         multiprocessing.freeze_support()
     except Exception as e:
-        logger.critical(f"T - Критическая ошибка при многопоточности\n{e}")
+        logger.exception(f"T - {l["multiprocessing_error"]}", e)
 
     try:
-        #elevate()
         if ctypes.windll.shell32.IsUserAnAdmin():
             try:
                 Crowbar()
             except Exception as e:
-                comment = f"T - Фатальная ошибка при работе ядра программы\n{e}"
-                logger.critical(comment)
-                if messagebox.askyesno(random_string(),f"{comment}\n\nПерезапустить программу?"):
+                comment = f"T - {l["t_critical_error"]}"
+                logger.exception(comment, e)
+                if messagebox.askyesno(random_string(), f"{comment}:\n{e}\n\n{l["restart_program"]}?"):
                     Crowbar()
         else:
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
     except Exception as e:
-        admin_error = f"T - Ошибка при получении прав администратора:\n{e}"
-        logger.critical(admin_error)
-        messagebox.showerror(random_string(), admin_error)
+        admin_error = f"T - {l["admin_error"]}"
+        logger.exception(admin_error, e)
+        messagebox.showerror(random_string(), f"{admin_error}:\n{e}")

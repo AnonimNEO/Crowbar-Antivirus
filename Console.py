@@ -1,15 +1,29 @@
+#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+#Или в файле COPYING.txt в архиве с установщиком
+#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+#Coded by @AnonimNEO (Telegram)
+
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
 from io import StringIO
 #Логирование Ошибок
 from loguru import logger
 import threading
+import random
 import sys
 
+from languages import localizations, current_localization
+from config import program_authentication_clyth
 from RS import random_string
 import config
 
-crowbar_console_version = "0.0.2 Pre-Alpha"
+crowbar_console_version = "0.1.1 Pre-Alpha"
+l = localizations[current_localization]
 
 class CrowbarConsole:
     def __init__(self, globals_dict=None):
@@ -33,10 +47,9 @@ class CrowbarConsole:
             height=20
         )
         self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        self.output_text.insert(tk.END, f"=== Crowbar Antivirus Console {crowbar_console_version} ===\n")
-        self.output_text.insert(tk.END, f"=== Консоль Антивируса Монтировка {crowbar_console_version} ===\n")
-        self.output_text.insert(tk.END, "Будте осторожны, данный компоеннт может быть не стабилен\n")
-        self.output_text.insert(tk.END, "Доступно изменение переменных run_in_recovery\n")
+        self.output_text.insert(tk.END, f"=== {l["crowbar_console"]} {crowbar_console_version} ===\n")
+        self.output_text.insert(tk.END, f"{l["pac"]} - {program_authentication_clyth}\n")
+        self.output_text.insert(tk.END, l["crowbar_console_text"])
         
         self.output_text.config(state=tk.DISABLED)
         
@@ -66,11 +79,11 @@ class CrowbarConsole:
         if not command.strip():
             return
 
-        logger.info(f"Console - попытка выполнить команду: {command}")
+        logger.info(f"Console - {l["attempt_command"]}: {command}")
 
         if any(x in command for x in ("exit", "quit", "os._exit")):
             self.output_text.config(state=tk.NORMAL)
-            comment = "Не не Я не дам тебе обойти капчю (как минимум попытаюсь)\n"
+            comment = f"{l["exit_with_console_text"]}\n"
             logger.info(f"Console - {comment}")
             self.output_text.insert(tk.END, comment)
             self.output_text.config(state=tk.DISABLED)
@@ -119,5 +132,13 @@ class CrowbarConsole:
         self.output_text.config(state=tk.DISABLED)
 
 def open_console(globals_dict=None):
+    n = random.randint(128, 2048)
+    captcha_input = tk.simpledialog.askinteger(random_string(), f"{l["enter_number"]}: {n}")
+
+    if captcha_input == n:
+        pass
+    else:
+        messagebox.showerror(random_string(), l["bad_password_for_console"])
+        return
     console = CrowbarConsole(globals_dict)
     console.create_console()

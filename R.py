@@ -16,10 +16,12 @@ import subprocess
 #Работа с файлами
 import os
 
+from languages import localizations, current_localization
 from config import *
 
 global restart_windows_bat
-restart_version = "0.8.3 Beta"
+restart_version = "0.9.0 Beta"
+l = localizations[current_localization]
 
 @logger.catch
 def R():
@@ -28,7 +30,7 @@ def R():
     global restart_windows
     try:
         if restart_windows == "win32com":
-            logger.info("R - Попытка перезагрузки через WMI (win32com)")
+            logger.info(f"R - {l["attempt_to_reboot"]} WMI (win32com)")
 
             #Получаем объект WMI для управления операционной системой
             wmi = win32com.client.GetObject("winmgmts:{impersonationLevel=impersonate, (Shutdown)}\\\\.\\root\\cimv2")
@@ -41,30 +43,30 @@ def R():
             #но это более надёжный способ для win32com/WMI.
             os_instance.Reboot()
         elif restart_windows == "os":
-            logger.info(f"R - Попытка перезагрузки через os.system('shutdown /r /t {time_to_restart}')")
+            logger.info(f"R - {l["attempt_to_reboot"]} os.system('shutdown /r /t {time_to_restart}')")
             os.system(f"shutdown /r /t {time_to_restart}")
         elif restart_windows == "subprocess":
-            logger.info(f"R - Попытка перезагрузки через subprocess.call (shutdown /r /t {time_to_restart})")
+            logger.info(f"R - {l["attempt_to_reboot"]} subprocess.call (shutdown /r /t {time_to_restart})")
             subprocess.call(["shutdown", "/r", "/t", f"{time_to_restart}"])
         elif restart_windows == "bat":
-            logger.info("R - Попытка перезагрузки через bat-файл")
+            logger.info(f"R - {l["attempt_to_reboot"]} bat-файл")
             with open(restart_windows_bat, "w") as bat_file:
                 bat_file.write(f"shutdown /r /t {time_to_restart}")
             os.startfile(restart_windows_bat)
     except Exception as e:
-        logger.error(f'R - В Компоненте Restart произошла неизвестная ошибка в методе "{restart_windows}"\n{e}')
+        logger.error(f'R - {l["r_critical_error"]} "{restart_windows}"', e)
         error += 1
         if error == 1:
-            logger.info("R - Переход к следующему способу: os")
+            logger.info(f"R - {l["next_method"]}: os")
             restart_windows = "os"
             R()
         if error == 2:
-            logger.info("R - Переход к следующему способу: subprocess")
+            logger.info(f"R - {l["next_method"]}: subprocess")
             restart_windows = "subprocess"
             R()
         if error == 3:
-            logger.info("R - Переход к следующему способу: bat")
+            logger.info(f"R - {l["next_method"]}: bat")
             restart_windows = "bat"
             R()
         if error < 5:
-            logger.error("R - Были выполнены все возможные способы перезагрузки шindows, не один не увенчался успехом.")
+            logger.error(f"R - {l["all_method_used"]}")

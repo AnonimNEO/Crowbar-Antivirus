@@ -25,82 +25,16 @@ import xml.etree.ElementTree as ET
 import win32com.client
 import os
 
+from FE import FE
+from GFA import GFA
 from config import *
 from RS import random_string
-from OF import get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme
+from languages import localizations, current_localization
+from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme
 
 #global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.2.9 Beta"
-
-def remove_autorun_entry(target_exe):
-    target_exe = target_exe.lower()
-    cur_vet = r"Software\Microsoft\Windows\CurrentVersion"
-    #Список путей
-    keys = {
-        "HKCU Run": (winreg.HKEY_CURRENT_USER, rf"{cur_ver}\Run"),
-        "HKLM Run": (winreg.HKEY_LOCAL_MACHINE, rf"{cur_ver}\Run"),
-        "HKCU RunOnce": (winreg.HKEY_CURRENT_USER, rf"{cur_ver}\RunOnce"),
-        "HKLM RunOnce": (winreg.HKEY_LOCAL_MACHINE, rf"{cur_ver}\RunOnce"),
-        "Startup User": os.path.expandvars(r"C:\Users\All Users\Microsoft\Windows\Start Menu\Programs\StartUp"),
-        "Startup Common": os.path.expandvars(r"%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup")
-    }
-
-    #Инициализируем COM для работы с ярлыками
-    try:
-        shell = win32com.client.Dispatch("WScript.Shell")
-    except Exception:
-        shell = None
-
-    for name, path in keys.items():
-        try:
-            if isinstance(path, tuple):
-                root, subkey = path
-                to_delete = []
-
-                #Сначала находим все подходящие параметры
-                with winreg.OpenKey(root, subkey, 0, winreg.KEY_READ) as key:
-                    num_values = winreg.QueryInfoKey(key)[1]
-                    for i in range(num_values):
-                        v_name, v_val, _ = winreg.EnumValue(key, i)
-                        if target_exe in str(v_val).lower():
-                            to_delete.append(v_name)
-
-                #Удаляем найденные параметры
-                if to_delete:
-                    with winreg.OpenKey(root, subkey, 0, winreg.KEY_SET_VALUE) as key:
-                        for v_name in to_delete:
-                            winreg.DeleteValue(key, v_name)
-                            logger.success(f"ARM - Удален параметр реестра: {v_name} из {name}")
-
-            else: #Обработка каталогов
-                if os.path.exists(path):
-                    for file_name in os.listdir(path):
-                        full_path = os.path.join(path, file_name)
-
-                        #Если это сам исполняемый файл
-                        if full_path.lower() == target_exe:
-                            os.remove(full_path)
-                            logger.success(f"ARM - Удален исполняемый файл из автозагрузки: {file_name}")
-                            continue
-
-                        #Если это ярлык, проверяем его цель
-                        if file_name.lower().endswith(".lnk") and shell:
-                            try:
-                                shortcut = shell.CreateShortCut(full_path)
-                                if shortcut.TargetPath.lower() == target_exe:
-                                    os.remove(full_path)
-                                    logger.success(f"ARM - Удален ярлык автозагрузки: {file_name} -> {target_exe}")
-                            except Exception:
-                                pass
-
-        except PermissionError:
-            logger.error(f"ARM - Недостаточно прав для очистки {name}")
-        except Exception as e:
-            logger.error(f"ARM - Ошибка при очистке {name}: {e}")
-
-    return True
-
-
+autorun_master_version = "3.4.0 Beta"
+l = localizations[current_localization]
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -113,8 +47,8 @@ class TaskSchedulerManager:
         except Exception as e:
             self.scheduler = None
             self.root_folder = None
-            logger.error(f"ARM - Ошибка при подключении к COM-интерфейсу:\n{e}")
-            messagebox.showerror(random_string(), f"Не удалось подключиться к Планировщику Задач.\n{e}")
+            logger.exception(f"ARM - {l["scheduler_error"]}", e)
+            messagebox.showerror(random_string(), f"{l["scheduler_error"]}.\n{e}")
 
     #Вспомогательная функция для получения каталога задач
     def get_folder(self, task_path):
@@ -167,16 +101,16 @@ class TaskSchedulerManager:
 
             task.Enabled = enable
             folder.RegisterTaskDefinition(
-                task_name, 
-                task.Definition, 
-                6, 
-                None, 
-                None, 
+                task_name,
+                task.Definition,
+                6,
+                None,
+                None,
                 task.Definition.Principal.LogonType
             )
             return True
         except Exception as e:
-            logger.error(f"ARM - Ошибка изменения состояния COM-задачи {task_path_full}:\n{e}")
+            logger.exception(f"ARM - {l["edit_task_error"]} {task_path_full}", e)
             return False
 
     #Удаляет задачу через COM
@@ -190,7 +124,7 @@ class TaskSchedulerManager:
             folder.DeleteTask(task_name, 0)
             return True
         except Exception as e:
-            logger.error(f"ARM - Ошибка удаления COM-задачи {task_path_full}:\n{e}")
+            logger.exception(f"ARM - {l["delete_task_error"]} {task_path_full}", e)
             return False
 
 
@@ -227,7 +161,7 @@ def ARM(run_in_recovery, current_theme):
     if run_in_recovery:
         current_disc, found_disc = get_current_disc(run_in_recovery)
         if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
-            user_name = simpledialog.askstring(title=random_string(), prompt=f"Не найден пользователь {default_user_name}\nВведите нужное имя пользователя: ")
+            user_name = simpledialog.askstring(title=random_string(), prompt=f"{l["user_not_found"]} {default_user_name}\n{l["enter_user_name"]}: ")
         else:
             user_name = default_user_name
         #Путь к каталогу автозагрузки оффлайн-системы
@@ -240,7 +174,6 @@ def ARM(run_in_recovery, current_theme):
             user_startup = Path(appdata_path) / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Startup"
         else:
             user_startup = f"C:\\Users\\{default_user_name}\\AppData\\Microsoft\\Windows\\Start Menu\\Program\\Startup\\"
-            logger.error("ARM - Переменная среды APPDATA не найдена. Невозможно получить путь автозагрузки пользователя. Используется заглушка Path('.').")
 
 
 
@@ -314,7 +247,7 @@ def ARM(run_in_recovery, current_theme):
                                 "Путь Параметра": str(item)
                             })
                         except Exception as e:
-                            logger.error(f"ARM - Ошибка при получении метаданных файла {item.name}:\n{e}")
+                            logger.exception(f"ARM - {l["metadata_error"]} {item.name}", e)
                             ARM_data.append({
                                 "Имя Файла": item.name,
                                 "Дата создания": "Ошибка",
@@ -323,8 +256,8 @@ def ARM(run_in_recovery, current_theme):
                                 "Путь Параметра": str(item)
                             })
             except Exception as e:
-                logger.error(f"ARM - Ошибка при доступе к папке автозагрузки пользователя:\n{e}")
-                messagebox.showerror(random_string(), f"Не удалось получить доступ к папке автозагрузки.\n{e}")
+                logger.exception(f"ARM - {l["startup_error"]}", e)
+                messagebox.showerror(random_string(), f"{l["startup_error"]}:\n{e}")
             return ARM_data
 
 
@@ -367,9 +300,9 @@ def ARM(run_in_recovery, current_theme):
                         except OSError: #Ошибка возникает, когда перебраны все значения
                             break
             except FileNotFoundError:
-                logger.warning(f"ARM - Ключ реестра не найден: {full_path}")
+                logger.warning(f"ARM - {l["key_not_found"]}: {full_path}")
             except Exception as e:
-                logger.error(f"ARM - Ошибка при считывании ключа реестра {full_path}:\n{e}")
+                logger.exception(f"ARM - {l["read_key_error"]} {full_path}", e)
             return ARM_data
 
 
@@ -391,7 +324,7 @@ def ARM(run_in_recovery, current_theme):
             hkey_map = ARM_CORE_GLOBALS["HKEY_MAP"]
             ARM_data = []
             for hkey_const, subkey_path, value_name in reg_keys["Системная"]:
-                
+
                 if run_in_recovery:
                     final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
                 else:
@@ -399,7 +332,7 @@ def ARM(run_in_recovery, current_theme):
                     final_subkey = subkey_path
 
                 hkey_name = hkey_map.get(hkey_const, str(hkey_const))
-                full_path = f"{hkey_name}\\{subkey_path}" 
+                full_path = f"{hkey_name}\\{subkey_path}"
 
                 try:
                     with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_READ) as key:
@@ -414,7 +347,7 @@ def ARM(run_in_recovery, current_theme):
                             "value_type": reg_type
                         })
                 except Exception as e:
-                    logger.error(f"ARM - Ошибка при считывании системного параметра {value_name} из {full_path}:\n{e}")
+                    logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
                     ARM_data.append({
                         "Имя Параметра": value_name,
                         "Значение Параметра": "Ошибка",
@@ -466,7 +399,7 @@ def ARM(run_in_recovery, current_theme):
                             "value_type": reg_type
                         })
                 except FileNotFoundError as e:
-                    logger.error(f"ARM - Не найден параметр реестра AppInit_DLLs{value_name} ({bitness}) из {full_path}:\n{e}")
+                    logger.error(f"ARM - {l["key_not_found"]} AppInit_DLLs ({bitness}) {full_path}\\{value_name}:\n{e}")
                     ARM_data.append({
                         "Имя Параметра": value_name,
                         "Битность": bitness,
@@ -478,7 +411,7 @@ def ARM(run_in_recovery, current_theme):
                         "value_type": winreg.REG_NONE
                     })
                 except Exception as e:
-                    logger.error(f"ARM - Ошибка при считывании параметра AppInit_DLLs{value_name} ({bitness}) из {full_path}:\n{e}")
+                    logger.exception(f"ARM - {l["read_key_error"]} AppInit_DLLs ({bitness}) {full_path}\\{value_name}", e)
                     ARM_data.append({
                         "Имя Параметра": value_name,
                         "Битность": bitness,
@@ -520,7 +453,7 @@ def ARM(run_in_recovery, current_theme):
                             "value_type": reg_type
                         })
                 except Exception as e:
-                    logger.error(f"ARM - Ошибка при считывании параметра {value_name} из {full_path}:\n{e}")
+                    logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
                     ARM_data.append({
                         "Имя Параметра": value_name,
                         "Значение Параметра": "Ошибка или отсутствует",
@@ -538,7 +471,7 @@ def ARM(run_in_recovery, current_theme):
         def create_reg_value(hkey_const, subkey_path, name, reg_type_str, ARM_GUI_ELEMENTS):
             reg_type = REG_TYPE_MAP_REV.get(reg_type_str)
             if reg_type is None:
-                logger.error(f"ARM - Неизвестный тип реестра: {reg_type_str}")
+                #logger.error(f"ARM - Неизвестный тип реестра: {reg_type_str}")
                 return False
 
             if reg_type in (winreg.REG_SZ, winreg.REG_EXPAND_SZ, winreg.REG_MULTI_SZ):
@@ -559,15 +492,15 @@ def ARM(run_in_recovery, current_theme):
             try:
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE | winreg.KEY_READ) as key:
                     winreg.SetValueEx(key, name, 0, reg_type, initial_value)
-                    logger.success(f"ARM - Создан параметр реестра: {name} с типом {reg_type_str} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
+                    logger.success(f"ARM - {l["create_key"]}: {name} {l["with_type"]} {reg_type_str} {l["in"]} {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\")
                     ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "name", "value": name}
                     return True
             except PermissionError:
-                messagebox.showerror(random_string(), "Недостаточно прав для изменения реестра. Требуются права администратора.")
+                messagebox.showerror(random_string(), l["permission_error"])
                 return False
             except Exception as e:
-                logger.error(f"ARM - Ошибка при создании параметра реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
-                messagebox.showerror(random_string(), f'Не удалось создать параметр реестра "{name}".\n{e}')
+                logger.exception(f"ARM - {l["create_key_error"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
+                messagebox.showerror(random_string(), f'{l["create_key_error"]} "{name}".\n{e}')
                 return False
 
 
@@ -586,7 +519,8 @@ def ARM(run_in_recovery, current_theme):
                     try:
                         value_to_set = int(new_value)
                     except ValueError:
-                        raise ValueError(f"ARM - Некорректное числовое значение для типа {REG_TYPE_MAP.get(reg_type, 'неизвестный')}")
+                        #raise ValueError(f"ARM - Некорректное числовое значение для типа {REG_TYPE_MAP.get(reg_type, 'неизвестный')}")
+                        pass
 
                 elif reg_type == winreg.REG_MULTI_SZ:
                     value_to_set = new_value.split("\n")
@@ -599,26 +533,28 @@ def ARM(run_in_recovery, current_theme):
 
                         value_to_set = bytes.fromhex(hex_string)
                     except ValueError as e:
-                        raise ValueError(f"ARM - Некорректная шестнадцатеричная строка для REG_BINARY.\n{e}")
+                        #raise ValueError(f"ARM - Некорректная шестнадцатеричная строка для REG_BINARY.\n{e}")
+                        pass
 
                 else:
                     value_to_set = new_value
 
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE) as key:
                     winreg.SetValueEx(key, name, 0, reg_type, value_to_set)
-                    logger.success(f"ARM - Обновлен параметр реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
+                    logger.success(f"ARM - {l["update_key"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
                     ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                     return True
 
             except PermissionError:
-                messagebox.showerror(random_string(), "Недостаточно прав для изменения реестра. Требуются права администратора.")
+                messagebox.showerror(random_string(), l["permission_error"])
                 return False
             except ValueError as e:
-                logger.error(f"ARM - Ошибка преобразования значения для параметра реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
+                #logger.error(f"ARM - Ошибка преобразования значения для параметра реестра: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}:\n{e}")
                 return False
             except Exception as e:
-                messagebox.showerror(random_string(), f"Не удалось обновить параметр реестра '{name}'.\n{e}")
-                logger.error(f"ARM - Ошибка при обновлении параметра реестра: {name} в {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
+                comment = f"ARM - {l["update_key_error"]}: {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}\\{name}"
+                messagebox.showerror(random_string(), f"{comment}\n{e}")
+                logger.exception(comment, e)
                 return False
 
 
@@ -635,15 +571,15 @@ def ARM(run_in_recovery, current_theme):
 
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE) as key:
                     winreg.DeleteValue(key, name)
-                    logger.success(f"ARM - Удален параметр реестра: {name} из {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
+                    logger.success(f"ARM - {l["delete_key"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
                     return True
             except PermissionError:
-                messagebox.showerror(random_string(), "Недостаточно прав для удаления из реестра. Требуются права администратора.")
-                logger.error(f"ARM - Ошибка доступа при удалении параметра реестра: {name} из {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}")
+                logger.error(f"ARM - {l["delete_key_error"]}, {l["permission_error"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
+                messagebox.showerror(random_string(), l["permission_error"])
                 return False
             except Exception as e:
-                messagebox.showerror(random_string(), f"Не удалось удалить параметр реестра '{name}'.\n{e}")
-                logger.error(f"ARM - Ошибка при удалении параметра реестра: {name} из {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:\n{e}")
+                messagebox.showerror(random_string(), f'{l["delete_key_error"]} "{name}".\n{e}')
+                logger.exception(f"ARM - {l["delete_key_error"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
                 return False
 
 
@@ -655,16 +591,16 @@ def ARM(run_in_recovery, current_theme):
                 if file.exists():
                     ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                     file.unlink()
-                    logger.success(f"ARM - Удален файл: {file_path}")
+                    logger.success(f"ARM - {l["file_delete"]}: {file_path}")
                     return True
                 return False
             except PermissionError:
-                messagebox.showerror(random_string(), "Недостаточно прав для удаления файла.")
-                logger.error(f"ARM - Ошибка доступа при удалении файла: {file_path}")
+                logger.error(f"ARM - {l["permission_error"]}: {file_path}")
+                messagebox.showerror(random_string(), l["permission_error"])
                 return False
             except Exception as e:
-                messagebox.showerror(random_string(), f"Не удалось удалить файл '{file.name}'.\n{e}")
-                logger.error(f"ARM - Ошибка при удалении файла: {file_path}:\n{e}")
+                logger.exception(f"ARM - {l["file_delete_error"]}: {file_path}", e)
+                messagebox.showerror(random_string(), f'{l["file_delete_error"]} "{file.name}".\n{e}')
                 return False
 
 
@@ -682,7 +618,7 @@ def ARM(run_in_recovery, current_theme):
         #Вспомогательная функция для удаления пространства имен из тегов XML
         def strip_namespace(tag):
             if "}" in tag:
-                return tag.split('}', 1)[1]
+                return tag.split("}", 1)[1]
             return tag
 
 
@@ -695,7 +631,7 @@ def ARM(run_in_recovery, current_theme):
                     tree.write(f, encoding="utf-16", xml_declaration=True)
                 return True
             except Exception as e:
-                logger.error(f"ARM - Ошибка сохранения XML задачи {file_path}:\n{e}")
+                logger.exception(f"ARM - {l["save_xml_task_error"]} {file_path}", e)
                 return False
 
 
@@ -711,7 +647,7 @@ def ARM(run_in_recovery, current_theme):
                 for task in com_tasks:
                     try:
                         #Получаем полный путь задачи
-                        full_path = task.Path 
+                        full_path = task.Path
                         name = os.path.basename(full_path)
                         is_enabled = task.Enabled
 
@@ -721,7 +657,7 @@ def ARM(run_in_recovery, current_theme):
 
                         for action in definition.Actions:
                             #TASK_ACTION_EXEC = 0 (константа COM)
-                            if action.Type == 0: 
+                            if action.Type == 0:
                                 cmd = action.Path
                                 args = action.Arguments
                                 action_path = f"{cmd} {args}".strip()
@@ -744,18 +680,18 @@ def ARM(run_in_recovery, current_theme):
                                 raw_path = getattr(action, "Path", "Неизвестно")
                                 if raw_path != "Неизвестно":
                                     action_path = os.path.abspath(raw_path)
-            
+
                         ARM_data.append({
                             "Имя": name,
                             "Вкл/Выкл": "Включен" if is_enabled else "Отключен",
                             "Путь": action_path,
                             "Автор": author,
                             "Дата создания": date_created,
-                            "TaskPath": full_path, 
+                            "TaskPath": full_path,
                             "Enabled_raw": is_enabled
                         })
                     except Exception as e:
-                        logger.error(f"ARM - Ошибка обработки COM-задачи {task.Path}:\n{e}")
+                        logger.exception(f"ARM - {l["task_error"]} {task.Path}", e)
                         ARM_data.append({
                             "Имя": task.Path,
                             "Вкл/Выкл": "Ошибка",
@@ -771,7 +707,7 @@ def ARM(run_in_recovery, current_theme):
                 tasks_dir = get_tasks_directory()
 
                 if not tasks_dir.exists():
-                    logger.error(f"ARM - Папка задач не найдена: {tasks_dir}")
+                    logger.error(f"ARM - {l["task-dir_error"]}: {tasks_dir}")
                     return ARM_data
 
                 for root, _, files in os.walk(tasks_dir):
@@ -837,7 +773,7 @@ def ARM(run_in_recovery, current_theme):
                             #Это не XML или файл поврежден
                             continue
                         except Exception as e:
-                            logger.error(f"ARM - Ошибка обработки файла задачи {file_name}:\n{e}")
+                            logger.exception(f"ARM - {l["xml_task_error"]} {file_name}", e)
                             ARM_data.append({
                                 "Имя": file_name,
                                 "Вкл/Выкл": "Ошибка",
@@ -855,12 +791,12 @@ def ARM(run_in_recovery, current_theme):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
                 if manager.set_task_state_com(task_path_str, enable):
-                    state = "включена" if enable else "отключена"
-                    logger.success(f'ARM - Задача "{task_path_str}" успешно {state} через COM.')
+                    state = l["on"] if enable else l["off"]
+                    logger.success(f'ARM - {l["task"]} "{task_path_str}" {l["success"]} {state} {l["from_com"]}.')
                     ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                     return True
                 return False
-            else: 
+            else:
                 task_path = Path(task_path_str)
                 if not task_path.exists():
                     messagebox.showerror(random_string(), f"Файл задачи не найден:\n{task_path}")
@@ -872,8 +808,8 @@ def ARM(run_in_recovery, current_theme):
                     root = tree.getroot()
 
                     ns = ""
-                    if '}' in root.tag:
-                        ns = root.tag.split('}')[0] + '}'
+                    if ("}") in root.tag:
+                        ns = root.tag.split("}")[0] + "}"
 
                     settings = root.find(f"{ns}Settings")
                     if settings is None:
@@ -886,14 +822,14 @@ def ARM(run_in_recovery, current_theme):
                     enabled_tag.text = "true" if enable else "false"
 
                     if save_xml_task(tree, task_path):
-                        state = "включена" if enable else "отключена"
-                        logger.success(f'ARM - Задача "{task_path.name}" успешно {state} через XML.')
+                        state = l["on"] if enable else l["off"]
+                        logger.success(f'ARM - {l["task"]} "{task_path.name}" {l["success"]} {state} {l["from_xml"]}.')
                         ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                         return True
                     return False
                 except Exception as e:
-                    logger.error(f"ARM - Ошибка XML:\n{e}")
-                    messagebox.showerror(random_string(), f"Ошибка XML:\n{e}")
+                    logger.exception(f"ARM - {l["xml_error"]}", e)
+                    messagebox.showerror(random_string(), f"{l["xml_error"]}:\n{e}")
                     return False
 
 
@@ -903,31 +839,25 @@ def ARM(run_in_recovery, current_theme):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
                 if manager.delete_task_com(task_path_str):
-                    logger.success(f'ARM - Задача "{task_path_str}" удалена через COM.')
+                    logger.success(f'ARM - {l["task"]} "{task_path_str}" {l["delete_task_com"]}.')
                     ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                     return True
                 return False
-            else: 
+            else:
                 try:
                     task_path = Path(task_path_str)
                     if task_path.exists():
                         ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                         task_path.unlink()
-                        logger.success(f"ARM - XML файл задачи удален: {task_path}")
+                        logger.success(f"ARM - {l["xml_task_delete"]}: {task_path}")
                         return True
                     else:
                         messagebox.showerror(random_string(), "Файл задачи уже отсутствует.")
                         return False
                 except Exception as e:
-                    logger.error(f"ARM - Ошибка удаления XML файла:\n{e}")
-                    messagebox.showerror(random_string(), f"Не удалось удалить файл:\n{e}")
+                    logger.exception(f"ARM - {l["xml_task_delete_error"]}", e)
+                    messagebox.showerror(random_string(), f"{l["file_delete_error"]}:\n{e}")
                     return False
-
-
-
-        #О Программе
-        def about_ARM():
-            messagebox.showinfo(random_string(), f"Мастер Автозагрузки - {autorun_master_version}")
 
 
 
@@ -958,7 +888,7 @@ def ARM(run_in_recovery, current_theme):
             if not tree:
                 return
 
-            items = tree.get_children("") 
+            items = tree.get_children("")
             if not items:
                 return
 
@@ -1056,7 +986,7 @@ def ARM(run_in_recovery, current_theme):
 
             for col in columns:
                 ARM_GUI_ELEMENTS["tree"].heading(
-                    col, 
+                    col,
                     text=headings.get(col, col),
                     command=lambda _col=col: sort_treeview_column(ARM_GUI_ELEMENTS, _col)
                 )
@@ -1082,7 +1012,7 @@ def ARM(run_in_recovery, current_theme):
 
 
 
-        #Воссанавливываем фокус после обновления данных
+        #Восстанавливаем фокус после обновления данных
         def restore_focus_after_update(ARM_GUI_ELEMENTS):
             tree = ARM_GUI_ELEMENTS["tree"]
             focus_info = ARM_GUI_ELEMENTS["focus_after_update"]
@@ -1146,15 +1076,15 @@ def ARM(run_in_recovery, current_theme):
                 columns = ["Имя Параметра", "Значение Параметра", "Тип Параметра", "Путь Параметра"]
             elif current_tab == "Планировщик":
                 raw_tasks = get_task_scheduler_startup()
-                
+
                 if show_only_with_date.get():
                     ARM_GUI_ELEMENTS["treeview_data"] = [
-                        t for t in raw_tasks 
+                        t for t in raw_tasks
                         if t.get("Дата создания") and t.get("Дата создания") not in ["", "Ошибка", "01-01-1970 00:00:00"]
                     ]
                 else:
                     ARM_GUI_ELEMENTS["treeview_data"] = raw_tasks
-                    
+
                 columns = ["Имя", "Вкл/Выкл", "Путь", "Автор"]
             else:
                 ARM_GUI_ELEMENTS["treeview_data"] = []
@@ -1216,6 +1146,7 @@ def ARM(run_in_recovery, current_theme):
                     file_path = item_data["Путь Параметра"]
                     file_name = item_data["Имя Файла"]
 
+                    menu.add_command(label="Отредактировать файл", command=lambda: FE(file_path))
                     menu.add_command(label="Копировать Путь (Ctrl+C)", command=lambda: copy_to_clipboard(master, file_path))
                     menu.add_command(label="Копировать имя файла (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, file_name))
                     menu.add_separator()
@@ -1225,6 +1156,7 @@ def ARM(run_in_recovery, current_theme):
                     reg_name = item_data["Имя Параметра"]
                     reg_path = item_data["Путь Параметра"]
 
+                    menu.add_command(label="Получить полные права", command=lambda:GFA(reg_path, run_in_recovery))
                     menu.add_command(label="Копировать путь (Ctrl+C)", command=lambda: copy_to_clipboard(master, reg_path))
                     menu.add_command(label="Копировать имя параметра (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, reg_name))
                     menu.add_separator()
@@ -1297,7 +1229,7 @@ def ARM(run_in_recovery, current_theme):
 
             new_value = simpledialog.askstring(
                 random_string(),
-                f"Редактирование параметра:\n{name} ({REG_TYPE_MAP.get(reg_type, 'Неизвестный')})",
+                f'Редактирование параметра:\n{name} ({REG_TYPE_MAP.get(reg_type, "Неизвестный")})',
                 initialvalue=current_value,
                 parent=master
             )
@@ -1322,7 +1254,7 @@ def ARM(run_in_recovery, current_theme):
             hkey_const = item_data["hkey"]
             subkey_path = item_data["subkey"]
 
-            if messagebox.askyesno(random_string(), f"Вы уверены, что хотите удалить параметр реестра:\n'{name}' из {path}?"):
+            if messagebox.askyesno(random_string(), f"{l["delete_file?"]}:\n{path}\\{name}?"):
                 if delete_reg_value(hkey_const, subkey_path, name, item_id, ARM_GUI_ELEMENTS):
                     load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
@@ -1333,7 +1265,7 @@ def ARM(run_in_recovery, current_theme):
             master = ARM_GUI_ELEMENTS["master"]
             name = simpledialog.askstring(
                 random_string(),
-                f"Введите имя нового параметра реестра ({reg_type_str}) для\n{ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}:",
+                f"{l["enter_new_name_key"]} ({reg_type_str}) {l["for"]}\n{ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:",
                 parent=master
             )
             if name:
@@ -1363,7 +1295,7 @@ def ARM(run_in_recovery, current_theme):
             if not item_id:
                 return None, None
 
-            selected_values = tree.item(item_id, 'values')
+            selected_values = tree.item(item_id, "values")
             current_cols = tree["columns"]
 
             item_data = next((data for data in ARM_GUI_ELEMENTS["treeview_data"] if [str(data.get(k, "")) for k in current_cols] == list(selected_values)), None)
@@ -1472,7 +1404,7 @@ def ARM(run_in_recovery, current_theme):
 
 
         def help_arm():
-            messagebox.showinfo(random_string(), 'Во вкладке планировщик отображается так много задач, потому что вирусы могли модернизировать задачи, но такое крайне редко, поэтому вы можете отключить отображение задач без графа "создан". Для этого нажмите пункты в верхней панели окна: вид->Показывать только задачи с датой.')
+            messagebox.showinfo(random_string(), l["arm_help_text"])
 
 
 
@@ -1494,12 +1426,10 @@ def ARM(run_in_recovery, current_theme):
         menubar = tk.Menu(ARM_GUI)
         view_menu = tk.Menu(menubar, tearoff=0)
         view_menu.add_checkbutton(
-            label="Показывать только задачи с датой", 
+            label=l["show_date"],
             variable=show_only_with_date,
             command=lambda: load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
         )
-
-
 
         def restart_arm(user_theme):
             global current_theme
@@ -1509,26 +1439,22 @@ def ARM(run_in_recovery, current_theme):
             apply_global_theme(ARM_GUI, current_theme)
 
         #Пункт "Вид"
-        menubar.add_cascade(label="Вид", menu=view_menu)
-        
+        menubar.add_cascade(label=l["view"], menu=view_menu)
+
         #Пункт "Помощь"
-        menubar.add_cascade(label="Помощь", command=help_arm)
+        menubar.add_cascade(label=l["help"], command=help_arm)
 
         theme_menu = Menu(menubar, tearoff=0)
-        theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_arm("dark"))
-        theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_arm("white"))
-        theme_menu.add_checkbutton(label="Красная", command=lambda: restart_arm("red"))
-        theme_menu.add_checkbutton(label="Зелёная", command=lambda: restart_arm("lime"))
-        theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_arm("black"))
-        theme_menu.add_checkbutton(label="Серая", command=lambda: restart_arm("gray"))
-        theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_arm("orange"))
+        theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_arm("dark"))
+        theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_arm("white"))
+        theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_arm("red"))
+        theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_arm("lime"))
+        theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_arm("black"))
+        theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_arm("gray"))
+        theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_arm("orange"))
 
         #Пункт "Темы"
-        menubar.add_cascade(label="Темы", menu=theme_menu)
-
-        #Пункт "О Программе"
-        menubar.add_cascade(label="О Программе", command=about_ARM)
-        ARM_GUI.config(menu=menubar)
+        menubar.add_cascade(label=l["themes"], menu=theme_menu)
 
         ARM_GUI.attributes("-topmost", True)
 
@@ -1543,13 +1469,15 @@ def ARM(run_in_recovery, current_theme):
             GUI.attributes("-topmost", new_state)
 
         def update_topmost_label(menubar, GUI):
-            status = "вкл" if higher.get() else "выкл"
+            status = l["on2"] if higher.get() else l["off2"]
             #Индекс command в menubar
-            menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+            menubar.entryconfig(5, label=f"{l["topmost"]}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(ARM_GUI))
+        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(ARM_GUI))
         update_topmost_label(menubar, ARM_GUI)
+
+        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
 
         ARM_GUI_ELEMENTS["notebook"] = ttk.Notebook(ARM_GUI)
         ARM_GUI_ELEMENTS["notebook"].pack(pady=10, padx=10, fill="both", expand=True)
@@ -1575,9 +1503,8 @@ def ARM(run_in_recovery, current_theme):
 
         ARM_GUI.mainloop()
     except Exception as e:
-        comment = f"В Компоненте AutoRunMaster произошла неизвестная ошибка!\n{e}"
-        logger.error(comment)
-        messagebox.showerror(random_string(), comment)
+        logger.exception(l["arm_critical_error"], e)
+        messagebox.showerror(random_string(), f"{l["arm_critical_error"]}\n{e}")
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

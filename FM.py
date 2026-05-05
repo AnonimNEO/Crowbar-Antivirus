@@ -29,12 +29,16 @@ import os.path
 import shutil
 import os
 
-from OF import get_current_disc, apply_global_theme
+from OF import pac, get_user_name, get_current_disc, apply_global_theme
+from languages import localizations, current_localization
 from RS import random_string
 from config import *
+from GFA import GFA
+from FE import FE
 
 #Глобальная переменная версии
-file_manager_version = "4.8.10 Beta"
+file_manager_version = "4.10.0 Beta"
+l = localizations[current_localization]
 
 def FM(run_in_recovery, current_theme):
     try:
@@ -45,17 +49,6 @@ def FM(run_in_recovery, current_theme):
             #FM_GUI.destroy()
             #FM(run_in_recovery, current_theme)
             apply_global_theme(FM_GUI, current_theme)
-
-
-
-        #Получаем Имени текущего пользователя
-        def get_user_name():
-            try:
-                user_name = getpass.getuser()
-                return user_name
-            except Exception as e:
-                logger.error(f"FM - Ошибка получения имени пользователя!\n{e}")
-                return default_user_name
 
 
 
@@ -79,7 +72,7 @@ def FM(run_in_recovery, current_theme):
                         "ext": ""
                     })
                 except Exception as e:
-                    logger.warning(f"FM - Ошибка при получении информации о файле:\n{e}")
+                    logger.exception(f"FM - {l["metadata_error"]}", e)
 
             #Получаем список файлов/каталогов
             for item in os.listdir(path):
@@ -111,7 +104,7 @@ def FM(run_in_recovery, current_theme):
                     })
                 except (PermissionError, FileNotFoundError) as e:
                     #Пропускаем файлы, к которым нет доступа
-                    logger.warning(f"FM - Пропущен файл: {item_path}\n{e}")
+                    logger.warning(f"FM - {l["skip_file"]}: {item_path}\n{e}")
                     continue
 
             return files_info
@@ -240,8 +233,8 @@ def FM(run_in_recovery, current_theme):
 
                 #Контекстное меню по ПКМ
                 self.path_menu = Menu(self.FM_GUI, tearoff=0)
-                self.path_menu.add_command(label="Копировать путь", command=self.copy_path_to_clipboard)
-                self.path_menu.add_command(label="Вставить", command=self.paste_from_clipboard)
+                self.path_menu.add_command(label=l["copy_path"], command=self.copy_path_to_clipboard)
+                self.path_menu.add_command(label=l["paste"], command=self.paste_from_clipboard)
                 self.path_entry.bind("<Button-3>", self.show_path_context_menu)
 
 
@@ -249,20 +242,20 @@ def FM(run_in_recovery, current_theme):
             #Создаём верхнее меню программы
             def create_menu(self):
                 menubar = tk.Menu(self.FM_GUI)
-                menubar.add_command(label="Поиск", command=self.open_search_dialog)
-                menubar.add_command(label="Помощь", command=self.help_fm)
+                menubar.add_command(label=l["search"], command=self.open_search_dialog)
+                menubar.add_command(label=l["help"], command=self.help_fm)
                 theme_menu = Menu(menubar, tearoff=0)
-                theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_fm("dark"))
-                theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_fm("white"))
-                theme_menu.add_checkbutton(label="Красная", command=lambda: restart_fm("red"))
-                theme_menu.add_checkbutton(label="Зелёная", command=lambda: restart_fm("lime"))
-                theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_fm("black"))
-                theme_menu.add_checkbutton(label="Серая", command=lambda: restart_fm("gray"))
-                theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_fm("orange"))
+                theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_fm("dark"))
+                theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_fm("white"))
+                theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_fm("red"))
+                theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_fm("lime"))
+                theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_fm("black"))
+                theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_fm("gray"))
+                theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_fm("orange"))
 
                 #Пункт "Темы"
-                menubar.add_cascade(label="Темы", menu=theme_menu)
-                menubar.add_command(label="О программе", command=self.about_FM)
+                menubar.add_cascade(label=l["themes"], menu=theme_menu)
+                menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
                 self.FM_GUI.config(menu=menubar)
 
                 #FM_GUI.attributes("-topmost", True)
@@ -323,7 +316,7 @@ def FM(run_in_recovery, current_theme):
                 tree.bind("<Menu>", self.on_key_context_menu)
 
                 #Добавляем фрейм в панель
-                self.notebook.add(tab_frame, text="Загрузка...")
+                self.notebook.add(tab_frame, text=f"{l["loading"]}...")
 
                 tab_id = str(tab_frame)
 
@@ -412,15 +405,15 @@ def FM(run_in_recovery, current_theme):
                     else:
                         default_path = "C:\\"
 
-                    chosen_path = simpledialog.askstring(random_string(),f"Введите путь\nДоступные диски: {get_available_drives()}", initialvalue=default_path)
+                    chosen_path = simpledialog.askstring(random_string(),f"{l["enter_path"]}\n{l["available_disks"]}: {get_available_drives()}", initialvalue=default_path)
                     if chosen_path:
                         path = chosen_path
                     else:
                         self.on_close_tab() #Пользователь нажал "Отмена"
                         return
-                
+
                 if not os.path.exists(path):
-                    messagebox.showerror(random_string(), f"Путь не найден: {path}")
+                    messagebox.showerror(random_string(), f"{l["path"]} {l["not_found"]}: {path}")
                     #Возвращаем старый путь в поле ввода, если ввели неверный
                     self.update_path_entry()
                     return
@@ -450,9 +443,8 @@ def FM(run_in_recovery, current_theme):
                     self.update_toolbar_buttons()
                     
                 except Exception as e:
-                    if current_theme:
-                        logger.error(f"FM - Ошибка доступа к {path}: {e}")
-                        messagebox.showerror(random_string(), f"Нет доступа к: {path}")
+                    logger.exception(f"FM - {l["permission_error"]} {path}", e)
+                    messagebox.showerror(random_string(), f"{l["permission_error"]}: {path}")
 
 
 
@@ -768,9 +760,8 @@ def FM(run_in_recovery, current_theme):
                 if not paths_to_delete: return
 
                 count = len(paths_to_delete)
-                msg = f"Вы уверены, что хотите удалить {count} эл.?" if count > 1 else f"Удалить '{os.path.basename(paths_to_delete[0])}'?"
-                
-                if not messagebox.askyesno(random_string(), f"{msg}\n\nЭто действие безвозвратно."):
+
+                if not messagebox.askyesno(random_string(), f"{l["you_want_to_delete"]} {count} {l["elements"]}?" if count > 1 else f"{l["delete"]} '{os.path.basename(paths_to_delete[0])}'?"):
                     return
 
                 for path in paths_to_delete:
@@ -780,8 +771,8 @@ def FM(run_in_recovery, current_theme):
                         else:
                             os.remove(path)
                     except Exception as e:
-                        logger.error(f"FM - Ошибка удаления {path}: {e}")
-                        messagebox.showerror(random_string(), f"Не удалось удалить {os.path.basename(path)}:\n{e}")
+                        logger.exception(f"FM - {l["delete_error"]} {path}", e)
+                        messagebox.showerror(random_string(), f"{l["delete_error"]} {os.path.basename(path)}:\n{e}")
                 
                 self.on_refresh()
 
@@ -793,7 +784,7 @@ def FM(run_in_recovery, current_theme):
                 if not paths: return
                 
                 self.clipboard_data = {"paths": paths, "action": "copy"}
-                logger.info(f"FM - Скопировано элементов: {len(paths)}")
+                #logger.info(f"FM - {l["elements_copy"]}: {len(paths)}")
 
 
 
@@ -801,15 +792,15 @@ def FM(run_in_recovery, current_theme):
                 selected_paths = self.get_selected_items_paths()
                 paths = [p for p in selected_paths if not p.endswith("..")]
                 if not paths: return
-                
+
                 self.clipboard_data = {"paths": paths, "action": "cut"}
-                logger.info(f"FM - Вырезано элементов: {len(paths)}")
+                #logger.info(f"FM - Вырезано элементов: {len(paths)}")
 
 
 
             def handle_paste(self):
                 if "paths" not in self.clipboard_data or not self.clipboard_data["paths"]:
-                    messagebox.showinfo(random_string(), "Буфер обмена пуст.")
+                    messagebox.showinfo(random_string(), l["clipboard_is_empty"])
                     return
 
                 src_paths = self.clipboard_data["paths"]
@@ -837,11 +828,11 @@ def FM(run_in_recovery, current_theme):
                         elif action == "cut":
                             shutil.move(src_path, dest_path)
                     except Exception as e:
-                        logger.error(f"FM - Ошибка вставки {src_path}: {e}")
-                        
+                        logger.exception(f"FM - {l["paste_error"]} {src_path}", e)
+
                 if action == "cut":
                     self.clipboard_data = {"paths": [], "action": None}
-                    
+
                 self.on_refresh()
 
 
@@ -857,7 +848,7 @@ def FM(run_in_recovery, current_theme):
 
 
             #Получаем автора файла
-            def get_author_and_verison_file(self, path):
+            def get_author_and_version_file(self, path):
                 if os.path.isdir(path):
                     return "Н/Д (Каталог)"
 
@@ -909,8 +900,8 @@ def FM(run_in_recovery, current_theme):
                     else:
                         return "Нет"
                 except Exception as e:
-                    logger.warning(f"FM - Ошибка проверки доступа для {path}:\n{e}")
-                    return "Ошибка"
+                    logger.exception(f"FM - {l["access_check_error_for"]} {path}", e)
+                    return l["error"]
 
 
 
@@ -924,7 +915,7 @@ def FM(run_in_recovery, current_theme):
 
                 #Создаём окно свойств
                 prop_win = tk.Toplevel(self.FM_GUI)
-                prop_win.title(f"Свойства: {os.path.basename(item_path)}")
+                prop_win.title(f"{l["properties"]}: {os.path.basename(item_path)}")
                 prop_win.geometry("350x450")
                 prop_win.transient(self.FM_GUI) #Связываем с главным окном
                 prop_win.grab_set() #Делаем окно модальным
@@ -943,8 +934,8 @@ def FM(run_in_recovery, current_theme):
                 vsb = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
                 tree.configure(yscrollcommand=vsb.set)
 
-                tree.heading("param", text="Параметр", anchor=tk.W)
-                tree.heading("value", text="Значение", anchor=tk.W)
+                tree.heading("param", text=l["parameter"], anchor=tk.W)
+                tree.heading("value", text=l["meaning"], anchor=tk.W)
                 #Колонка "Параметр" - фиксированная, "Значение" - растягивается
                 tree.column("param", width=150, stretch=False, anchor=tk.W)
                 tree.column("value", width=350, stretch=True, anchor=tk.W)
@@ -969,7 +960,7 @@ def FM(run_in_recovery, current_theme):
                     accessed = format_time(stat.st_atime) #Открыт
 
                     #специфичная информация
-                    version, author = self.get_author_and_verison_file(item_path)
+                    version, author = self.get_author_and_version_file(item_path)
 
                     #Права доступа
                     acc_read = self.get_access_string(item_path, os.R_OK)
@@ -983,28 +974,28 @@ def FM(run_in_recovery, current_theme):
                     #Формируем список для вывода
                     #Используем "---" как разделитель
                     properties_data = [
-                        ("Имя", file_name),
-                        ("Расположение", file_path),
-                        ("Размер", file_size_formatted),
+                        (l["name"], file_name),
+                        (l["location"], file_path),
+                        (l["size"], file_size_formatted),
                         ("---", "---"),
-                        ("Создан", created),
-                        ("Изменён", edited),
-                        ("Открыт", accessed),
+                        (l["created"], created),
+                        (l["changed"], edited),
+                        (l["opened"], accessed),
                         ("---", "---"),
-                        ("Версия файла", version),
-                        ("Автор", author),
+                        (l["file_version"], version),
+                        (l["author"], author),
                         ("---", "---"),
-                        ("Права доступа (для " + self.user_name + "):", ""),
-                        ("Полный доступ", acc_full),
-                        ("Чтение", acc_read),
-                        ("Изменение", acc_modify),
-                        ("Запись", acc_write),
-                        ("Запуск", acc_exec),
+                        (f"{l["access_for"]} " + self.user_name + "):", ""),
+                        (l["full_access"], acc_full),
+                        (l["reading"], acc_read),
+                        (l["changed"], acc_modify),
+                        (l["record"], acc_write),
+                        (l["launch"], acc_exec),
                     ]
 
                 except Exception as e:
-                    logger.error(f"FM - Ошибка при сборе свойств для {item_path}:\n{e}")
-                    tree.insert("", "end", values=("Ошибка", f"Не удалось прочитать свойства файла:\n{e}"))
+                    logger.exception(f"FM - {l["collecting_properties_error"]} {item_path}", e)
+                    tree.insert("", "end", values=(l["error"], f"{l["read_file_properties_error"]}:\n{e}"))
                     properties_data = []
 
                 #Заполнение таблицы
@@ -1048,13 +1039,13 @@ def FM(run_in_recovery, current_theme):
                     return None
 
                 if not new_name.strip():
-                    messagebox.showwarning(random_string(), "Имя не может быть пустым.", parent=self.FM_GUI)
+                    messagebox.showwarning(random_string(), f"{l["name"]} {l["not_empty"]}", parent=self.FM_GUI)
                     return None
 
                 #Проверка на недопустимые символы
                 invalid_chars = '<>:"/\\|?*'
                 if any(char in new_name for char in invalid_chars):
-                    messagebox.showwarning(random_string(), f"Имя содержит недопустимые символы:\n{invalid_chars}", parent=self.FM_GUI)
+                    messagebox.showwarning(random_string(), f"{l["name"]} {l["invalid_characters"]}:\n{invalid_chars}", parent=self.FM_GUI)
                     return None
 
                 return new_name
@@ -1084,10 +1075,10 @@ def FM(run_in_recovery, current_theme):
 
                 #Проверяем, что текущий каталог существует
                 if not os.path.isdir(current_dir):
-                    messagebox.showerror(random_string(), f"Текущий каталог не найден: {current_dir}", parent=self.FM_GUI)
+                    messagebox.showerror(random_string(), f"{l["current"]} {l["dir"]} {l["not_found"]}: {current_dir}", parent=self.FM_GUI)
                     return
 
-                new_name = self.ask_for_name(random_string(), f"Новое имя для:\n{old_name}", initial_value=old_name)
+                new_name = self.ask_for_name(random_string(), f"{l["new_name_for"]}:\n{old_name}", initial_value=old_name)
 
                 if new_name is None:
                     return #Отмена
@@ -1097,39 +1088,39 @@ def FM(run_in_recovery, current_theme):
 
                 new_path = os.path.join(current_dir, new_name)
 
+                comment = f'{l["name_file_or_dir"]} "{new_name}" {l["already_exists"]}'
                 if action != "rename" and os.path.exists(new_path):
-                    messagebox.showerror(random_string(), f"Файл или папка с именем '{new_name}' уже существует.", parent=self.FM_GUI)
+                    messagebox.showerror(random_string(), comment, parent=self.FM_GUI)
                     return
                 elif action == "rename" and old_path != new_path and os.path.exists(new_path):
-                    messagebox.showerror(random_string(), f"Файл или папка с именем '{new_name}' уже существует.", parent=self.FM_GUI)
+                    messagebox.showerror(random_string(), comment, parent=self.FM_GUI)
                     return
-
 
                 if action == "rename":
                     try:
                         os.rename(old_path, new_path)
-                        logger.info(f"FM - Переименовано: {old_path} -> {new_path}")
+                        logger.info(f"FM - {l["renamed"]}: {old_path} -> {new_path}")
                         self.on_refresh()
 
                         #Пытаемся восстановить фокус на переименованном файле
                         tree.after(100, lambda: self.focus_item_by_path(new_path))
 
                     except Exception as e:
-                        logger.error(f"FM - Ошибка переименования:\n{e}")
-                        messagebox.showerror(random_string(), f"Не удалось переименовать:\n{e}", parent=self.FM_GUI)
+                        logger.exception(f"FM - {l["error"]} {l["when_renaming"]}", e)
+                        messagebox.showerror(random_string(), f"{l["error"]} {l["when_renaming"]}:\n{e}", parent=self.FM_GUI)
 
                 elif action == "create_path":
                     try:
                         os.mkdir(new_path)
-                        logger.info(f"FM - Создан каталог: {new_path}")
+                        logger.info(f"FM - {l["created"]} {l["dir"]}: {new_path}")
                         self.on_refresh()
                     except Exception as e:
-                        logger.error(f"FM - Ошибка создания каталога\n{e}")
-                        messagebox.showerror(random_string(), f"Не удалось создать каталог:\n{e}", parent=self.FM_GUI)
+                        logger.exception(f"FM - {l["create_dir_error"]}", e)
+                        messagebox.showerror(random_string(), f"{l["create_dir_error"]}:\n{e}", parent=self.FM_GUI)
 
                 elif action == "create_file":
                     #Запрос содержимого
-                    content = simpledialog.askstring(random_string(), f"Введите содержимое для файла:\n{new_name}", parent=self.FM_GUI)
+                    content = simpledialog.askstring(random_string(), f"{l["enter_data_file"]}:\n{new_name}", parent=self.FM_GUI)
 
                     #Если пользователь нажал Отмена или не ввел содержимое
                     if content is None:
@@ -1139,11 +1130,11 @@ def FM(run_in_recovery, current_theme):
                         with open(new_path, "w") as new_file:
                             new_file.write(content)
 
-                        logger.info(f"FM - Создан файл:\n{new_path}")
+                        logger.info(f"FM - {l["create_file"]}:\n{new_path}")
                         self.on_refresh()
                     except Exception as e:
-                        logger.error(f"FM - Ошибка создания файла:\n{e}")
-                        messagebox.showerror(random_string(), f"Не удалось создать файл:\n{e}", parent=self.FM_GUI)
+                        logger.exception(f"FM - {l["create_file_error"]}", e)
+                        messagebox.showerror(random_string(), f"{l["create_file_error"]}:\n{e}", parent=self.FM_GUI)
 
 
 
@@ -1159,11 +1150,11 @@ def FM(run_in_recovery, current_theme):
                         tree.focus(item_path)
                         tree.see(item_path) #Прокрутить до элемента
                 except Exception as e:
-                    logger.warning(f"FM - Не удалось восстановить фокус на {item_path}:\n{e}")
+                    logger.exception(f"FM - {l["restore_focus_error"]} {item_path}", e)
 
 
 
-            #Создание Контенкстного меню
+            #Создание Контекстного меню
             def build_context_menu(self, target_type, target_path):
                 menu = tk.Menu(self.FM_GUI, tearoff=0)
                 data = self.get_current_tab_data()
@@ -1179,74 +1170,78 @@ def FM(run_in_recovery, current_theme):
 
                     #Открыть и Вверх
                     if is_dotdot:
-                        menu.add_command(label="Вверх", accelerator="Backspace", command=self.on_up)
+                        menu.add_command(label=l["up"], accelerator="Backspace", command=self.on_up)
                     elif is_dir:
                         #Используем lambda для отложенного вызова
-                        menu.add_command(label="Открыть", accelerator="Enter", command=lambda: self.load_directory_for_tab(self.get_current_tab_id(), target_path))
+                        menu.add_command(label=l["open"], accelerator="Enter", command=lambda: self.load_directory_for_tab(self.get_current_tab_id(), target_path))
                     else:
-                        menu.add_command(label="Открыть", accelerator="Enter", command=lambda: self.open_file(target_path))
+                        menu.add_command(label=l["open"], accelerator="Enter", command=lambda: self.open_file(target_path))
 
                     menu.add_separator()
 
                     #Вырезать, копировать, вставить
-                    menu.add_command(label="Вырезать", accelerator="Ctrl+X",
+                    menu.add_command(label=l["cut"], accelerator="Ctrl+X",
                                      command=self.handle_cut, state=item_state)
-                    menu.add_command(label="Копировать", accelerator="Ctrl+C",
+                    menu.add_command(label=l["copy"], accelerator="Ctrl+C",
                                      command=self.handle_copy, state=item_state)
-                    menu.add_command(label="Вставить", accelerator="Ctrl+V",
+                    menu.add_command(label=l["paste"], accelerator="Ctrl+V",
                                      command=self.handle_paste, state=paste_state)
 
                     menu.add_separator()
 
                     #Переименовать и Удалить
-                    menu.add_command(label="Переименовать", accelerator="F2",
+                    menu.add_command(label=l["rename"], accelerator="F2",
                                      command=lambda: self.action_in_path("rename"), state=item_state)
-                    menu.add_command(label="Удалить", accelerator="Delete",
+                    menu.add_command(label=l["delete"], accelerator="Delete",
                                      command=self.handle_key_delete, state=item_state)
 
                     menu.add_separator()
 
+                    #Полные права и редактор
+                    menu.add_command(label=l["get_full_access"], command=lambda:GFA(self.get_focused_item_path(), run_in_recovery))
+                    menu.add_command(label=l["edit_file"], command=lambda:FE(self.get_focused_item_path()))
+
                     #Создать
                     sub_menu_create = tk.Menu(menu, tearoff=0)
-                    sub_menu_create.add_command(label="Каталог", accelerator="Ctrl+Shift+N",
+                    sub_menu_create.add_command(label=l["dir"], accelerator="Ctrl+Shift+N",
                                                 command=lambda: self.action_in_path("create_path"))
-                    sub_menu_create.add_command(label="Файл", accelerator="Ctrl+N",
+                    sub_menu_create.add_command(label=l["file"], accelerator="Ctrl+N",
                                                 command=lambda: self.action_in_path("create_file"))
-                    menu.add_cascade(label="Создать", menu=sub_menu_create)
+                    menu.add_cascade(label=l["create"], menu=sub_menu_create)
 
                     menu.add_separator()
 
                     #Свойства
-                    menu.add_command(label="Свойства", accelerator="Ctrl+I",
+                    menu.add_command(label=l["properties"], accelerator="Ctrl+I",
                                      command=self.show_properties, state=item_state)
 
                     #Копировать данные
-                    menu.add_command(label="Копировать путь", command=lambda: self.copy_to_clipboard(target_path))
-                    menu.add_command(label="Копировать имя", command=lambda: self.copy_to_clipboard(os.path.basename(target_path)))
+                    menu.add_command(label=l["copy_path"], command=lambda: self.copy_to_clipboard(target_path))
+                    menu.add_command(label=l["copy_name"], command=lambda: self.copy_to_clipboard(os.path.basename(target_path)))
 
                 elif target_type == "directory":
-                    #Меню для Каталога (пустого места) ---
+                    #Меню для Каталога (пустого места)
                     current_dir_path = target_path
 
                     #Создать
                     sub_menu_create = tk.Menu(menu, tearoff=0)
-                    sub_menu_create.add_command(label="Каталог", accelerator="Ctrl+Shift+N",
+                    sub_menu_create.add_command(label=l["dir"], accelerator="Ctrl+Shift+N",
                                                 command=lambda: self.action_in_path("create_path"))
-                    sub_menu_create.add_command(label="Файл", accelerator="Ctrl+N",
+                    sub_menu_create.add_command(label=l["file"], accelerator="Ctrl+N",
                                                 command=lambda: self.action_in_path("create_file"))
-                    menu.add_cascade(label="Создать", menu=sub_menu_create)
+                    menu.add_cascade(label=l["create"], menu=sub_menu_create)
 
                     menu.add_separator()
 
                     #Вставить и Обновить
-                    menu.add_command(label="Вставить", accelerator="Ctrl+V",
+                    menu.add_command(label=l["paste"], accelerator="Ctrl+V",
                                      command=self.handle_paste, state=paste_state)
-                    menu.add_command(label="Обновить", accelerator="F5", command=self.on_refresh)
+                    menu.add_command(label=l["update"], accelerator="F5", command=self.on_refresh)
 
                     menu.add_separator()
 
                     #Копировать путь
-                    menu.add_command(label="Копировать путь", command=lambda: self.copy_to_clipboard(current_dir_path))
+                    menu.add_command(label=l["copy_path"], command=lambda: self.copy_to_clipboard(current_dir_path))
 
                 return menu
 
@@ -1332,7 +1327,7 @@ def FM(run_in_recovery, current_theme):
                 if not item_path or item_path.endswith(".."):
                     return
                 self.clipboard_data = {"path": item_path, "action": "copy"}
-                logger.info(f"FM - Скопировано: {item_path}")
+                #logger.info(f"FM - Скопировано: {item_path}")
 
 
 
@@ -1342,14 +1337,14 @@ def FM(run_in_recovery, current_theme):
                 if not item_path or item_path.endswith(".."):
                     return
                 self.clipboard_data = {"path": item_path, "action": "cut"}
-                logger.info(f"FM - Вырезано: {item_path}")
+                #logger.info(f"FM - Вырезано: {item_path}")
 
 
 
             #Вставляем объект из буфера программы
             def handle_paste(self):
                 if not self.clipboard_data["path"]:
-                    messagebox.info(random_string(), "Буфер обмена пуст, вставка отменена.")
+                    messagebox.info(random_string(), l["clipboard_is_empty"])
                     return
 
                 src_path = self.clipboard_data["path"]
@@ -1357,7 +1352,7 @@ def FM(run_in_recovery, current_theme):
 
                 data = self.get_current_tab_data()
                 if not data or not data["path"]:
-                    messagebox.info(random_string(), "Не выбран каталог для вставки.")
+                    messagebox.info(random_string(), l["not_dir_selected"])
                     return #Некуда вставлять
 
                 dest_dir = data["path"]
@@ -1365,19 +1360,19 @@ def FM(run_in_recovery, current_theme):
 
                 #Проверка, что источник все еще существует
                 if not os.path.exists(src_path):
-                    messagebox.showerror(random_string(), f"Источник не найден (возможно, был перемещен):\n{src_path}")
+                    messagebox.showerror(random_string(), f"{l["source_file_not_found"]}:\n{src_path}")
                     self.clipboard_data = {"path": None, "action": None} #Очистить буфер
                     return
 
                 #Защита от вставки в самого себя
                 if os.path.normpath(src_path) == os.path.normpath(dest_path) or \
                    (os.path.isdir(src_path) and os.path.normpath(dest_dir).startswith(os.path.normpath(src_path))):
-                    messagebox.showerror(random_string(), "Нельзя скопировать или переместить элемент сам в себя.")
+                    messagebox.showerror(random_string(), l["dont_copy_in_in"])
                     return
 
                 #Логика конфликта (Заменить или Пропустить)
                 if os.path.exists(dest_path):
-                    choice = messagebox.askquestion("Конфликт", f'Файл "{os.path.basename(dest_path)}" уже существует.\n\nЗаменить его?', icon="warning", type="yesno")
+                    choice = messagebox.askquestion(random_string(), f'{l["file"]} "{os.path.basename(dest_path)}" {l["already_exists"]}.\n\n{l["replace_it"]}', icon="warning", type="yesno")
 
                     if choice == "no": #no означает пропустить
                         return
@@ -1388,7 +1383,8 @@ def FM(run_in_recovery, current_theme):
                             else:
                                 os.remove(dest_path)
                         except Exception as e:
-                            messagebox.showerror(random_string(), f"Не удалось заменить: {e}")
+                            logger.exception(f"FM - {l["replace_file_not_found"]}", e)
+                            messagebox.showerror(random_string(), f"{l["replace_file_not_found"]}:\n{e}")
                             return
 
                 #Выполнение действия (Копирование или Перемещение)
@@ -1398,7 +1394,7 @@ def FM(run_in_recovery, current_theme):
                             shutil.copytree(src_path, dest_path)
                         else:
                             shutil.copy2(src_path, dest_path)
-                        logger.info(f"FM - Скопирован {src_path} в {dest_path}")
+                        logger.info(f"FM - {src_path} {l["copied2"]} {l["in"]} {dest_path}")
 
                     elif action == "cut":
                         shutil.move(src_path, dest_path)
@@ -1407,8 +1403,8 @@ def FM(run_in_recovery, current_theme):
                         self.clipboard_data = {"path": None, "action": None}
 
                 except Exception as e:
-                    logger.error(f"FM - Ошибка вставки:\n{e}")
-                    messagebox.showerror(random_string(), f"Не удалось {action}:\n{e}")
+                    logger.exception(f"FM - {l["paste_error"]}", e)
+                    messagebox.showerror(random_string(), f"{l["paste_error"]} {action}:\n{e}")
 
                 self.on_refresh()
 
@@ -1522,8 +1518,8 @@ def FM(run_in_recovery, current_theme):
                 try:
                     os.startfile(file_path)
                 except Exception as e:
-                    logger.error(f"FM - Не удалось открыть файл {file_path}:\n{e}")
-                    messagebox.showerror(random_string(), f"Не удалось открыть файл:\n{e}")
+                    logger.exception(f"FM - {l["open_file_error"]} {file_path}", e)
+                    messagebox.showerror(random_string(), f"{l["open_file_error"]}:\n{e}")
 
 
 
@@ -1531,20 +1527,20 @@ def FM(run_in_recovery, current_theme):
             def delete_item(self, path):
                 try:
                     name = os.path.basename(path)
-                    if not messagebox.askyesno(random_string(), f"Вы уверены, что хотите удалить '{name}'?\n\nЭтот элемент будет удален БЕЗВОЗВРАТНО."):
+                    if not messagebox.askyesno(random_string(), f'{l["you_want_to_delete"]} "{name}"?'):
                         return
 
                     if os.path.isdir(path):
                         shutil.rmtree(path)
-                        logger.info(f"FM - Удалён каталог: {path}")
+                        #logger.info(f"FM - Удалён каталог: {path}")
                     else:
                         os.remove(path)
-                        logger.info(f"FM - Удалён файл: {path}")
+                        #logger.info(f"FM - Удалён файл: {path}")
 
                     self.on_refresh()
                 except Exception as e:
-                    logger.error(f"FM - Ошибка удаления {path}:\n{e}")
-                    messagebox.showerror(random_string(), f"Не удалось удалить:\n{e}")
+                    logger.exception(f"FM - {l["delete_file_error"]} {path}", e)
+                    messagebox.showerror(random_string(), f"{l["delete_file_error"]}:\n{e}")
 
 
 
@@ -1555,15 +1551,9 @@ def FM(run_in_recovery, current_theme):
 
 
 
-            #Пункт "О Программе"
-            def about_FM(self):
-                messagebox.showinfo(random_string(), f"Файловый Менеджер {file_manager_version}\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO\nCopyleft 🄯 NEO Organization 2024 - 2026")
-
-
-
             #Пункт "Помощь"
             def help_fm(self):
-                messagebox.showinfo(random_string(), "Добро пожаловать в Файловый Менеджер!\nДанный Компонент поддерживает:\n1)Полное управление с клавиатуры\n2)Поиск - чтобы его вызвать нажмите на пункт в верхней левой части окна.")
+                messagebox.showinfo(random_string(), l["fm_help_text"])
 
 
 
@@ -1588,7 +1578,7 @@ def FM(run_in_recovery, current_theme):
                 search_frame = ttk.Frame(self.search_window, padding="10 10 10 5")
                 search_frame.pack(fill="x", expand=True)
 
-                ttk.Label(search_frame, text="Текст для поиска:").pack(side="top", fill="x", pady=(0, 5))
+                ttk.Label(search_frame, text=l["text_for_search"]).pack(side="top", fill="x", pady=(0, 5))
 
                 search_entry = ttk.Entry(search_frame, textvariable=self.search_text_var, width=50)
                 search_entry.pack(side="top", fill="x", expand=True)
@@ -1607,17 +1597,17 @@ def FM(run_in_recovery, current_theme):
 
                 #С учётом регистра
                 ttk.Checkbutton(checkbox_frame,
-                                text="с учётом регистра",
+                                text=l["match_case"],
                                 variable=self.search_case_var).pack(side="left", padx=5)
 
                 #Слова целиком
                 ttk.Checkbutton(checkbox_frame,
-                                text="слова целиком",
+                                text=l["whole_words"],
                                 variable=self.search_whole_word_var).pack(side="left", padx=5)
 
                 #В текущем каталоге
                 ttk.Checkbutton(checkbox_frame,
-                                text="в текущем каталоге",
+                                text=l["in_current_dir"],
                                 variable=self.search_current_dir_var).pack(side="left", padx=5)
 
                 #Кнопка Поиска
@@ -1628,11 +1618,11 @@ def FM(run_in_recovery, current_theme):
                 ttk.Separator(self.search_window, orient="horizontal").pack(fill="x", padx=5)
 
                 ttk.Button(button_frame,
-                           text="Поиск",
+                           text=l["search"],
                            command=lambda: self.start_search(self.search_text_var.get())).pack(side="right", padx=5)
 
                 ttk.Button(button_frame,
-                           text="Отмена",
+                           text=l["cancel2"],
                            command=self.search_window.destroy).pack(side="right")
 
                 #Устанавливаем диалог модальным и центрируем
@@ -1645,7 +1635,7 @@ def FM(run_in_recovery, current_theme):
             #Поиск
             def start_search(self, search_text):
                 if not search_text:
-                    messagebox.showwarning(random_string(), "Введите текст для поиска!")
+                    messagebox.showwarning(random_string(), l["enter_text_for_search"])
                     return
 
                 #Считываем настройки
@@ -1656,7 +1646,7 @@ def FM(run_in_recovery, current_theme):
                 #Получаем текущий путь для поиска
                 data = self.get_current_tab_data()
                 if not data:
-                    messagebox.showerror(random_string(), "Нет активной вкладки для поиска.")
+                    messagebox.showerror(random_string(), l["not_current_tab_for_search"])
                     self.search_window.destroy()
                     return
 
@@ -1668,7 +1658,7 @@ def FM(run_in_recovery, current_theme):
                     self.search_window = None
 
                 #Запускаем рекурсивный поиск
-                messagebox.showinfo(random_string(), f"Начинаем поиск '{search_text}' в каталоге: {start_path}...")
+                #messagebox.showinfo(random_string(), f"Начинаем поиск '{search_text}' в каталоге: {start_path}...")
 
                 #Вызываем основной метод поиска
                 search_results = self.recursive_search_files(
@@ -1681,7 +1671,7 @@ def FM(run_in_recovery, current_theme):
 
                 #Обрабатываем результаты
                 if not search_results:
-                    messagebox.showinfo(random_string(), f'Файлы, содержащие "{search_text}"", не найдены.')
+                    messagebox.showinfo(random_string(), f'{l["files_containing"]} "{search_text}", {l["not_founded"]}')
                     #Не меняем текущую вкладку
                     self.on_refresh() #Просто обновим, чтобы снять сообщение о загрузке
                     return
@@ -1693,7 +1683,7 @@ def FM(run_in_recovery, current_theme):
 
             #Рекурсивный поиск
             def recursive_search_files(self, start_path, search_text, case_sensitive, whole_word, single_dir):
-                logger.info(f'FM - Начало поиска: {start_path}, Текст: "{search_text}", Одиночный каталог: {single_dir}')
+                #logger.debug(f'FM - Начало поиска: {start_path}, Текст: "{search_text}", Одиночный каталог: {single_dir}')
                 results = []
 
                 #Подготовка поискового текста
@@ -1754,7 +1744,7 @@ def FM(run_in_recovery, current_theme):
                                         "ext": ""
                                     })
                                 except Exception as e:
-                                    logger.warning(f"FM - Ошибка получения информации о папке {dir_path}:\n{e}")
+                                    logger.exception(f"FM - {l["info_dir_error"]} {dir_path}", e)
 
                         #Ищем совпадения в именах файлов
                         for file_name in files:
@@ -1766,9 +1756,9 @@ def FM(run_in_recovery, current_theme):
                                     if found_item:
                                         results.append(found_item)
                                 except Exception as e:
-                                    logger.warning(f"FM - Ошибка получения информации о файле {file_path}:\n{e}")
+                                    logger.exception(f"FM - {l["info_file_error"]} {file_path}", e)
 
-                logger.info(f"FM - Поиск завершен. Найдено результатов: {len(results)}")
+                #logger.debug(f"FM - Поиск завершен. Найдено результатов: {len(results)}")
                 return results
 
 
@@ -1788,7 +1778,7 @@ def FM(run_in_recovery, current_theme):
 
                 #Обновляем историю и путь
                 #Путь теперь - это наш запрос, но для отображения его храним в history
-                search_display_path = f'Результаты поиска: "{search_text}" в "{searched_path}"'
+                search_display_path = f'{l["search_result"]}: "{search_text}" {l["in"]} "{searched_path}"'
 
                 #ВАЖНО: В историю мы добавляем СПЕЦИАЛЬНУЮ СТРОКУ, которая пометит состояние поиска.
                 #Это нужно, чтобы при нажатии "Назад" мы знали, что нужно ПОВТОРИТЬ ПОИСК.
@@ -1829,20 +1819,15 @@ def FM(run_in_recovery, current_theme):
 
         #Обработка закрытия окна
         def on_closing():
-            if messagebox.askokcancel(random_string(), "Вы уверены, что хотите выйти?"):
+            if messagebox.askokcancel(random_string(), l["fm_exit"]):
                 FM_GUI.destroy()
 
         FM_GUI.protocol("WM_DELETE_WINDOW", on_closing)
         FM_GUI.mainloop()
 
     except Exception as e:
-        comment = f"В FileManager произошла неизвестная ошибка!\n{e}"
-        logger.critical(comment)
-        FM_GUI.destroy()
-        if "was deleted before its visibility changed" in str(e):
-            messagebox.showwarning(random_string(), "Чтобы запустить второй экземпляр Файлового Мегеджера, сначала закройте окно Анлокера.")
-        else:
-            messagebox.showerror(random_string(), comment)
+        logger.critical(l["fm_critical_error"], e)
+        messagebox.showerror(random_string(), f"{l["fm_error"]}\n{e}")
 
 if __name__ == "__main__":
     FM(False, theme["dark"])

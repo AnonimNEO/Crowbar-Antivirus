@@ -9,7 +9,7 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Вставка картинок
-from PIL import Image, ImageTk
+#from PIL import Image, ImageTk
 #Графический Интерфейс
 from tkinter import messagebox
 import tkinter as tk
@@ -22,14 +22,37 @@ import os
 
 #Импорт Компонентов
 from config import *
+from languages import *
 from RS import random_string
 
 global about_program_version
-about_program_version = "0.2.21 Beta"
-
+about_program_version = "0.3.0 Beta"
+l = localizations[current_localization]
 image_references = {}
 
-def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticality_version, file_manager_version, real_time_protect_version, unlocker_version, other_components_version, process_manager_version, restart_version, random_string_version, run_version, scarecrow_protection_version, settings_and_update_version, trey_version, unlock_all_version, users_manager_version):
+def AP(autorun_master_version="error",
+       anti_xyina_version="error",
+       clear_cache_version="error",
+       crowbar_menu_version="error",
+       crowbar_console_version="error",
+       exit_version="error",
+       edit_criticality_version="error",
+       file_editor_version="error",
+       file_manager_version="error",
+       file_replacer_version="error",
+       get_full_access_version="error",
+       on_board_pc_version="error",
+       other_function_version="error",
+       process_manager_version="error",
+       restart_version="error",
+       real_time_protect_version="error",
+       random_string_version="error",
+       run_version="error",
+       settings_and_update_version="error",
+       scarecrow_protection_version="error",
+       trey_version="error",
+       unlock_all_version="error",
+       users_manager_version="error"):
     try:
         #Загрузка изображений
         def load_images(master):
@@ -44,7 +67,7 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
             try:
                 image_files = [f for f in os.listdir(images_path) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
             except Exception as e:
-                logger.error(f"AP - Ошибка при чтении каталога {images_path}:\n{e}")
+                logger.exception(f"AP - Ошибка при чтении каталога {images_path}", e)
                 return image_labels_container
 
             #Проверяем наличие файлов
@@ -73,7 +96,7 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
                     image_labels_container.append(label)
 
                 except Exception as e:
-                    logger.error(f"Не удалось загрузить изображение {image_file}:\n{e}")
+                    logger.exception(f"Не удалось загрузить изображение {image_file}", e)
                     continue #если одно изображение не загрузилось, продолжаем с другими
 
             return image_labels_container #Возвращаем список загруженных меток, чтобы знать, создался ли фрейм
@@ -81,35 +104,36 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
 
 
         def show_component_versions(event):
-            about_program_text = (
-                f"Версии Компонентов:\n"
-                f"---Главные Компоненты---\n"
-                f"Ядро программы (трей): {trey_version}\n"
-                f"Защита Нагрузки: {real_time_protect_version}\n"
-                f"Мастер Автозагрузки: {autorun_master_version}\n"
-                f"Менеджер Процессов: {process_manager_version}\n"
-                f"Файловый Менеджер: {file_manager_version}\n"
-                f"Раблокировка всего: {unlock_all_version}\n"
-                f"---Мини Компоненты---\n"
-                f"Главное меню: {unlocker_version}\n"
-                f"Пугало: {scarecrow_protection_version}\n"
-                f"Очистка Кэша: {clear_cache_version}\n"
-                f"Менеджер Пользователей: {users_manager_version}\n"
-                #f"Менеджер Пользователей: данный компонент отсутствует из-за его неработоспособности\n"
-                f"Перезапуск ПК: {restart_version}\n"
-                f"Запуск от имени администратора: {run_version}\n"
-                #f"Голосовое Управление: {on_board_pc_version}\n"
-                f"Голосовое Управление: данный компонент отсутствует из-за его нестабильности\n"
-                f"---Системные Компоненты---\n"
-                f'Шифрование "Шифр Цезаря": 2.2\n'
-                f"Смена Критичности: {edit_criticality_version}\n"
-                f"Прочие Компоненты: {other_components_version}\n"
-                f"Генератор Заголовков: {random_string_version}\n"
-                f"Выход из программы: {exit_version}\n"
-                f"О Программе: {about_program_version}\n"
-                f"Настройки: {settings_and_update_version}"
+            version_component_text = (
+                f"{l["version_component"]}:\n"
+                f"{l["pac"]}: {program_authentication_clyth}\n"
+                f"---{l["general_component"]}---\n"
+                f"{l["program_kernel"]}: {trey_version}\n"
+                f"{l["RLP"]}: {real_time_protect_version}\n"
+                f"{l["ARM"]}: {autorun_master_version}\n"
+                f"{l["PM"]}: {process_manager_version}\n"
+                f"{l["FM"]}: {file_manager_version}\n"
+                f"{l["UA"]}: {unlock_all_version}\n"
+                f"{l["FE"]}: {file_editor_version}\n"
+                f"---{l["mini_component"]}---\n"
+                f"{l["CM"]}: {crowbar_menu_version}\n"
+                f"{l["SP"]}: {scarecrow_protection_version}\n"
+                f"{l["CC"]}: {clear_cache_version}\n"
+                f"{l["UM"]}: {users_manager_version}\n"
+                f"{l["R"]}: {restart_version}\n"
+                f"{l["Run"]}: {run_version}\n"
+                f"{l["OBPC"]}: {on_board_pc_version}\n"
+                f"---{l["system_component"]}---\n"
+                f'{l["CC22"]}: 2.2\n'
+                f"{l["EC"]}: {edit_criticality_version}\n"
+                f"{l["GFA"]}: {get_full_access_version}\n"
+                f"{l["OF"]}: {other_function_version}\n"
+                f"{l["RS"]}: {random_string_version}\n"
+                f"{l["E"]}: {exit_version}\n"
+                f"{l["AP"]}: {about_program_version}\n"
+                f"{l["SAU"]}: {settings_and_update_version}"
             )
-            messagebox.showinfo(random_string(), about_program_text)
+            messagebox.showinfo(random_string(), version_component_text)
 
 
 
@@ -139,14 +163,14 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
             frame = tk.Frame(donate_window, bg="black")
             frame.pack(expand=True, padx=20, pady=20)
 
-            label = tk.Label(frame, text="Поддержать нас можно, оплатив 2 банки сгущёнки, перейдя по ссылке:", fg="white", bg="black", font=("Arial", 12))
+            label = tk.Label(frame, text=l["support_text"], fg="white", bg="black", font=("Arial", 12))
             label.pack(pady=(0, 10))
 
             link1 = tk.Label(frame, text="DonationAlerts", fg="red", bg="black", cursor="hand2", font=("Arial", 12, "underline"))
             link1.pack()
             link1.bind("<Button-1>", open_donationalerts)
 
-            label2 = tk.Label(frame, text="или поддержать через Обмен в Steam", fg="white", bg="black", font=("Arial", 12))
+            label2 = tk.Label(frame, text=l["steam_trade_text"], fg="white", bg="black", font=("Arial", 12))
             label2.pack(pady=(10, 0))
 
             link2 = tk.Label(frame, text="Steam", fg="red", bg="black", cursor="hand2", font=("Arial", 12, "underline"))
@@ -160,28 +184,30 @@ def AP(autorun_master_version, clear_cache_version, exit_version, edit_criticali
         about_window.configure(bg="black")
 
         #Текст
-        label_text = f"Антивирус Монтировка!\nВытащит любой гвоздь из крышки гроба вашего ПК!\n(как минимум попытается, а если не смог - поставь Linux)\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO, Всего строчек кода : {all_line}\nПрограмисты/Задумщики/Художники/Тестировщики : @AnonimNEO\nЛицензия: GPL v3.0 Copyleft 🄯 2024 - 2026\n"
-        label = tk.Label(about_window, text=label_text, bg="black", fg="white", font=("ComicSans", 16))
+        label = tk.Label(about_window, text=l["about_program_text"], bg="black", fg="white", font=("ComicSans", 16))
         label.pack(pady=20)
 
         image_labels = load_images(about_window)
 
-        versionlink = tk.Label(about_window, text="Версии Компонентов", bg="black", fg="green", cursor="hand2", font=("ComicSans", 16))
-        versionlink.pack(pady=10)
-        versionlink.bind("<Button-1>", show_component_versions)
+        version_link = tk.Label(about_window, text=l["version_component"], bg="black", fg="green", cursor="hand2", font=("ComicSans", 16))
+        version_link.pack(pady=10)
+        version_link.bind("<Button-1>", show_component_versions)
 
-        donationalerts_link = tk.Label(about_window, text="Поддержать нас через DonationAlerts или Steam", bg="black", fg="red", cursor="hand2", font=("ComicSans", 16))
+        donationalerts_link = tk.Label(about_window, text=l["donation_alerts_text"], bg="black", fg="red", cursor="hand2", font=("ComicSans", 16))
         donationalerts_link.pack(pady=10)
         donationalerts_link.bind("<Button-1>", donate_window)
 
-        gpl_link = tk.Label(about_window, text="Лицензия GPL v3.0", bg="red", fg="white", cursor="hand2", font=("ComicSans", 16))
+        gpl_link = tk.Label(about_window, text=f"{l["license"]} GPL v3.0", bg="red", fg="white", cursor="hand2", font=("ComicSans", 16))
         gpl_link.pack(pady=10)
         gpl_link.bind("<Button-1>", open_gpl_licenses)
 
-        website_link = tk.Label(about_window, text="Веб-Сайт NEO Organization", bg="blue", fg="yellow", cursor="hand2", font=("ComicSans", 16))
+        website_link = tk.Label(about_window, text=l["website_neo_organization"], bg="blue", fg="yellow", cursor="hand2", font=("ComicSans", 16))
         website_link.pack(pady=10)
         website_link.bind("<Button-1>", open_website)
 
         about_window.mainloop()
     except Exception as e:
-        logger.critical(f"В Компоненте AboutProgram произошла неизвестная ошибка!\n{e}")
+        logger.exception(l["ap_exception_text"], e)
+
+if __name__ == "__main__":
+    AP()

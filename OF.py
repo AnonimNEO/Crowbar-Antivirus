@@ -23,12 +23,15 @@ import winreg
 import sys
 import os
 from io import BytesIO
+
 #from OBPC import OBPC
 from RS import random_string
+from languages import localizations, current_localization
 from config import *
 
 global load_bush
-other_components_version = "0.7.2 Beta"
+other_function_version = "0.8.0 Beta"
+l = localizations[current_localization]
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -69,21 +72,26 @@ class Psutil:
 
 
 
+def pac():
+    messagebox.showinfo(random_string(), l["pac_text"])
+
+
+
 @logger.catch()
 def run_component(func, *args):
     try:
         process = multiprocessing.Process(target=func, args=args)
         process.daemon = True
         process.start()
-        logger.info(f"OF/run_component - Успешно запущен процесс для {func.__name__}")
+        logger.info(f"OF/run_component - {l["start_process"]} {func.__name__}")
     except Exception as e:
-        logger.error(f"OF/run_component - Ошибка при запуске процесса {func.__name__}: {e}")
+        logger.error(f"OF/run_component - {l["start_process_error"]} {func.__name__}: {e}")
 
 
 
 @logger.catch()
 def restart_ca():
-    logger.info("OF/restart_ca - Перезапуск программы...")
+    logger.info(f"OF/restart_ca - {l["restart_ca"]}...")
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
@@ -234,7 +242,7 @@ def get_current_disc(run_in_recovery=False):
             drives = [f"{d}:\\" for d in "ABCDEFGHIJKLMNOPQRSTUVWYZ"]
             for drive in drives:
                 if os.path.exists(os.path.join(drive, "Windows")):
-                    logger.info(f"OF - Система найдена на {drive}")
+                    logger.info(f"OF - {l["system_found"]} {drive}")
                     return drive, True
             return "X:\\", False
 
@@ -246,7 +254,7 @@ def get_current_disc(run_in_recovery=False):
                 return p.mountpoint, True
         return "C:\\", False
     except Exception as e:
-        logger.critical(f"OF\\get_current_disc - Неизвестная ошибка:\n{e}")
+        logger.exception(f"OF\\get_current_disc - {l["unknown_error"]}", e)
         return "X:\\", False
 
 
@@ -261,7 +269,7 @@ def load_bush(current_disc, user=False):
     else:
         #Формируем пути к файлам
         if not os.path.isdir(f"{current_disc}\\Users\\{default_user_name}\\"):
-            user_name = simpledialog.askstring(title=random_string(), prompt=f"Не найден пользователь {default_user_name}\nВведите нужное имя пользователя: ")
+            user_name = simpledialog.askstring(title=random_string(), prompt=f"{l["user_not_found"]} {default_user_name}\n{l["enter_user_name"]}:")
         else:
             user_name = default_user_name
 
@@ -275,7 +283,7 @@ def load_bush(current_disc, user=False):
 
     for name, path in hive_paths.items():
         if not os.path.exists(path):
-            logger.error(f"OF/load_bush - Файл куста не найден: {path}")
+            logger.critical(f"OF/load_bush - {l["bush_not_found"]}: {path}")
             continue
 
         #Если куст уже в списке активных, пропустим
@@ -287,10 +295,10 @@ def load_bush(current_disc, user=False):
             winreg.LoadKey(winreg.HKEY_LOCAL_MACHINE, name, path)
 
             active_loaded_hives.append(name)
-            logger.info(f"OF/load_bush - Куст {name} успешно загружен из {path}")
+            logger.info(f"OF/load_bush - {l["bush"]} {name} {l["success_load"]} {path}")
             success_count += 1
         except Exception as e:
-            logger.error(f"OF/load_bush - Ошибка при загрузке куста {name} из {path}:\n{e}")
+            logger.exception(f"OF/load_bush - {l["load_bush_error"]} {path}\\{name}", e)
 
     #Возвращаем True, если загрузили хотя бы один куст
     return success_count > 0
@@ -306,9 +314,9 @@ def unload_bush():
         try:
             winreg.unloadkey(winreg.HKEY_LOCAL_MACHINE, name)
             active_loaded_hives.remove(name)
-            logger.success(f"OF/unload_bush - Куст {name} успешно выгружен.")
+            logger.success(f"OF/unload_bush - {l["bush"]} {name} {l["success_unload"]}.")
         except Exception as e:
-            logger.error(f"OF/unload_bush - Ошибка при выгрузке куста {name}:\n{e}")
+            logger.exception(f"OF/unload_bush - {l["unload_bush_error"]} {name}", e)
 
 
 
@@ -319,7 +327,7 @@ def get_user_name():
         user_name = os.getlogin()
         return user_name
     except Exception as e:
-        logger.error(f"OF/get_user_name - Ошибка получения имени пользователя!\n{e}")
+        logger.exception(f"OF/get_user_name - {l["get_user_name_error"]}!", e)
         return default_user_name
 
 
@@ -334,8 +342,8 @@ def open_with():
             try:
                 subprocess.Popen([app_path, target_file_path])
             except Exception as e:
-                logger.error(f"OF/open_with - Не удалось открыть файл '{target_file_path}'с помощью указанной программы '{app_path}'\n{e}")
-                messagebox.showerror(random_string(), f"Не удалось открыть файл с помощью указанной программы:\n{e}")
+                logger.exception(f'OF/open_with - {l["open_file_error"]} "{target_file_path}" {l["with_program"]} "{app_path}"', e)
+                messagebox.showerror(random_string(), f"{l["open_file_error"]} {l["with_program"]}:\n{e}")
 
 
 
@@ -346,7 +354,7 @@ def reg_file(reg_file, reg_code):
     try:
         os.startfile(reg_file)
     except Exception as e:
-        logger.error(f"OF/reg_file - Ошибка при запуске {reg_file}\n{e}")
+        logger.exception(f"OF/reg_file - {l["start_error"]} {reg_file}", e)
 
 
 
@@ -357,4 +365,4 @@ def run_command(command):
         process = subprocess.run(command, shell=True)
         return process.returncode
     except Exception as e:
-        logger.error(f"OF/run_command - Ошибка при выполнении команды - {command}:\n{e}")
+        logger.exception(f"OF/run_command - {l["start_command_error"]} - {command}", e)

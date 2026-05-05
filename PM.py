@@ -15,10 +15,12 @@ import tkinter as tk
 from loguru import logger
 
 from config import *
-from OF import Psutil, apply_global_theme
+from languages import localizations, current_localization
+from OF import pac, Psutil, apply_global_theme
 from RS import random_string
 
-process_manager_version = "1.6.10 Beta"
+process_manager_version = "1.7.0 Beta"
+l = localizations[current_localization]
 
 def PM(run_in_recovery, current_theme):
     PM_GUI_ELEMENTS = {
@@ -85,7 +87,7 @@ def PM(run_in_recovery, current_theme):
                 return None
             except Exception as e:
                 process_name = get_process_name(proc.pid)
-                logger.error(f"PM - Ошибка при получении информации о процессе {process_name} (pid:{proc.pid}):\n{e}")
+                logger.exception(f"PM - {l["info_process_error"]} {process_name} (pid:{proc.pid})", e)
                 return None
 
 
@@ -137,7 +139,7 @@ def PM(run_in_recovery, current_theme):
 
             #Создаем дочернее окно (Toplevel)
             search_window = tk.Toplevel(manager)
-            search_window.title("Поиск")
+            search_window.title(random_string())
             search_window.geometry("300x100")
             search_window.resizable(False, False)
             #Делаем окно модальным (пока оно открыто, нельзя взаимодействовать с основным окном
@@ -155,7 +157,7 @@ def PM(run_in_recovery, current_theme):
 
             search_window.geometry("250x125")
 
-            ttk.Label(search_window, text="Введите текст для поиска:").pack(pady=5, padx=10, anchor="w")
+            ttk.Label(search_window, text=l["enter_text_for_search"]).pack(pady=5, padx=10, anchor="w")
 
             #Текстовое поле с начальным значением
             search_text = tk.StringVar(value=PM_GUI_ELEMENTS["search_query"])
@@ -179,8 +181,8 @@ def PM(run_in_recovery, current_theme):
             button_frame = ttk.Frame(search_window)
             button_frame.pack(pady=10)
 
-            ttk.Button(button_frame, text="Отмена", command=cancel_search).pack(side="left", padx=5)
-            ttk.Button(button_frame, text="ОК", command=perform_search).pack(side="left", padx=5)
+            ttk.Button(button_frame, text=l["cancel2"], command=cancel_search).pack(side="left", padx=5)
+            ttk.Button(button_frame, text=l["ok"], command=perform_search).pack(side="left", padx=5)
 
             #Привязка Enter к кнопке "ОК"
             search_window.bind("<Return>", lambda e: perform_search())
@@ -228,16 +230,10 @@ def PM(run_in_recovery, current_theme):
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
                 except Exception as e:
-                    logger.critical(f"PM - Ошибка при {action} для PID {pid}: {e}")
+                    logger.exception(f"PM - {l["at"]} {action} PID {pid}", e)
 
             #Обновляем таблицу один раз после обработки всех процессов
             PM_GUI_ELEMENTS["manager"].after(200, lambda: load_current_tab_data(PM_GUI_ELEMENTS))
-
-
-
-        #О Программе
-        def about_PM():
-            messagebox.showinfo(random_string(), f"Менеджер Процессов - {process_manager_version}")
 
 
 
@@ -271,7 +267,7 @@ def PM(run_in_recovery, current_theme):
                         return 0 #Возвращаем 0, если не удается преобразовать в число
                 return value
 
-            #Сортируем данные. reverse=True, если направление 'desc' (по убыванию)
+            #Сортируем данные. reverse=True, если направление "desc" (по убыванию)
             data.sort(key=sort_func, reverse=(direction == "desc"))
             return data
 
@@ -496,16 +492,16 @@ def PM(run_in_recovery, current_theme):
 
             if selected_pids:
                 #Стандартные действия
-                menu.add_command(label=f"Убить процессы{suffix}",
+                menu.add_command(label=f"{l["kill_processes"]} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "kill", selected_pids))
-                menu.add_command(label=f"Заморозить{suffix}",
+                menu.add_command(label=f"{l["suspend"]} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "suspend", selected_pids))
-                menu.add_command(label=f"Разморозить{suffix}",
+                menu.add_command(label=f"{l["resume"]} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "resume", selected_pids))
                 menu.add_separator()
-                menu.add_command(label=f"Сделать критичными{suffix}",
+                menu.add_command(label=f"{l["make_it_critical"]} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_true", selected_pids))
-                menu.add_command(label=f"Снять критичность{suffix}",
+                menu.add_command(label=f"{l["remove_criticality"]} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_false", selected_pids))
 
                 #если выбран ровно один процесс
@@ -516,9 +512,8 @@ def PM(run_in_recovery, current_theme):
 
                     if file_path and file_path != "Н/Д":
                         menu.add_command(
-                            label="Скопировать путь к файлу",
-                            command=lambda: copy_to_clipboard(manager, file_path)
-                        )
+                            label=f"{l["copy_path"]} {l["to_file"]}",
+                            command=lambda: copy_to_clipboard(manager, file_path))
 
             try:
                 menu.tk_popup(event.x_root, event.y_root)
@@ -578,7 +573,7 @@ def PM(run_in_recovery, current_theme):
                 action_process(PM_GUI_ELEMENTS, action, list(selected_items))
 
         def help_pm():
-            messagebox.showinfo(random_string(), "Добро пожаловать в Менеджер Процессов, он поддерживает:\n1)Выделение нескольких процессов и работу с ними\n2)Поиск - чтобы его вызвать нажмите на пункт вверху левой части окна.\n3)Замороженные процессы - помечены серым цветом, а критические - красным. Также есть вкладки для удобной навигации.\n\nУчтите, что windows создаёт свои 4 критических процессов svhost.exe, но вирус может изменить эти значения, будьте бдительны!")
+            messagebox.showinfo(random_string(), l["pm_help_text"])
 
         def restart_pm(user_theme):
             global current_theme
@@ -598,28 +593,25 @@ def PM(run_in_recovery, current_theme):
         menubar = tk.Menu(PM_GUI)
         #Создаем выпадающее меню "Действия"
         actions_menu = tk.Menu(menubar, tearoff=0)
-        actions_menu.add_command(label="Поиск", accelerator="Ctrl+F", command=lambda: open_search_dialog(PM_GUI_ELEMENTS))
-        actions_menu.add_command(label="Прекратить поиск", accelerator="Esc", command=lambda: stop_search(PM_GUI_ELEMENTS))
-        menubar.add_cascade(label="Действия", menu=actions_menu)
+        actions_menu.add_command(label=l["search"], accelerator="Ctrl+F", command=lambda: open_search_dialog(PM_GUI_ELEMENTS))
+        actions_menu.add_command(label=l["cancel_search"], accelerator="Esc", command=lambda: stop_search(PM_GUI_ELEMENTS))
+        menubar.add_cascade(label=l["actions"], menu=actions_menu)
 
         #Пункт "Помощь"
-        menubar.add_command(label="Помощь", command=help_pm)
+        menubar.add_command(label=l["help"], command=help_pm)
 
         #Меню
         theme_menu = tk.Menu(menubar, tearoff=0)
-        theme_menu.add_checkbutton(label="Тёмная", command=lambda: restart_pm("dark"))
-        theme_menu.add_checkbutton(label="Светлая", command=lambda: restart_pm("white"))
-        theme_menu.add_checkbutton(label="Красная", command=lambda: restart_pm("red"))
-        theme_menu.add_checkbutton(label="Зелёная", command=lambda: restart_pm("lime"))
-        theme_menu.add_checkbutton(label="Контрастная", command=lambda: restart_pm("black"))
-        theme_menu.add_checkbutton(label="Серая", command=lambda: restart_pm("gray"))
-        theme_menu.add_checkbutton(label="Оранжевая", command=lambda: restart_pm("orange"))
+        theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_pm("dark"))
+        theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_pm("white"))
+        theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_pm("red"))
+        theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_pm("lime"))
+        theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_pm("black"))
+        theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_pm("gray"))
+        theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_pm("orange"))
 
         #Пункт "Темы"
-        menubar.add_cascade(label="Темы", menu=theme_menu)
-
-        #Пункт "О Программе"
-        menubar.add_command(label="О программе", command=about_PM)
+        menubar.add_cascade(label=l["themes"], menu=theme_menu)
 
         PM_GUI.attributes("-topmost", True) 
 
@@ -631,13 +623,15 @@ def PM(run_in_recovery, current_theme):
             GUI.attributes("-topmost", new_state)
 
         def update_topmost_label(menubar, GUI):
-            status = "вкл" if higher.get() else "выкл"
+            status = l["on2"] if higher.get() else l["off2"]
             #Индекс command в menubar
-            menubar.entryconfig(5, label=f"Поверх всех окон: {status}")
+            menubar.entryconfig(5, label=f"{l["topmost"]}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label="Поверх всех окон: вкл", command=lambda: toggle_topmost(PM_GUI))
+        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(PM_GUI))
         update_topmost_label(menubar, PM_GUI)
+
+        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
 
         PM_GUI.config(menu=menubar)
 
@@ -686,7 +680,7 @@ def PM(run_in_recovery, current_theme):
 
         PM_GUI.mainloop()
     except Exception as e:
-        logger.critical(f"В Компоненте ProcessManager произошла неизвестная ошибка!\n{e}")
+        logger.exception(l["pm_critical_error"], e)
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

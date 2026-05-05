@@ -28,6 +28,9 @@ T_log_txt = "Crawbar_log.txt"
 #Ключ Шифрования
 clyth = 13
 
+#Ключ подтверждения подлиного окна
+program_authentication_clyth = "88005553535"
+
 #icon - только иконка, only-windows - только окно, window - иконка и окно
 start_interface = "icon"
 

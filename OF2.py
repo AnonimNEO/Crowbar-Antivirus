@@ -16,21 +16,13 @@ from loguru import logger
 import winreg
 
 global load_bush
-other_komponents_version = "0.6.1 Beta"
+other_komponents_version = "0.6.2 Beta"
 
 #Глобальные имена загруженных кустов
-loaded_hive_names = {
-    "SYSTEM": "Offline_SYSTEM",
-    "SOFTWARE": "Offline_SOFTWARE",
-    "USER": "Offline_USER"
-}
+loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
 
 #Глобальные имена для загрузки кустов
-HIVE_MAP = {
-    "SYSTEM": "Offline_SYSTEM",
-    "SOFTWARE": "Offline_SOFTWARE",
-    "USER": "Offline_USER"
-}
+HIVE_MAP = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
 
 #Список для отслеживания загруженных кустов
 active_loaded_hives = []
