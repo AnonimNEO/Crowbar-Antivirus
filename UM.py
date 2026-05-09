@@ -17,7 +17,8 @@ import threading
 #Логирование
 from loguru import logger
 
-from languages import localizations, current_localization
+from config import current_localization
+from languages import localizations
 from OF import pac, apply_global_theme
 from RS import random_string
 from config import *

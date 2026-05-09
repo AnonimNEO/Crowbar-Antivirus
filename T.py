@@ -8,8 +8,13 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
+try:
+    from config import current_localization
+except Exception as e:
+    current_localization = "ru"
+
 #Локализация
-from languages import localizations, current_localization
+from languages import localizations
 l = localizations[current_localization]
 
 import ctypes
@@ -247,7 +252,7 @@ except Exception as e:
     logger.exception(f"T - {l["component_import_error"]} MountUnlocker", e)
 
 try:
-    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, other_function_version
+    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, other_function_version
 except Exception as e:
     not_of = True
     def restart_ca():
@@ -396,7 +401,7 @@ except Exception as e:
 #Глобальные Переменные
 global T_log_txt, start_interface, run_in_recovery, current_theme
 font_trey = "Default"
-trey_version = "2.4.1 Beta"
+trey_version = "2.4.2 Beta"
 on_board_pc_version = l["not_stable"]
 
 def Crowbar():
@@ -496,9 +501,9 @@ def Crowbar():
                         return MenuItem(enabled_text, enabled_func)
 
                 unlocker_menu = Menu(
-                    create_menu_item(not_arm, l["ARM"], lambda: run_component(ARM, run_in_recovery, current_theme), "ARM"),
-                    create_menu_item(not_pm, l["PM"], lambda: run_component(PM, run_in_recovery, current_theme), "PM"),
-                    create_menu_item(not_fm, l["FM"], lambda: run_component(FM, run_in_recovery, current_theme), "FM"),
+                    create_menu_item(not_arm, l["ARM"], lambda: run_component_process(ARM, run_in_recovery, current_theme), "ARM"),
+                    create_menu_item(not_pm, l["PM"], lambda: run_component_process(PM, run_in_recovery, current_theme), "PM"),
+                    create_menu_item(not_fm, l["FM"], lambda: run_component_process(FM, run_in_recovery, current_theme), "FM"),
                     create_menu_item(not_fr, l["FR"], lambda: run_component(FR, run_in_recovery, current_theme), "FR"),
                     create_menu_item(not_um, l["UM"], lambda: run_component(UM, current_theme), "UM"),
                     create_menu_item(not_fe, l["FE"], lambda: run_component(FE), "FE"),
@@ -508,8 +513,39 @@ def Crowbar():
                     create_menu_item(not_r, l["R"], R, "R")
                 )
 
-                def open_console_on_thread():
-                    console_globals = {
+                #Меню По ПКМ
+                image = create_image(20, 20)
+                menu = Menu(
+                    create_menu_item(not_cm, f"{l["open"]} {l["CM"]}", lambda: run_component(CM, run_in_recovery, current_theme), "CM"),
+                    MenuItem(l["utilities"], unlocker_menu),
+                    create_menu_item(not_ua, l["UA"], lambda: UA(run_in_recovery), "UA"),
+                    create_menu_item(not_run, l["Run"], lambda: run_component(Run, current_theme), "Run"),
+                    create_menu_item(not_ap, l["AP"], lambda: run_component(AP,
+                        autorun_master_version,
+                        anti_xyina_version,
+                        clear_cache_version,
+                        crowbar_menu_version,
+                        crowbar_console_version,
+                        exit_version,
+                        edit_criticality_version,
+                        file_editor_version,
+                        file_manager_version,
+                        file_replacer_version,
+                        get_full_access_version,
+                        on_board_pc_version,
+                        other_function_version,
+                        process_manager_version,
+                        restart_version,
+                        real_time_protect_version,
+                        random_string_version,
+                        run_version,
+                        settings_and_update_version,
+                        scarecrow_protection_version,
+                        trey_version,
+                        unlock_all_version,
+                        users_manager_version
+                    ), "AP"),
+                    create_menu_item(not_console, l["Console"], lambda: open_console({
                         "run_component": run_component,
                         "run_in_recovery": run_in_recovery,
                         "current_theme": current_theme,
@@ -546,43 +582,7 @@ def Crowbar():
                         "UM": UM,
                         "icon": icon if "icon" in locals() else None,
                         "logger": logger,
-                    }
-                    console_thread = threading.Thread(target=open_console, args=(console_globals,), daemon=True)
-                    console_thread.start()
-
-                #Меню По ПКМ
-                image = create_image(20, 20)
-                menu = Menu(
-                    create_menu_item(not_cm, f"{l["open"]} {l["CM"]}", lambda: CM(run_in_recovery, current_theme), "CM"),
-                    MenuItem(l["utilities"], unlocker_menu),
-                    create_menu_item(not_ua, l["UA"], lambda: UA(run_in_recovery), "UA"),
-                    create_menu_item(not_run, l["Run"], lambda: run_component(Run, current_theme), "Run"),
-                    create_menu_item(not_ap, l["AP"], lambda: AP(
-                        autorun_master_version,
-                        anti_xyina_version,
-                        clear_cache_version,
-                        crowbar_menu_version,
-                        crowbar_console_version,
-                        exit_version,
-                        edit_criticality_version,
-                        file_editor_version,
-                        file_manager_version,
-                        file_replacer_version,
-                        get_full_access_version,
-                        on_board_pc_version,
-                        other_function_version,
-                        process_manager_version,
-                        restart_version,
-                        real_time_protect_version,
-                        random_string_version,
-                        run_version,
-                        settings_and_update_version,
-                        scarecrow_protection_version,
-                        trey_version,
-                        unlock_all_version,
-                        users_manager_version
-                    ), "AP"),
-                    create_menu_item(not_console, l["Console"], open_console_on_thread, "Console"),
+                    }), "Console"),
                     create_menu_item(not_sau, l["SAU"], lambda: run_component(SAU, current_theme), "SAU"),
                     create_menu_item(not_config, f"{l["pac"]} - {program_authentication_clyth}", pac, "config"),
                     create_menu_item(not_e, l["E"], E, "Exit")

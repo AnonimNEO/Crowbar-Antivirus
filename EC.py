@@ -15,7 +15,8 @@ import ctypes
 from ctypes import wintypes
 
 from OF import Psutil
-from languages import localizations, current_localization
+from languages import localizations
+from config import current_localization
 
 edit_criticality_version = "0.4.0 Beta"
 l = localizations[current_localization]

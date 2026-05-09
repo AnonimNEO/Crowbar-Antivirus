@@ -29,7 +29,7 @@ from FE import FE
 from GFA import GFA
 from config import *
 from RS import random_string
-from languages import localizations, current_localization
+from languages import localizations
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme
 
 #global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
@@ -1471,7 +1471,7 @@ def ARM(run_in_recovery, current_theme):
         def update_topmost_label(menubar, GUI):
             status = l["on2"] if higher.get() else l["off2"]
             #Индекс command в menubar
-            menubar.entryconfig(5, label=f"{l["topmost"]}: {status}")
+            menubar.entryconfig(4, label=f"{l["topmost"]}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
         menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(ARM_GUI))
@@ -1501,6 +1501,7 @@ def ARM(run_in_recovery, current_theme):
         set_treeview_columns(ARM_GUI_ELEMENTS)
         load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
+        ARM_GUI.config(menu=menubar)
         ARM_GUI.mainloop()
     except Exception as e:
         logger.exception(l["arm_critical_error"], e)

@@ -21,8 +21,8 @@ import os
 
 from RS import random_string
 from OF import pac, apply_global_theme, get_user_name
-from languages import localizations, current_localization
-from config import theme, default_theme, program_authentication_clyth
+from languages import localizations
+from config import theme, default_theme, program_authentication_clyth, current_localization
 l = localizations[current_localization]
 
 scarecrow_protection_version = "0.3.8 Beta"

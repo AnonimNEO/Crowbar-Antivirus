@@ -20,8 +20,8 @@ import re
 
 from RS import random_string
 from OF import pac, apply_global_theme
-from config import theme, default_theme, program_authentication_clyth
-from languages import localizations, current_localization
+from config import theme, default_theme, program_authentication_clyth, current_localization
+from languages import localizations
 
 run_version = "1.1.0 Beta"
 run_width_window = 400

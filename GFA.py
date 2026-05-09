@@ -14,7 +14,8 @@ import subprocess
 import os
 
 from RS import random_string
-from languages import localizations, current_localization
+from languages import localizations
+from config import current_localization
 
 get_full_access_version = "0.4.0 Alpha"
 l = localizations[current_localization]

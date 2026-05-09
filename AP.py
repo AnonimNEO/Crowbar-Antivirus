@@ -22,7 +22,7 @@ import os
 
 #Импорт Компонентов
 from config import *
-from languages import *
+from languages import localizations
 from RS import random_string
 
 global about_program_version
@@ -31,7 +31,6 @@ l = localizations[current_localization]
 image_references = {}
 
 def AP(autorun_master_version="error",
-       anti_xyina_version="error",
        clear_cache_version="error",
        crowbar_menu_version="error",
        crowbar_console_version="error",
@@ -67,7 +66,7 @@ def AP(autorun_master_version="error",
             try:
                 image_files = [f for f in os.listdir(images_path) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
             except Exception as e:
-                logger.exception(f"AP - Ошибка при чтении каталога {images_path}", e)
+                logger.exception(f"AP - {l["read_dir_error"]} {images_path}", e)
                 return image_labels_container
 
             #Проверяем наличие файлов
@@ -96,7 +95,7 @@ def AP(autorun_master_version="error",
                     image_labels_container.append(label)
 
                 except Exception as e:
-                    logger.exception(f"Не удалось загрузить изображение {image_file}", e)
+                    logger.exception(f"AP - {l["read_image_error"]} {image_file}", e)
                     continue #если одно изображение не загрузилось, продолжаем с другими
 
             return image_labels_container #Возвращаем список загруженных меток, чтобы знать, создался ли фрейм

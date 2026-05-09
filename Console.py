@@ -17,8 +17,8 @@ import threading
 import random
 import sys
 
-from languages import localizations, current_localization
-from config import program_authentication_clyth
+from config import program_authentication_clyth, current_localization
+from languages import localizations
 from RS import random_string
 import config
 

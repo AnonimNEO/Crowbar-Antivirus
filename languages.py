@@ -1,6 +1,3 @@
-#Текущий язык (current_language)
-current_localization = "ru"
-
 from config import all_line, program_authentication_clyth
 years_copyleft = "2024 - 2026"
 
@@ -49,6 +46,8 @@ localizations = {
         "about_program_text": f"Антивирус Монтировка!\nВытащит любой гвоздь из крышки гроба вашего ПК!\n(как минимум попытается, а если не смог - поставь Linux)\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO, Всего строчек кода : {all_line}\nПрограммисты/Задумщики/Художники/Тестировщики : @AnonimNEO\nЛицензия: GPL v3.0 Copyleft 🄯 {years_copyleft}\n",
         "ap_exception_text": "В Компоненте AboutProgram произошла неизвестная ошибка!",
         "not_stable": "не доступен из-за нестабильности",
+        "read_dir_error": "Ошибка при чтении каталога",
+        "read_image_error": "Не удалось загрузить изображение",
         #T
         "import_error": "Ошибка импорта",
         "replacement_is_used": "Используется замена",
@@ -139,8 +138,10 @@ localizations = {
         "ec_critical_error": "В Компоненте EditCriticality произошла неизвестная ошибка",
         #OF
         "pac_text": f"Ключ Подлинности Программы (КПП) - это ключ для подтверждения, что эта программа подлинная.\nЕсли вы видите ключ который вы указывали при компиляции, значит перед вами настоящий Антивирус Монтировка.\nЕсли ключ не совпадает с вашим - значит перед вами клон программы который маскируется под Антивирус Монтировка.\n\nКПП - {program_authentication_clyth}",
+        "start_thread": "Успешно запущен поток для",
         "start_process": "Успешно запущен процесс для",
-        "start_process_error": "Ошибка при запуске процесса",
+        "start_theard_error": "Ошибка при запуске потока для процесса",
+        "start_process_error": "Ошибка при запуске процесса для процесса",
         "restart_ca": "Перезапуск программы",
         "system_found": "Система найдена на",
         "unknown_error": "Неизвестная ошибка",

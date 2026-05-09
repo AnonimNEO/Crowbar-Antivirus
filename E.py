@@ -18,8 +18,8 @@ import random
 import os
 
 from RS import random_string
-from config import program_authentication_clyth
-from languages import localizations, current_localization
+from config import program_authentication_clyth, current_localization
+from languages import localizations
 
 exit_version = "1.1.0 Beta"
 l = localizations[current_localization]

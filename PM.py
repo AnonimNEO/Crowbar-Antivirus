@@ -15,7 +15,7 @@ import tkinter as tk
 from loguru import logger
 
 from config import *
-from languages import localizations, current_localization
+from languages import localizations
 from OF import pac, Psutil, apply_global_theme
 from RS import random_string
 
@@ -140,22 +140,11 @@ def PM(run_in_recovery, current_theme):
             #Создаем дочернее окно (Toplevel)
             search_window = tk.Toplevel(manager)
             search_window.title(random_string())
-            search_window.geometry("300x100")
-            search_window.resizable(False, False)
+            search_window.geometry("250x125")
+            #search_window.resizable(False, False)
+            search_window.attributes("-topmost", True)
             #Делаем окно модальным (пока оно открыто, нельзя взаимодействовать с основным окном
             search_window.grab_set()
-
-            #Устанавливаем положение окна по центру
-            #manager_x = manager.winfo_x()
-            #manager_y = manager.winfo_y()
-            #manager_width = manager.winfo_width()
-            #manager_height = manager.winfo_height()
-            manager.winfo_x()
-            manager.winfo_y()
-            manager.winfo_width()
-            manager.winfo_height()
-
-            search_window.geometry("250x125")
 
             ttk.Label(search_window, text=l["enter_text_for_search"]).pack(pady=5, padx=10, anchor="w")
 
@@ -625,7 +614,7 @@ def PM(run_in_recovery, current_theme):
         def update_topmost_label(menubar, GUI):
             status = l["on2"] if higher.get() else l["off2"]
             #Индекс command в menubar
-            menubar.entryconfig(5, label=f"{l["topmost"]}: {status}")
+            menubar.entryconfig(4, label=f"{l["topmost"]}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
         menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(PM_GUI))

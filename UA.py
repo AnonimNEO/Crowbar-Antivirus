@@ -20,7 +20,8 @@ from loguru import logger
 
 #from OF2 import get_offline_reg_path, loaded_hive_names
 from OF import get_offline_reg_path, loaded_hive_names
-from languages import localizations, current_localization
+from config import current_localization
+from languages import localizations
 
 unlock_all_version = "1.2.0 Beta"
 l = localizations[current_localization]

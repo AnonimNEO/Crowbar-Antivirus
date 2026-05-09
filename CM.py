@@ -34,7 +34,7 @@ except Exception as e:
         pass
     
 try:
-    from FE import EE
+    from FE import FE
 except Exception as e:
     def FE():
         pass
@@ -52,7 +52,7 @@ except Exception as e:
         pass
 
 try:
-    from OF import pac, run_component, open_with, get_current_disc, apply_global_theme
+    from OF import pac, run_component, run_component_process, open_with, get_current_disc, apply_global_theme
 except Exception as e:
     def pac():
         pass
@@ -107,8 +107,8 @@ except Exception as e:
     def UM(a=None):
         pass
 
-from config import theme, default_theme, program_authentication_clyth
-from languages import localizations, current_localization
+from config import theme, default_theme, program_authentication_clyth, current_localization
+from languages import localizations
 l = localizations[current_localization]
 
 global run_in_recovery, current_theme, crowbar_menu_version
@@ -230,12 +230,12 @@ def CM(run_in_recovery, current_theme, current_disc=None):
         header_labels.append(label_comp)
 
         arm_btn = ttk.Button(tab_components, text=l["ARM"],
-                     command=lambda:run_component(ARM, run_in_recovery, current_theme))
+                     command=lambda:run_component_process(ARM, run_in_recovery, current_theme))
         arm_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(arm_btn)
 
         pm_btn = ttk.Button(tab_components, text=l["PM"],
-                     command=lambda:run_component(PM, run_in_recovery, current_theme))
+                     command=lambda:run_component_process(PM, run_in_recovery, current_theme))
         pm_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(pm_btn)
 

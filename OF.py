@@ -26,7 +26,7 @@ from io import BytesIO
 
 #from OBPC import OBPC
 from RS import random_string
-from languages import localizations, current_localization
+from languages import localizations
 from config import *
 
 global load_bush
@@ -79,6 +79,17 @@ def pac():
 
 @logger.catch()
 def run_component(func, *args):
+    try:
+        thread = threading.Thread(target=func, args=args, daemon=True)
+        thread.start()
+        logger.info(f"OF/run_component - {l["start_thread"]} {func.__name__}")
+    except Exception as e:
+        logger.error(f"OF/run_component - {l["start_thread_error"]} {func.__name__}: {e}")
+
+
+
+@logger.catch()
+def run_component_process(func, *args):
     try:
         process = multiprocessing.Process(target=func, args=args)
         process.daemon = True

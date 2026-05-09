@@ -21,8 +21,8 @@ import os
 from GFA import GFA
 from RS import random_string
 from OF import pac, apply_global_theme, get_current_disc
-from languages import localizations, current_localization
-from config import theme, default_theme, program_authentication_clyth
+from languages import localizations
+from config import theme, default_theme, program_authentication_clyth, current_localization
 
 file_replacer_version = "0.4.0 Beta"
 l = localizations[current_localization]

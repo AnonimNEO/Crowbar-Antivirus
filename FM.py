@@ -30,14 +30,14 @@ import shutil
 import os
 
 from OF import pac, get_user_name, get_current_disc, apply_global_theme
-from languages import localizations, current_localization
+from languages import localizations
 from RS import random_string
 from config import *
 from GFA import GFA
 from FE import FE
 
 #Глобальная переменная версии
-file_manager_version = "4.10.0 Beta"
+file_manager_version = "4.10.1 Beta"
 l = localizations[current_localization]
 
 def FM(run_in_recovery, current_theme):
@@ -112,7 +112,7 @@ def FM(run_in_recovery, current_theme):
 
 
         #Получаем доступные диски
-        def get_available_drives():
+        def get_available_disks():
             drives = []
             for drive in string.ascii_uppercase:
                 if os.path.exists(drive + ":\\"):
@@ -255,6 +255,28 @@ def FM(run_in_recovery, current_theme):
 
                 #Пункт "Темы"
                 menubar.add_cascade(label=l["themes"], menu=theme_menu)
+
+                FM_GUI.attributes("-topmost", True)
+
+                if run_in_recovery:
+                    higher = tk.BooleanVar(value=False)
+                else:
+                    higher = tk.BooleanVar(value=True)
+
+                def toggle_topmost(GUI):
+                    new_state = not higher.get()
+                    higher.set(new_state)
+                    GUI.attributes("-topmost", new_state)
+
+                def update_topmost_label(menubar, GUI):
+                    status = l["on2"] if higher.get() else l["off2"]
+                    #Индекс command в menubar
+                    menubar.entryconfig(4, label=f"{l["topmost"]}: {status}")
+                    GUI.after(200, lambda: update_topmost_label(menubar, GUI))
+
+                menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(FM_GUI))
+                update_topmost_label(menubar, FM_GUI)
+
                 menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
                 self.FM_GUI.config(menu=menubar)
 
@@ -405,12 +427,58 @@ def FM(run_in_recovery, current_theme):
                     else:
                         default_path = "C:\\"
 
-                    chosen_path = simpledialog.askstring(random_string(),f"{l["enter_path"]}\n{l["available_disks"]}: {get_available_drives()}", initialvalue=default_path)
+                    #Получаем путь от пользователя
+                    def open_enter_dialog():
+                        result = {"path": None}
+
+                        def cancel_enter_path():
+                            result["path"] = None
+                            path_window.destroy()
+
+                        def ok_path():
+                            result["path"] = path_text.get()
+                            path_window.destroy()
+
+                        #Создаем окно
+                        path_window = tk.Toplevel(FM_GUI)
+                        path_window.title(random_string())
+                        path_window.geometry("250x135")
+                        path_window.attributes("-topmost", True)
+
+                        #Делаем окно модальным
+                        path_window.grab_set()
+
+                        ttk.Label(path_window, text=f"{l["enter_path"]}\n{l["available_disks"]}: {get_available_disks()}").pack(pady=5, padx=10, anchor="w")
+
+                        #Текстовое поле
+                        path_text = tk.StringVar(value=default_path)
+                        path_entry = ttk.Entry(path_window, textvariable=path_text, width=40)
+                        path_entry.pack(pady=5, padx=10)
+                        path_entry.focus_set()
+
+                        button_frame = ttk.Frame(path_window)
+                        button_frame.pack(pady=10)
+
+                        ttk.Button(button_frame, text=l["cancel2"], command=cancel_enter_path).pack(side="left", padx=5)
+                        ttk.Button(button_frame, text=l["ok"], command=ok_path).pack(side="left", padx=5)
+
+                        #Привязки Enter и Esc
+                        path_window.bind("<Return>", lambda e: ok_path())
+                        path_window.bind("<Escape>", lambda e: cancel_enter_path())
+
+                        #Ожидаем закрытия
+                        FM_GUI.wait_window(path_window)
+
+                        return result["path"]
+
+                    chosen_path = open_enter_dialog()
+
                     if chosen_path:
                         path = chosen_path
                     else:
-                        self.on_close_tab() #Пользователь нажал "Отмена"
+                        self.on_close_tab()
                         return
+
 
                 if not os.path.exists(path):
                     messagebox.showerror(random_string(), f"{l["path"]} {l["not_found"]}: {path}")
@@ -441,7 +509,6 @@ def FM(run_in_recovery, current_theme):
                     #Обновляем поле пути после успешной загрузки
                     self.update_path_entry()
                     self.update_toolbar_buttons()
-                    
                 except Exception as e:
                     logger.exception(f"FM - {l["permission_error"]} {path}", e)
                     messagebox.showerror(random_string(), f"{l["permission_error"]}: {path}")
@@ -1827,7 +1894,7 @@ def FM(run_in_recovery, current_theme):
 
     except Exception as e:
         logger.critical(l["fm_critical_error"], e)
-        messagebox.showerror(random_string(), f"{l["fm_error"]}\n{e}")
+        messagebox.showerror(random_string(), f"{l["fm_critical_error"]}\n{e}")
 
 if __name__ == "__main__":
     FM(False, theme["dark"])

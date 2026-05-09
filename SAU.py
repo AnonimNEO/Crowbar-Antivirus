@@ -30,8 +30,8 @@ import threading
 
 #Чтение конфига
 import config
-from config import theme, default_theme, program_authentication_clyth
-from languages import localizations, current_localization
+from config import theme, default_theme, program_authentication_clyth, current_localization
+from languages import localizations
 #Запуск команд
 from OF import run_command, apply_global_theme
 #Случайные заголовки

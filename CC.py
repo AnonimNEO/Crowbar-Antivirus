@@ -18,7 +18,7 @@ import getpass
 import shutil
 import os
 
-from languages import localizations, current_localization
+from languages import localizations
 from OF import get_user_name, get_current_disc
 from RS import random_string
 from config import *

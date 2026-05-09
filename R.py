@@ -16,7 +16,7 @@ import subprocess
 #Работа с файлами
 import os
 
-from languages import localizations, current_localization
+from languages import localizations
 from config import *
 
 global restart_windows_bat

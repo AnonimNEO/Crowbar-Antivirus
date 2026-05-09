@@ -13,8 +13,8 @@ from tkinter import filedialog, messagebox
 from loguru import logger
 import os
 
-from languages import localizations, current_localization
-from config import program_authentication_clyth
+from languages import localizations
+from config import program_authentication_clyth, current_localization
 from RS import random_string
 from OF import pac
 
@@ -139,13 +139,12 @@ class FileEditor:
             higher.set(not higher.get())
             GUI.attributes("-topmost", higher.get())
 
-        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda:toggle_topmost(self.FE_GUI))
-
         def update_topmost_label(menubar, GUI):
             status = l["on2"] if higher.get() else l["off2"]
             menubar.entryconfig(4, label=f"{l["topmost"]}: {status}")
             GUI.after(100, lambda:update_topmost_label(menubar, GUI))
 
+        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda:toggle_topmost(self.FE_GUI))
         menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
         update_topmost_label(menubar, self.FE_GUI)
 
