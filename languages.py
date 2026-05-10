@@ -344,6 +344,7 @@ localizations = {
         #FM
         "skip_file": "Пропущен файл",
         "copy_path": "Скопировать путь",
+        "copy_name": "Скопировать имя",
         "search": "Поиск",
         "loading": "Загрузка",
         "enter_path": "Введите путь",
