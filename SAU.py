@@ -30,6 +30,9 @@ import threading
 import urllib.request
 import platform
 from pathlib import Path
+import webbrowser
+import subprocess
+import sys
 
 #Чтение конфига
 import config
@@ -790,11 +793,12 @@ def crowbar_settings(current_theme):
         webbrowser.open("https://www.gnu.org/licenses/gpl-3.0.html")
 
     def install_python():
+        messagebox.showinfo(random_string(), "Сейчас окно зависнет, дождитесь конца установки")
         logger.info("SAU - Скачиваем Python 3.12...")
 
         arch = "amd64" if platform.machine() == "AMD64" else ""
         url = f"https://www.python.org/ftp/python/3.12.10/python-3.12.10-{arch}.exe".replace("--", "-")
-        filename = rf"C:\Users\{get_user_name()}\Download\python-3.12.0-installer.exe"
+        filename = "python-3.12.0-installer.exe"
 
         try:
             logger.debug(f"SAU - Скачивание с {url}...")
