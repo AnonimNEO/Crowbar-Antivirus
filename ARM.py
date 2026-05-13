@@ -33,7 +33,7 @@ from languages import localizations
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme
 
 #global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.4.0 Beta"
+autorun_master_version = "3.5.0 Beta"
 l = localizations[current_localization]
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
@@ -187,7 +187,8 @@ def ARM(run_in_recovery, current_theme):
             ],
             "Системная": [
                 (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Shell"),
-                (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Userinit")
+                (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Userinit"),
+                (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Taskman")
             ],
             "AppInit_DLLs": [
                 (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows", "AppInit_DLLs",
@@ -347,10 +348,11 @@ def ARM(run_in_recovery, current_theme):
                             "value_type": reg_type
                         })
                 except Exception as e:
-                    logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
+                    if value_name != "Taskman":
+                        logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
                     ARM_data.append({
                         "Имя Параметра": value_name,
-                        "Значение Параметра": "Ошибка",
+                        "Значение Параметра": "Не найден",
                         "Тип Параметра": "Ошибка",
                         "Путь Параметра": full_path,
                         "hkey": hkey_const,
