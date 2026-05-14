@@ -27,23 +27,17 @@ import re
 #Логирование
 from loguru import logger
 import threading
-import urllib.request
-import platform
-from pathlib import Path
-import webbrowser
-import subprocess
-import sys
 
 #Чтение конфига
 import config
 from config import theme, default_theme, program_authentication_clyth, current_localization
 from languages import localizations
 #Запуск команд
-from OF import run_command, apply_global_theme, get_user_name
+from OF import run_command, apply_global_theme
 #Случайные заголовки
 from RS import random_string
 
-settings_and_update_version = "1.3.0 Beta"
+settings_and_update_version = "1.2.0 Beta"
 l = localizations[current_localization]
 
 def compiling_crowbar():
@@ -789,61 +783,6 @@ def crowbar_settings(current_theme):
         except Exception as e:
             logger.error(f"{l["open_error"]} {l["log"]}: {e}")
 
-    def license():
-        webbrowser.open("https://www.gnu.org/licenses/gpl-3.0.html")
-
-    def install_python():
-        messagebox.showinfo(random_string(), "Сейчас окно зависнет, дождитесь конца установки")
-        logger.info("SAU - Скачиваем Python 3.12...")
-
-        arch = "amd64" if platform.machine() == "AMD64" else ""
-        url = f"https://www.python.org/ftp/python/3.12.10/python-3.12.10-{arch}.exe".replace("--", "-")
-        filename = "python-3.12.0-installer.exe"
-
-        try:
-            logger.debug(f"SAU - Скачивание с {url}...")
-            urllib.request.urlretrieve(url, filename)
-            logger.info(f"SAU - Скачивание завершено")
-
-            logger.info("SAU - Запуск установщика...")
-            subprocess.run([filename, "/quiet", "InstallAllUsers=1", "PrependPath=1"], check=True)
-            logger.info("SAU - Установка завершена")
-
-            if messagebox.askyesno(random_string(), "Удалить файл установщика?"):
-                os.remove(filename)
-                logger.info("SAU - Файл удален")
-        except Exception as e:
-            logger.exception(f"SAU - Ошибка при скачивании python", e)
-
-    def install_libraries():
-        packages = [
-            "--upgrade pip",
-            "--upgrade pip",
-            "-U nuitka",
-            "SpeechRecognition",
-            "ordered-set",
-            "datetime",
-            "elevate",
-            "pywin32",
-            "pyttsx3",
-            "pystray",
-            "psutil",
-            "loguru",
-        ]
-
-        logger.info("SAU - Устанавливаем библиотеки...")
-
-        for package in packages:
-            try:
-                logger.info(f"SAU - Установка: {package}")
-                subprocess.run([sys.executable, "-m", "pip", "install"] + package.split(), check=True,
-                               capture_output=True)
-                logger.info(f"SAU - {package.split()[-1]} установлен")
-            except subprocess.CalledProcessError as e:
-                logger.error(f"SAU - Ошибка при установке {package}:\n{e}")
-
-        logger.info("SAU - Библиотеки установлены успешно!")
-
     button_frame = ttk.Frame(frame)
     button_frame.pack(pady=5)
 
@@ -859,20 +798,11 @@ def crowbar_settings(current_theme):
     apply_button = ttk.Button(button_frame, text=l["apply"], command=apply_settings)
     apply_button.grid(row=0, column=3, padx=3, pady=2)
 
-    license_button = ttk.Button(button_frame, text=l["license"], command=license)
-    license_button.grid(row=1, column=0, padx=3, pady=2)
-
-    python_button = ttk.Button(button_frame, text=f"{l["install"]} Python", command=install_python)
-    python_button.grid(row=1, column=1, padx=3, pady=2)
-
-    install_library_button = ttk.Button(button_frame, text=f"{l["install"]} {l["libraries"]}", command=install_libraries)
-    install_library_button.grid(row=1, column=2, columnspan=2, padx=3, pady=2, sticky="ew")
-
     open_dir_button = ttk.Button(button_frame, text=f"{l["open"]} {l["dir"]}", command=open_current_dir)
-    open_dir_button.grid(row=2, column=0, columnspan=2, padx=3, pady=2, sticky="ew")
+    open_dir_button.grid(row=1, column=0, columnspan=2, padx=3, pady=2, sticky="ew")
 
     open_log_button = ttk.Button(button_frame, text=f"{l["open"]} {l["log"]}", command=open_log_file)
-    open_log_button.grid(row=2, column=2, columnspan=2, padx=3, pady=2, sticky="ew")
+    open_log_button.grid(row=1, column=2, columnspan=2, padx=3, pady=2, sticky="ew")
 
     #Сохраняем ссылки для управления состоянием
     action_buttons.extend([

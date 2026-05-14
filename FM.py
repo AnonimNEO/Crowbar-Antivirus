@@ -428,7 +428,7 @@ def FM(run_in_recovery, current_theme):
                         default_path = "C:\\"
 
                     #Получаем путь от пользователя
-                    def open_enter_dialog(default_path="C:\\"):
+                    def open_enter_dialog():
                         result = {"path": None}
 
                         def cancel_enter_path():
@@ -471,7 +471,7 @@ def FM(run_in_recovery, current_theme):
 
                         return result["path"]
 
-                    chosen_path = open_enter_dialog(default_path)
+                    chosen_path = open_enter_dialog()
 
                     if chosen_path:
                         path = chosen_path
