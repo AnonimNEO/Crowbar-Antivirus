@@ -2,7 +2,7 @@
 current_localization = "ru"
 
 #Общее количество строчек кода
-all_line = "8298"
+all_line = "10600"
 
 #Каталог логов
 log_path = "log"
