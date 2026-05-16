@@ -240,7 +240,7 @@ def CM(run_in_recovery, current_theme, current_disc=None):
         regular_buttons.append(pm_btn)
 
         fm_btn = ttk.Button(tab_components, text=l["FM"],
-                     command=lambda:run_component(FM, run_in_recovery, current_theme))
+                     command=lambda:run_component_process(FM, run_in_recovery, current_theme))
         fm_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fm_btn)
 

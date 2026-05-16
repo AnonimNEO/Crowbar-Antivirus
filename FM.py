@@ -37,7 +37,7 @@ from GFA import GFA
 from FE import FE
 
 #Глобальная переменная версии
-file_manager_version = "4.10.1 Beta"
+file_manager_version = "4.10.3 Beta"
 l = localizations[current_localization]
 
 def FM(run_in_recovery, current_theme):
@@ -592,7 +592,15 @@ def FM(run_in_recovery, current_theme):
             def on_refresh(self):
                 data = self.get_current_tab_data()
                 if data and data["path"]:
+                    # Сохраняем текущий фокус перед обновлением
+                    tree = data["tree"]
+                    current_focus = tree.focus()
+                    
                     self.load_directory_for_tab(self.get_current_tab_id(), data["path"], is_history_nav=True)
+                    
+                    # Восстанавливаем фокус, если элемент все еще существует
+                    if current_focus and tree.exists(current_focus):
+                        tree.after(50, lambda: self.focus_item_by_path(current_focus))
 
 
 
@@ -828,9 +836,51 @@ def FM(run_in_recovery, current_theme):
 
                 count = len(paths_to_delete)
 
-                if not messagebox.askyesno(random_string(), f"{l["you_want_to_delete"]} {count} {l["elements"]}?" if count > 1 else f"{l["delete"]} '{os.path.basename(paths_to_delete[0])}'?"):
+                if not messagebox.askyesno(random_string(), f"{l['you_want_to_delete']} {count} {l['elements']}?" if count > 1 else f"{l['delete']} '{os.path.basename(paths_to_delete[0])}'?"):
                     return
 
+                   # Получаем текущую таблицу и данные для восстановления фокуса
+                data = self.get_current_tab_data()
+                if not data:
+                    return
+                
+                tree = data["tree"]
+                
+                # Находим все элементы в таблице (кроме удаляемых)
+                all_items = tree.get_children()
+                
+                # Определяем, какой элемент получит фокус после удаления
+                # Берем элемент, следующий за последним удаляемым, или предыдущий
+                focus_target = None
+                
+                if all_items:
+                    # Сортируем индексы удаляемых элементов
+                    delete_indices = []
+                    for path in paths_to_delete:
+                        try:
+                            idx = all_items.index(path)
+                            delete_indices.append(idx)
+                        except ValueError:
+                            pass
+                    
+                    if delete_indices:
+                        max_delete_idx = max(delete_indices)
+                        min_delete_idx = min(delete_indices)
+                        
+                        # Пытаемся найти элемент после удаляемых
+                        for idx in range(max_delete_idx + 1, len(all_items)):
+                            if all_items[idx] not in paths_to_delete:
+                                focus_target = all_items[idx]
+                                break
+                        
+                        # Если нет элемента после, берем элемент перед удаляемыми
+                        if focus_target is None:
+                            for idx in range(min_delete_idx - 1, -1, -1):
+                                if all_items[idx] not in paths_to_delete:
+                                    focus_target = all_items[idx]
+                                    break
+
+                # Удаляем файлы
                 for path in paths_to_delete:
                     try:
                         if os.path.isdir(path):
@@ -838,10 +888,16 @@ def FM(run_in_recovery, current_theme):
                         else:
                             os.remove(path)
                     except Exception as e:
-                        logger.exception(f"FM - {l["delete_error"]} {path}", e)
-                        messagebox.showerror(random_string(), f"{l["delete_error"]} {os.path.basename(path)}:\n{e}")
+                        logger.exception(f"FM - {l['delete_error']} {path}", e)
+                        messagebox.showerror(random_string(), f"{l['delete_error']} {os.path.basename(path)}:\n{e}")
                 
+                # Обновляем и восстанавливаем фокус
                 self.on_refresh()
+                
+                # Восстанавливаем фокус после обновления
+                if focus_target:
+                    tree.after(100, lambda: self.focus_item_by_path(focus_target))
+
 
 
 
@@ -1284,7 +1340,7 @@ def FM(run_in_recovery, current_theme):
 
                     #Копировать данные
                     menu.add_command(label=l["copy_path"], command=lambda: self.copy_to_clipboard(target_path))
-                    menu.add_command(label=l["copy_name"], command=lambda: self.copy_to_clipboard(os.path.basename(target_path)))
+                    menu.add_command(label=f"{l["copy"]} {l["name"]}", command=lambda: self.copy_to_clipboard(os.path.basename(target_path)))
 
                 elif target_type == "directory":
                     #Меню для Каталога (пустого места)

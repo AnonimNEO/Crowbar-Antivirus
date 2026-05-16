@@ -401,7 +401,7 @@ except Exception as e:
 #Глобальные Переменные
 global T_log_txt, start_interface, run_in_recovery, current_theme
 font_trey = "Default"
-trey_version = "2.4.2 Beta"
+trey_version = "2.4.2 Beta build 6"
 on_board_pc_version = l["not_stable"]
 
 def Crowbar():
