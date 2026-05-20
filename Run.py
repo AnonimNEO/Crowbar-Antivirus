@@ -23,7 +23,7 @@ from OF import pac, apply_global_theme
 from config import theme, default_theme, program_authentication_clyth, current_localization
 from languages import localizations
 
-run_version = "1.1.0 Beta"
+run_version = "1.1.1 Beta"
 run_width_window = 400
 run_height_window = 200
 run_size_window = f"{run_width_window}x{run_height_window}"
@@ -53,7 +53,7 @@ class ApplicationLauncher:
             {"name": l["end_session"], "command": "shutdown /l"}
         ]
 
-        self.mode = tk.StringVar(value="professional")
+        self.mode = tk.StringVar(value=l["professional"])
         self.current_buttons = []
 
         self.create_menu()
@@ -66,7 +66,7 @@ class ApplicationLauncher:
         self.create_simplified_mode()
 
         #Переключение на профессиональный режим по умолчанию
-        self.switch_mode("professional")
+        self.switch_mode(l["professional"])
 
         #Привязка события изменения размера окна
         self.RUN_GUI.bind("<Configure>", self.on_window_resize)
@@ -91,7 +91,7 @@ class ApplicationLauncher:
         )
         mode_combo.pack(side=tk.LEFT, padx=5, pady=8)
         mode_combo.bind("<<ComboboxSelected>>", lambda e: self.switch_mode(
-            "professional" if self.mode.get() == l["professional"] else l["simplified"]
+            l["professional"] if self.mode.get() == l["professional"] else l["simplified"]
         ))
 
 
@@ -129,7 +129,7 @@ class ApplicationLauncher:
         log_frame = tk.Frame(self.professional_frame)
         log_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        tk.Label(log_frame, text="Ошибки:", font=("Default", 9)).pack(anchor=tk.W)
+        tk.Label(log_frame, text=f"{l["error"]}:", font=("Default", 9)).pack(anchor=tk.W)
 
         scrollbar = tk.Scrollbar(log_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -186,7 +186,7 @@ class ApplicationLauncher:
 
     #Переключаем режим
     def switch_mode(self, mode):
-        if mode == "professional":
+        if mode == l["professional"]:
             self.professional_frame.pack(fill=tk.BOTH, expand=True)
             self.simplified_frame.pack_forget()
             self.RUN_GUI.resizable(False, False)

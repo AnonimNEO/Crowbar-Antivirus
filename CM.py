@@ -112,7 +112,7 @@ from languages import localizations
 l = localizations[current_localization]
 
 global run_in_recovery, current_theme, crowbar_menu_version
-crowbar_menu_version = "2.3.0 Beta"
+crowbar_menu_version = "2.3.1 Beta"
 
 @logger.catch
 def CM(run_in_recovery, current_theme, current_disc=None):
@@ -267,7 +267,7 @@ def CM(run_in_recovery, current_theme, current_disc=None):
         regular_buttons.append(cc_btn)
 
         run_btn = ttk.Button(tab_utilities, text=l["Run"],
-                     command=lambda:run_component(Run, current_theme))
+                     command=lambda:run_component_process(Run, current_theme))
         run_btn.grid(row=2, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
         small_buttons.append(run_btn)
 

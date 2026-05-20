@@ -37,7 +37,7 @@ from GFA import GFA
 from FE import FE
 
 #Глобальная переменная версии
-file_manager_version = "4.10.3 Beta"
+file_manager_version = "4.10.4 Beta"
 l = localizations[current_localization]
 
 def FM(run_in_recovery, current_theme):
@@ -67,7 +67,7 @@ def FM(run_in_recovery, current_theme):
                         "size": 0,
                         "edited": stat.st_mtime,
                         "created": stat.st_ctime,
-                        "type": "Каталог",
+                        "type": l["dir"],
                         "is_dir": True,
                         "ext": ""
                     })
@@ -83,14 +83,14 @@ def FM(run_in_recovery, current_theme):
 
                     #Определение типа
                     if is_dir:
-                        file_type = "Каталог"
+                        file_type = l["dir"]
                         ext = ""
                     else:
                         ext = os.path.splitext(item)[1].lower()
                         if ext:
-                            file_type = f"{ext.upper()[1:]} Файл"
+                            file_type = f"{ext.upper()[1:]} {l["file"]}"
                         else:
-                            file_type = "Файл"
+                            file_type = {l["file"]}
 
                     files_info.append({
                         "name": item,
@@ -312,16 +312,16 @@ def FM(run_in_recovery, current_theme):
                 tree.pack(side="left", fill="both", expand=True)
 
                 #Настройка колонок таблицы и сортировки
-                columns = ("Имя", "Размер", "Тип", "Дата изменения")
+                columns = (l["name"], l["size"], l["type"], f"{l["date"]} {l["changes"]}")
                 tree["columns"] = columns
 
-                col_widths = {"Имя": 300, "Размер": 100, "Тип": 120, "Дата изменения": 150}
+                col_widths = {l["name"]: 300, l["size"]: 100, l["type"]: 120, f"{l["date"]} {l["changes"]}": 150}
 
                 tree.column("#0", width=0, stretch=tk.NO) #Убираем колонку по умолчанию
 
                 for col in columns:
                     tree.heading(col, text=col, command=lambda c=col: self.on_tree_sort(c))
-                    tree.column(col, width=col_widths.get(col, 150), anchor=tk.W if col != "Размер" else tk.E)
+                    tree.column(col, width=col_widths.get(col, 150), anchor=tk.W if col != l["size"] else tk.E)
 
                 #Бинды для таблицы
                 tree.bind("<Double-1>", self.on_tree_double_click)
@@ -351,7 +351,7 @@ def FM(run_in_recovery, current_theme):
                     "files_info": [], #Кэш данных для сортировки
                     "history": [],
                     "history_index": -1,
-                    "sort_col": "Имя",
+                    "sort_col": l["name"],
                     "sort_dir": False #False = asc, True = desc
                 }
 
@@ -827,6 +827,7 @@ def FM(run_in_recovery, current_theme):
 
 
 
+            #Удаляем элемент
             def handle_key_delete(self):
                 selected_paths = self.get_selected_items_paths()
                 if not selected_paths: return
@@ -839,22 +840,21 @@ def FM(run_in_recovery, current_theme):
                 if not messagebox.askyesno(random_string(), f"{l['you_want_to_delete']} {count} {l['elements']}?" if count > 1 else f"{l['delete']} '{os.path.basename(paths_to_delete[0])}'?"):
                     return
 
-                   # Получаем текущую таблицу и данные для восстановления фокуса
+                #Получаем текущую таблицу и данные
                 data = self.get_current_tab_data()
                 if not data:
                     return
-                
+
                 tree = data["tree"]
-                
-                # Находим все элементы в таблице (кроме удаляемых)
+
+                #Находим все элементы в таблице (кроме удаляемых)
                 all_items = tree.get_children()
-                
-                # Определяем, какой элемент получит фокус после удаления
-                # Берем элемент, следующий за последним удаляемым, или предыдущий
+
+                #Берем элемент, следующий за последним удаляемым, или предыдущий
                 focus_target = None
-                
+
                 if all_items:
-                    # Сортируем индексы удаляемых элементов
+                    #Сортируем индексы удаляемых элементов
                     delete_indices = []
                     for path in paths_to_delete:
                         try:
@@ -862,25 +862,25 @@ def FM(run_in_recovery, current_theme):
                             delete_indices.append(idx)
                         except ValueError:
                             pass
-                    
+
                     if delete_indices:
                         max_delete_idx = max(delete_indices)
                         min_delete_idx = min(delete_indices)
-                        
-                        # Пытаемся найти элемент после удаляемых
+
+                        #Пытаемся найти элемент после удаляемых
                         for idx in range(max_delete_idx + 1, len(all_items)):
                             if all_items[idx] not in paths_to_delete:
                                 focus_target = all_items[idx]
                                 break
-                        
-                        # Если нет элемента после, берем элемент перед удаляемыми
+
+                        #Если нет элемента после, берем элемент перед удаляемыми
                         if focus_target is None:
                             for idx in range(min_delete_idx - 1, -1, -1):
                                 if all_items[idx] not in paths_to_delete:
                                     focus_target = all_items[idx]
                                     break
 
-                # Удаляем файлы
+                #Удаляем файлы
                 for path in paths_to_delete:
                     try:
                         if os.path.isdir(path):
@@ -890,11 +890,11 @@ def FM(run_in_recovery, current_theme):
                     except Exception as e:
                         logger.exception(f"FM - {l['delete_error']} {path}", e)
                         messagebox.showerror(random_string(), f"{l['delete_error']} {os.path.basename(path)}:\n{e}")
-                
-                # Обновляем и восстанавливаем фокус
+
+                #Обновляем и восстанавливаем фокус
                 self.on_refresh()
-                
-                # Восстанавливаем фокус после обновления
+
+                #Восстанавливаем фокус после обновления
                 if focus_target:
                     tree.after(100, lambda: self.focus_item_by_path(focus_target))
 
@@ -973,10 +973,10 @@ def FM(run_in_recovery, current_theme):
             #Получаем автора файла
             def get_author_and_version_file(self, path):
                 if os.path.isdir(path):
-                    return "Н/Д (Каталог)"
+                    return f"{l["no_data"]} ({l["dir"]})"
 
-                version = "Н/Ж"
-                author = "Н/Д"
+                version = l["no_data"]
+                author = l["no_data"]
 
                 try:
                     #Получаем информацию о версии файла
@@ -1019,9 +1019,9 @@ def FM(run_in_recovery, current_theme):
                 try:
                     #os.access проверяет права текущего пользователя
                     if os.access(path, access_type):
-                        return "Да"
+                        return l["yse"]
                     else:
-                        return "Нет"
+                        return l["no"]
                 except Exception as e:
                     logger.exception(f"FM - {l["access_check_error_for"]} {path}", e)
                     return l["error"]
@@ -1092,7 +1092,7 @@ def FM(run_in_recovery, current_theme):
 
                     acc_modify = acc_write
 
-                    acc_full = "Да" if (acc_read == "Да" and acc_write == "Да" and acc_exec == "Да") else "Нет"
+                    acc_full = "Да" if (acc_read == l["yes"] and acc_write == l["yes"] and acc_exec == l["yes"]) else l["no"]
 
                     #Формируем список для вывода
                     #Используем "---" как разделитель
@@ -1185,7 +1185,7 @@ def FM(run_in_recovery, current_theme):
                 #Для создания (create_path, create_file) работаем с текущим каталогом
                 if action in ["create_path", "create_file"]:
                     current_dir = data["path"]
-                    old_name = "каталог" if action == "create_path" else "файл"
+                    old_name = l["dir"] if action == "create_path" else {l["file"]}
                     old_path = None #Нет старого пути для создания
                 else: #Для переименования
                     old_path = self.get_focused_item_path()
@@ -1619,13 +1619,13 @@ def FM(run_in_recovery, current_theme):
                         sort_group = 1
 
                     #Ключ сортировки в зависимости от колонки
-                    if col == "Имя":
+                    if col == l["name"]:
                         key = item["name"].lower()
-                    elif col == "Размер":
+                    elif col == l["size"]:
                         key = item["size"]
-                    elif col == "Тип":
+                    elif col == l["type"]:
                         key = item["type"]
-                    elif col == "Дата изменения":
+                    elif col == f"{l["date"]} {l["changes"]}":
                         key = item["edited"]
                     else:
                         key = item["name"].lower()
@@ -1841,10 +1841,10 @@ def FM(run_in_recovery, current_theme):
                                     if found_item:
                                         results.append(found_item)
                                 except Exception as e:
-                                    logger.warning(f"FM - Ошибка получения информации о файле/папке {item_path}:\n{e}")
+                                    logger.warning(f"FM - {l["info_file_error"]} {item_path}:\n{e}")
 
                     except Exception as e:
-                        logger.error(f"FM - Ошибка чтения каталога {start_path}:\n{e}")
+                        logger.error(f"FM - {l["read_dir_error"]} {start_path}:\n{e}")
 
                 #Ищем рекурсивно
                 else:
@@ -1862,7 +1862,7 @@ def FM(run_in_recovery, current_theme):
                                         "size": 0,
                                         "edited": stat.st_mtime,
                                         "created": stat.st_ctime,
-                                        "type": "Каталог",
+                                        "type": l["dir"],
                                         "is_dir": True,
                                         "ext": ""
                                     })
@@ -1899,8 +1899,7 @@ def FM(run_in_recovery, current_theme):
                     "is_active": True #Флаг, что сейчас отображаются результаты поиска
                 }
 
-                #Обновляем историю и путь
-                #Путь теперь - это наш запрос, но для отображения его храним в history
+                #Обновляем историю и путь, путь теперь - это наш запрос, но для отображения его храним в history
                 search_display_path = f'{l["search_result"]}: "{search_text}" {l["in"]} "{searched_path}"'
 
                 #ВАЖНО: В историю мы добавляем СПЕЦИАЛЬНУЮ СТРОКУ, которая пометит состояние поиска.

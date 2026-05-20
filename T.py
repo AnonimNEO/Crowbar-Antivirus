@@ -17,6 +17,7 @@ except Exception as e:
 from languages import localizations
 l = localizations[current_localization]
 
+
 import ctypes
 import time
 import sys
@@ -401,7 +402,7 @@ except Exception as e:
 #Глобальные Переменные
 global T_log_txt, start_interface, run_in_recovery, current_theme
 font_trey = "Default"
-trey_version = "2.4.2 Beta build 6"
+trey_version = "2.4.3 Beta"
 on_board_pc_version = l["not_stable"]
 
 def Crowbar():
@@ -519,7 +520,7 @@ def Crowbar():
                     create_menu_item(not_cm, f"{l["open"]} {l["CM"]}", lambda: run_component(CM, run_in_recovery, current_theme), "CM"),
                     MenuItem(l["utilities"], unlocker_menu),
                     create_menu_item(not_ua, l["UA"], lambda: UA(run_in_recovery), "UA"),
-                    create_menu_item(not_run, l["Run"], lambda: run_component(Run, current_theme), "Run"),
+                    create_menu_item(not_run, l["Run"], lambda: run_component_process(Run, current_theme), "Run"),
                     create_menu_item(not_ap, l["AP"], lambda: run_component(AP,
                         autorun_master_version,
                         anti_xyina_version,

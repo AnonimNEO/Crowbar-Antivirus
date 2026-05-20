@@ -23,7 +23,7 @@ from OF import pac, apply_global_theme
 from RS import random_string
 from config import *
 
-users_manager_version = "0.3.0 Beta"
+users_manager_version = "0.3.1 Beta"
 l = localizations[current_localization]
 
 def run_net_command(args):
@@ -84,8 +84,8 @@ class UserManager:
             lines = result.strip().splitlines()
 
             system_blacklist = [
-                "Administrator", "Администратор", 
-                "Guest", "Гость", 
+                "Administrator", l["admin"],
+                "Guest", l["guest"],
                 "DefaultAccount", "WDAGUtilityAccount", 
                 "UtilityAccount", "SystemAdmin"
             ]

@@ -19,7 +19,7 @@ from languages import localizations
 from OF import pac, Psutil, apply_global_theme
 from RS import random_string
 
-process_manager_version = "1.7.0 Beta"
+process_manager_version = "1.7.1 Beta"
 l = localizations[current_localization]
 
 def PM(run_in_recovery, current_theme):
@@ -29,14 +29,14 @@ def PM(run_in_recovery, current_theme):
         "tree": None,
         "tabs": {},
         "vsb": None,
-        "current_tab": "Все Процессы",
+        "current_tab": l["all_process"],
         "treeview_data": [],
         "update_interval": time_to_update_process_list * 1000,
         "sort_column": "PID",
         "sort_direction": "asc",
         "search_query": "",
         #Начальные значения ширины колонок
-        "column_widths": {"PID": 50, "Имя Процесса": 150, "Путь к файлу": 250, "Критичность": 80, "Статус": 80, "Пользователь": 150}
+        "column_widths": {"PID": 50, l["process2"]: 150, f"{l["path"]} {l["to_file"]}": 250, l["critical"]: 80, l["status"]: 80, l["user2"]: 150}
     }
 
     if not run_in_recovery:
@@ -69,19 +69,19 @@ def PM(run_in_recovery, current_theme):
         #Получаем информацию о процессе
         def get_process_info(proc):
             try:
-                status = "Заморожен" if proc.status() == psutil.STATUS_STOPPED else "Запущен"
+                status = l["frozen"] if proc.status() == psutil.STATUS_STOPPED else l["started"]
 
                 #РЕАЛИЗОВАТЬ ПРОВЕРКУ НА АДМИНИСТРАТОРА
                 is_elevated = False
 
                 return {
                     "PID": proc.pid,
-                    "Имя Процесса": proc.name(),
-                    "Путь к файлу": proc.exe() if proc.exe() else "Н/Д",
-                    "Пользователь": proc.username() if proc.username() else "Н/Д",
-                    "Критичность": get_process_critical_status(proc.pid, run_in_recovery),
-                    "Статус": status,
-                    "Администратор": is_elevated,
+                    l["process2"]: proc.name(),
+                    f"{l["path"]} {l["to_file"]}": proc.exe() if proc.exe() else l["no_data"],
+                    l["user2"]: proc.username() if proc.username() else l["no_data"],
+                    l["critical"] : get_process_critical_status(proc.pid, run_in_recovery),
+                    l["status"]: status,
+                    l["admin"]: is_elevated,
                 }
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 return None
@@ -103,9 +103,9 @@ def PM(run_in_recovery, current_theme):
             if list_type == "all_list":
                 return all_processes
             elif list_type == "critical_list":
-                return [p for p in all_processes if p["Критичность"]]
+                return [p for p in all_processes if p[l["critical"]]]
             elif list_type == "suspend_list":
-                return [p for p in all_processes if p["Статус"] == "Заморожен"]
+                return [p for p in all_processes if p[l["status"]] == l["frozen"]]
             return []
 
 
@@ -231,11 +231,11 @@ def PM(run_in_recovery, current_theme):
             #Словарь для преобразования столбцов в ключи, по которым нужно сортировать
             key_map = {
                 "PID": "PID",
-                "Имя Процесса": "Имя Процесса",
-                "Путь к файлу": "Путь к файлу",
-                "Пользователь": "Пользователь",
-                "Критичность": "Критичность",
-                "Статус": "Статус",
+                l["process2"]: l["process2"],
+                f"{l["path"]} {l["to_file"]}": f"{l["path"]} {l["to_file"]}",
+                l["user2"]: l["user2"],
+                l["critical"]: l["critical"],
+                l["status"]: l["status"],
             }
 
             #Получаем фактический ключ для сортировки
@@ -308,7 +308,7 @@ def PM(run_in_recovery, current_theme):
             PM_GUI_ELEMENTS["tree"].tag_configure("suspended", background="gray", foreground="white")
             PM_GUI_ELEMENTS["tree"].tag_configure("admin", background="orange", foreground="black")
 
-            columns = ("PID", "Имя Процесса", "Путь к файлу", "Пользователь", "Критичность", "Статус")
+            columns = ("PID", l["process2"], f"{l["path"]} {l["to_file"]}", l["user2"], l["critical"], l["status"])
             PM_GUI_ELEMENTS["tree"]["columns"] = columns
             PM_GUI_ELEMENTS["tree"]["show"] = "headings"
 
@@ -359,11 +359,11 @@ def PM(run_in_recovery, current_theme):
 
             #Загрузка исходных данных
             raw_data = []
-            if current_tab == "Все Процессы":
+            if current_tab == l["all_process"]:
                 raw_data = get_process_list("all_list")
-            elif current_tab == "Критичные Процессы":
+            elif current_tab == l["critical_process"]:
                 raw_data = get_process_list("critical_list")
-            elif current_tab == "Замороженные Процессы":
+            elif current_tab == l["suspend_process"]:
                 raw_data = get_process_list("suspend_list")
 
             if raw_data is None:
@@ -392,11 +392,11 @@ def PM(run_in_recovery, current_theme):
                 all_pids.append(PM_data["PID"])
 
                 tags = []
-                if PM_data.get("Критичность"):
+                if PM_data.get(l["critical"]):
                     tags.append("critical")
-                if PM_data.get("Статус") == "Заморожен":
+                if PM_data.get(l["status"]) == l["frozen"]:
                     tags.append("suspended")
-                if PM_data.get("Администратор"):
+                if PM_data.get(l["admin"]):
                     tags.append("admin")
 
                 #iid (идентификатор элемента) устанавливаем как PID
@@ -477,7 +477,7 @@ def PM(run_in_recovery, current_theme):
             menu = tk.Menu(manager, tearoff=0)
 
             count = len(selected_pids)
-            suffix = f" ({count} шт.)" if count > 1 else ""
+            suffix = f" ({count} {l["things"]}.)" if count > 1 else ""
 
             if selected_pids:
                 #Стандартные действия
@@ -499,7 +499,7 @@ def PM(run_in_recovery, current_theme):
                     item_values = tree.item(selected_pids[0], "values")
                     file_path = item_values[2] if len(item_values) > 2 else ""
 
-                    if file_path and file_path != "Н/Д":
+                    if file_path and file_path != l["no_data"]:
                         menu.add_command(
                             label=f"{l["copy_path"]} {l["to_file"]}",
                             command=lambda: copy_to_clipboard(manager, file_path))
@@ -647,14 +647,14 @@ def PM(run_in_recovery, current_theme):
         PM_GUI_ELEMENTS["notebook"].bind("<<NotebookTabChanged>>", lambda e: on_tab_change(e, PM_GUI_ELEMENTS))
 
         #Создаём вкладки
-        tab_names = ["Все Процессы", "Критичные Процессы", "Замороженные Процессы"]
+        tab_names = [l["all_process"], l["critical_process"], l["suspend_process"]]
         for tab_name in tab_names:
             frame = ttk.Frame(PM_GUI_ELEMENTS["notebook"], padding="5 5 5 5")
             PM_GUI_ELEMENTS["notebook"].add(frame, text=tab_name)
             PM_GUI_ELEMENTS["tabs"][tab_name] = frame
 
         #Создание начальной Таблицы и Скроллбара
-        initial_frame = PM_GUI_ELEMENTS["tabs"]["Все Процессы"]
+        initial_frame = PM_GUI_ELEMENTS["tabs"][l["all_process"]]
         PM_GUI_ELEMENTS["tree"] = ttk.Treeview(initial_frame, selectmode="browse")
         PM_GUI_ELEMENTS["vsb"] = ttk.Scrollbar(initial_frame, orient="vertical", command=PM_GUI_ELEMENTS["tree"].yview)
         PM_GUI_ELEMENTS["tree"].configure(yscrollcommand=PM_GUI_ELEMENTS["vsb"].set)
