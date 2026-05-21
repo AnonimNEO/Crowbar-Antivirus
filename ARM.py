@@ -33,7 +33,7 @@ from languages import localizations
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme
 
 #global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.5.2 Beta"
+autorun_master_version = "3.5.5 Beta"
 l = localizations[current_localization]
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
@@ -303,6 +303,19 @@ def ARM(run_in_recovery, current_theme):
                             i += 1
                         except OSError: #Ошибка возникает, когда перебраны все значения
                             break
+                        except FileNotFoundError:
+                            pass
+                        except Exception as e:
+                            logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
+                            ARM_data.append({
+                                f"{l["name"]} {l["parameter"]}": value_name,
+                                f"{l["meaning"]} {l["parameter"]}": l["error"],
+                                f"{l["type"]} {l["parameter"]}": l["error"],
+                                f"{l["path"]} {l["parameter"]}": full_path,
+                                "hkey": hkey_const,
+                                "subkey": subkey_path,
+                                "value_type": winreg.REG_NONE
+                            })
             except FileNotFoundError:
                 logger.warning(f"ARM - {l["key_not_found"]}: {full_path}")
             except Exception as e:
@@ -311,58 +324,104 @@ def ARM(run_in_recovery, current_theme):
 
 
 
+        #Получаем данные из заданного ключа реестра
+        def read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path, value_name=None):
+            #Если value_name = None, читает все значения в ключе
+            #Если value_name указано, читает только это значение
+            hkey_map = ARM_CORE_GLOBALS["HKEY_MAP"]
+            ARM_data = []
+
+            if run_in_recovery:
+                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
+            else:
+                final_hkey = hkey_const
+                final_subkey = subkey_path
+
+            hkey_name = hkey_map.get(hkey_const, str(hkey_const))
+            full_path = f"{hkey_name}\\{subkey_path}"
+
+            try:
+                with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_READ) as key:
+                    if value_name is not None:
+                        try:
+                            value, reg_type = winreg.QueryValueEx(key, value_name)
+                            ARM_data.append({
+                                f"{l["name"]} {l["parameter"]}": value_name,
+                                f"{l["meaning"]} {l["parameter"]}": str(value),
+                                f"{l["type"]} {l["parameter"]}": REG_TYPE_MAP.get(reg_type),
+                                f"{l["path"]} {l["parameter"]}": full_path,
+                                "hkey": hkey_const,
+                                "subkey": subkey_path,
+                                "value_type": reg_type
+                            })
+                        except FileNotFoundError:
+                            logger.warning(f"ARM - {l["key_not_found"]}: {full_path}\\{value_name}")
+                        except Exception as e:
+                            logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
+                            ARM_data.append({
+                                f"{l["name"]} {l["parameter"]}": value_name,
+                                f"{l["meaning"]} {l["parameter"]}": l["error"],
+                                f"{l["type"]} {l["parameter"]}": l["error"],
+                                f"{l["path"]} {l["parameter"]}": full_path,
+                                "hkey": hkey_const,
+                                "subkey": subkey_path,
+                                "value_type": winreg.REG_NONE
+                            })
+                    else:
+                        i = 0
+                        while True:
+                            try:
+                                value_name, value, reg_type = winreg.EnumValue(key, i)
+                                ARM_data.append({
+                                    f"{l["name"]} {l["parameter"]}": value_name,
+                                    f"{l["meaning"]} {l["parameter"]}": str(value),
+                                    f"{l["type"]} {l["parameter"]}": REG_TYPE_MAP.get(reg_type),
+                                    f"{l["path"]} {l["parameter"]}": full_path,
+                                    "hkey": hkey_const,
+                                    "subkey": subkey_path,
+                                    "value_type": reg_type
+                                })
+                                i += 1
+                            except OSError:
+                                break
+                            except FileNotFoundError:
+                                pass
+                            except Exception as e:
+                                logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
+                                ARM_data.append({
+                                    f"{l["name"]} {l["parameter"]}": value_name,
+                                    f"{l["meaning"]} {l["parameter"]}": l["error"],
+                                    f"{l["type"]} {l["parameter"]}": l["error"],
+                                    f"{l["path"]} {l["parameter"]}": full_path,
+                                    "hkey": hkey_const,
+                                    "subkey": subkey_path,
+                                    "value_type": winreg.REG_NONE
+                                })
+            except FileNotFoundError:
+                logger.warning(f"ARM - {l["key_not_found"]}: {full_path}")
+            except Exception as e:
+                logger.exception(f"ARM - {l["read_key_error"]} {full_path}", e)
+            
+            return ARM_data
+
+
+
         #Получаем данные из ключей Run и RunOnce пользователя
         def get_registry_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
-            all_data = []
-            #Перебираем все ключи в списке "Реестр"
-            for hkey_const, subkey_path, _ in reg_keys["Реестр"]:
-                all_data.extend(read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path))
-            return all_data
+            ARM_data = []
+            for hkey_const, subkey_path, _ in reg_keys[l["registry"]]:
+                ARM_data.extend(read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path))
+            return ARM_data
 
 
 
-        #Получаем значения Shell и Usernit из Winlogon
+        #Получаем значения из Winlogon
         def get_system_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
-            hkey_map = ARM_CORE_GLOBALS["HKEY_MAP"]
             ARM_data = []
             for hkey_const, subkey_path, value_name in reg_keys[l["system"]]:
-
-                if run_in_recovery:
-                    final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
-                else:
-                    final_hkey = hkey_const
-                    final_subkey = subkey_path
-
-                hkey_name = hkey_map.get(hkey_const, str(hkey_const))
-                full_path = f"{hkey_name}\\{subkey_path}"
-
-                try:
-                    with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_READ) as key:
-                        value, reg_type = winreg.QueryValueEx(key, value_name)
-                        ARM_data.append({
-                            f"{l["name"]} {l["parameter"]}": value_name,
-                            f"{l["meaning"]} {l["parameter"]}": str(value),
-                            f"{l["type"]} {l["parameter"]}": REG_TYPE_MAP.get(reg_type),
-                            f"{l["path"]} {l["parameter"]}": full_path,
-                            "hkey": hkey_const,
-                            "subkey": subkey_path,
-                            "value_type": reg_type
-                        })
-                except FileNotFoundError:
-                    pass
-                except Exception as e:
-                    logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
-                    ARM_data.append({
-                        f"{l["name"]} {l["parameter"]}": value_name,
-                        f"{l["meaning"]} {l["parameter"]}": l["error"],
-                        f"{l["type"]} {l["parameter"]}": l["error"],
-                        f"{l["path"]} {l["parameter"]}": full_path,
-                        "hkey": hkey_const,
-                        "subkey": subkey_path,
-                        "value_type": winreg.REG_NONE
-                    })
+                ARM_data.extend(read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path, value_name))
             return ARM_data
 
 
@@ -370,105 +429,19 @@ def ARM(run_in_recovery, current_theme):
         #Получаем значения параметров AppInit_DLLs и LoadAppInit_DLLs
         def get_dll_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
-            hkey_map = ARM_CORE_GLOBALS["HKEY_MAP"]
             ARM_data = []
             for hkey_const, subkey_path, value_name, bitness in reg_keys["AppInit_DLLs"]:
-                if run_in_recovery:
-                    final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
-                else:
-                    final_hkey = hkey_const
-                    final_subkey = subkey_path
-
-                #преобразование HKEY_const в имя:
-                hkey_name = hkey_map.get(hkey_const, str(hkey_const))
-                full_path = f"{hkey_name}\\{subkey_path}"
-                try: #Используем KEY_READ | winreg.KEY_WOW64_64KEY для 64-битного представления
-                    access = winreg.KEY_READ
-                    #При работе с загруженным кустом, KEY_WOW64_32KEY не нужен,
-                    #так как мы обращаемся напрямую к 32-битному пути (Wow6432Node)
-                    #Но сохраним проверку для совместимости
-                    if bitness == "x64":
-                        pass
-                    elif bitness == "x32":
-                        access |= winreg.KEY_WOW64_32KEY
-
-                    with winreg.OpenKey(final_hkey, final_subkey, 0, access) as key:
-                        value, reg_type = winreg.QueryValueEx(key, value_name)
-                        ARM_data.append({
-                            f"{l["name"]} {l["parameter"]}": value_name,
-                            l["bit"]: bitness,
-                            f"{l["meaning"]} {l["parameter"]}": str(value),
-                            f"{l["type"]} {l["parameter"]}": REG_TYPE_MAP.get(reg_type),
-                            f"{l["path"]} {l["parameter"]}": full_path,
-                            "hkey": hkey_const,
-                            "subkey": subkey_path,
-                            "value_type": reg_type
-                        })
-                except FileNotFoundError as e:
-                    logger.error(f"ARM - {l["key_not_found"]} AppInit_DLLs ({bitness}) {full_path}\\{value_name}:\n{e}")
-                    ARM_data.append({
-                        f"{l["name"]} {l["parameter"]}": value_name,
-                        l["bit"]: bitness,
-                        f"{l["meaning"]} {l["parameter"]}": f"{l["parameter"]} {l["not_found"]}",
-                        f"{l["type"]} {l["parameter"]}": "REG_NONE",
-                        f"{l["path"]} {l["parameter"]}": full_path,
-                        "hkey": hkey_const,
-                        "subkey": subkey_path,
-                        "value_type": winreg.REG_NONE
-                    })
-                except Exception as e:
-                    logger.exception(f"ARM - {l["read_key_error"]} AppInit_DLLs ({bitness}) {full_path}\\{value_name}", e)
-                    ARM_data.append({
-                        f"{l["name"]} {l["parameter"]}": value_name,
-                        l["bit"]: bitness,
-                        f"{l["meaning"]} {l["parameter"]}": l["error"],
-                        f"{l["type"]} {l["parameter"]}": l["error"],
-                        f"{l["path"]} {l["parameter"]}": full_path,
-                        "hkey": hkey_const,
-                        "subkey": subkey_path,
-                        "value_type": winreg.REG_NONE
-                    })
+                ARM_data.extend(read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path, value_name))
             return ARM_data
+
 
 
         #Получаем значения параметров для вкладки CmdLine
         def get_cmdline_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
-            hkey_map = ARM_CORE_GLOBALS["HKEY_MAP"]
             ARM_data = []
             for hkey_const, subkey_path, value_name in reg_keys["CmdLine"]:
-                if run_in_recovery:
-                    final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
-                else:
-                    final_hkey = hkey_const
-                    final_subkey = subkey_path
-
-                hkey_name = hkey_map.get(hkey_const, str(hkey_const))
-                full_path = f"{hkey_name}\\{subkey_path}"
-
-                try:
-                    with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_READ) as key:
-                        value, reg_type = winreg.QueryValueEx(key, value_name)
-                        ARM_data.append({
-                            f"{l["name"]} {l["parameter"]}": value_name,
-                            f"{l["meaning"]} {l["parameter"]}": str(value),
-                            f"{l["type"]} {l["parameter"]}": REG_TYPE_MAP.get(reg_type),
-                            f"{l["path"]} {l["parameter"]}": full_path,
-                            "hkey": hkey_const,
-                            "subkey": subkey_path,
-                            "value_type": reg_type
-                        })
-                except Exception as e:
-                    logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
-                    ARM_data.append({
-                        f"{l["name"]} {l["parameter"]}": value_name,
-                        f"{l["meaning"]} {l["parameter"]}": "Ошибка или отсутствует",
-                        f"{l["type"]} {l["parameter"]}": l["error"],
-                        f"{l["path"]} {l["parameter"]}": full_path,
-                        "hkey": hkey_const,
-                        "subkey": subkey_path,
-                        "value_type": winreg.REG_NONE
-                    })
+                ARM_data.extend(read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path, value_name))
             return ARM_data
 
 
@@ -1062,6 +1035,7 @@ def ARM(run_in_recovery, current_theme):
             tree = ARM_GUI_ELEMENTS["tree"]
             current_tab = ARM_GUI_ELEMENTS["current_tab"]
 
+            #Очищаем Treeview перед загрузкой новых данных
             for item in tree.get_children():
                 tree.delete(item)
 

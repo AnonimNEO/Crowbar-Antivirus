@@ -1,5 +1,5 @@
 #Текущий язык (доступные языки: ru)
-current_localization = "en"
+current_localization = "ru"
 
 #Общее количество строчек кода
 all_line = "~11000"
