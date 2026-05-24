@@ -13,14 +13,54 @@ from tkinter import ttk, messagebox
 import tkinter as tk
 #Логирование
 from loguru import logger
+import os
 
 from config import *
 from languages import localizations
-from OF import pac, Psutil, apply_global_theme
+from OF import pac, Psutil, apply_global_theme, extract_filename_from_path
 from RS import random_string
 
-process_manager_version = "1.7.1 Beta"
+process_manager_version = "1.8.2 Beta"
 l = localizations[current_localization]
+
+#Действие с процессами
+def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, run_in_recovery=False):
+    if not run_in_recovery:
+        import psutil
+        from EC import EC
+    else:
+        psutil = Psutil()
+        def EC(i, c, d):
+            pass
+
+    if not isinstance(process_ids, (list, tuple)):
+        process_ids = [process_ids]
+
+    for pid in process_ids:
+        try:
+            proc = psutil.Process(int(pid))
+
+            if action == "kill":
+                proc.terminate()
+            elif action == "suspend":
+                proc.suspend()
+            elif action == "resume":
+                proc.resume()
+            elif action == "edit_critical_to_false":
+                EC(int(pid), False)
+            elif action == "edit_critical_to_true":
+                EC(int(pid), True)
+
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+        except Exception as e:
+            logger.exception(f"PM - {l["at"]} {action} PID {pid}", e)
+
+    #Обновляем таблицу один раз после обработки всех процессов
+    if PM_GUI_ELEMENTS:
+        PM_GUI_ELEMENTS["manager"].after(200, lambda: load_current_tab_data(PM_GUI_ELEMENTS))
+
+
 
 def PM(run_in_recovery, current_theme):
     PM_GUI_ELEMENTS = {
@@ -46,7 +86,7 @@ def PM(run_in_recovery, current_theme):
         psutil = Psutil()
         def EC(i, c, d):
             pass
-        def get_process_critical_status(i, r):
+        def get_process_critical_status(i):
             return False
 
 
@@ -79,7 +119,7 @@ def PM(run_in_recovery, current_theme):
                     l["process2"]: proc.name(),
                     f"{l["path"]} {l["to_file"]}": proc.exe() if proc.exe() else l["no_data"],
                     l["user2"]: proc.username() if proc.username() else l["no_data"],
-                    l["critical"] : get_process_critical_status(proc.pid, run_in_recovery),
+                    l["critical"] : get_process_critical_status(proc.pid),
                     l["status"]: status,
                     l["admin"]: is_elevated,
                 }
@@ -196,36 +236,6 @@ def PM(run_in_recovery, current_theme):
 
 
 
-        #Действие с процессами
-        def action_process(PM_GUI_ELEMENTS, action, process_ids):
-            if not isinstance(process_ids, (list, tuple)):
-                process_ids = [process_ids]
-
-            for pid in process_ids:
-                try:
-                    proc = psutil.Process(int(pid))
-
-                    if action == "kill":
-                        proc.terminate()
-                    elif action == "suspend":
-                        proc.suspend()
-                    elif action == "resume":
-                        proc.resume()
-                    elif action == "edit_critical_to_false":
-                        EC(int(pid), False)
-                    elif action == "edit_critical_to_true":
-                        EC(int(pid), True)
-
-                except (psutil.NoSuchProcess, psutil.AccessDenied):
-                    continue
-                except Exception as e:
-                    logger.exception(f"PM - {l["at"]} {action} PID {pid}", e)
-
-            #Обновляем таблицу один раз после обработки всех процессов
-            PM_GUI_ELEMENTS["manager"].after(200, lambda: load_current_tab_data(PM_GUI_ELEMENTS))
-
-
-
         #Сортируем данные
         def sort_data(data, col, direction):
             #Словарь для преобразования столбцов в ключи, по которым нужно сортировать
@@ -335,7 +345,6 @@ def PM(run_in_recovery, current_theme):
             tree = PM_GUI_ELEMENTS["tree"]
             current_tab = PM_GUI_ELEMENTS["current_tab"]
 
-            #сохраняем текущий фокус, выделение и позицию скролла
             #Получаем PID процесса, который в данный момент в фокусе/выбран
             saved_pid = None
             saved_scroll_pos = None #переменная для сохранения позиции скролла
@@ -470,6 +479,11 @@ def PM(run_in_recovery, current_theme):
 
 
 
+        def delete_file(file_path):
+            os.remove(file_path)
+
+
+
         #Контекстное Меню
         def show_context_menu(event, PM_GUI_ELEMENTS, selected_pids):
             manager = PM_GUI_ELEMENTS["manager"]
@@ -482,22 +496,37 @@ def PM(run_in_recovery, current_theme):
             if selected_pids:
                 #Стандартные действия
                 menu.add_command(label=f"{l["kill_processes"]} {suffix}",
-                                 command=lambda: action_process(PM_GUI_ELEMENTS, "kill", selected_pids))
+                                 command=lambda: action_process(PM_GUI_ELEMENTS, "kill", selected_pids, run_in_recovery))
                 menu.add_command(label=f"{l["suspend"]} {suffix}",
-                                 command=lambda: action_process(PM_GUI_ELEMENTS, "suspend", selected_pids))
+                                 command=lambda: action_process(PM_GUI_ELEMENTS, "suspend", selected_pids, run_in_recovery))
                 menu.add_command(label=f"{l["resume"]} {suffix}",
-                                 command=lambda: action_process(PM_GUI_ELEMENTS, "resume", selected_pids))
+                                 command=lambda: action_process(PM_GUI_ELEMENTS, "resume", selected_pids, run_in_recovery))
                 menu.add_separator()
                 menu.add_command(label=f"{l["make_it_critical"]} {suffix}",
-                                 command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_true", selected_pids))
+                                 command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_true", selected_pids, run_in_recovery))
                 menu.add_command(label=f"{l["remove_criticality"]} {suffix}",
-                                 command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_false", selected_pids))
+                                 command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_false", selected_pids, run_in_recovery))
 
                 #если выбран ровно один процесс
                 if count == 1:
                     menu.add_separator()
                     item_values = tree.item(selected_pids[0], "values")
                     file_path = item_values[2] if len(item_values) > 2 else ""
+
+                    def kill_delete_process(process):
+                        process_file = process.exe()
+                        process_name = process.name()
+                        action_process(PM_GUI_ELEMENTS, "kill", selected_pids, run_in_recovery)
+                        try:
+                            process.wait(timeout=3) #Ждёт максимум 3 секунды
+                        except psutil.TimeoutExpired:
+                            comment = f"PM - {l["process"]} {process_name} ({selected_pids[0]}) {l["process_dont_close"]}"
+                            logger.error(comment)
+                            messagebox.showerror(random_string(), comment)
+                        delete_file(process_file)
+
+                    menu.add_command(label=l["kill_delete_file_process"], command=lambda: kill_delete_process(psutil.Process(int(selected_pids[0]))))
+                    menu.add_separator()
 
                     if file_path and file_path != l["no_data"]:
                         menu.add_command(
@@ -555,11 +584,11 @@ def PM(run_in_recovery, current_theme):
             elif key in ["c", "C"]:
                 #Для массового изменения берем статус первого элемента как образец
                 first_pid = int(selected_items[0])
-                is_critical = get_process_critical_status(first_pid, False)
+                is_critical = get_process_critical_status(first_pid)
                 action = "edit_critical_to_false" if is_critical else "edit_critical_to_true"
 
             if action:
-                action_process(PM_GUI_ELEMENTS, action, list(selected_items))
+                action_process(PM_GUI_ELEMENTS, action, list(selected_items), run_in_recovery)
 
         def help_pm():
             messagebox.showinfo(random_string(), l["pm_help_text"])

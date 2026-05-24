@@ -421,6 +421,8 @@ localizations = {
         "cancel_search": "Прекратить поиск",
         "actions": "Действия",
         "pm_critical_error": "В Компоненте ProcessManager произошла неизвестная ошибка!",
+        "kill_delete_file_process": "Убить + удалить файл процесса",
+        "process_dont_close": "не закрылся за 3 секунды",
         #Run
         "standard": "Стандартные",
         "regedit": "редактор реестра",
@@ -655,6 +657,11 @@ localizations = {
         "for": "for",
         "arm_help_text": 'The Scheduler tab displays so many tasks because viruses could modify tasks, but this is extremely rare, so you can disable the display of tasks without the "created" column. To do this, Click the item in the top panel of the window: view->Show only tasks with date.',
         "arm_critical_error": f"An unknown error occurred in the AutoRunMaster component!",
+        "danger": "Угроза",
+        "suspend_process_for_name": "Заморозить процессы с именем",
+        "kill_process_for_name": "Убить процессы с именем",
+        "action_error": "ошибка при действии",
+        "": "",
         #Console
         "crowbar_console": "Crowbar Antivirus Developer Console",
         "crowbar_console_text": "Be careful, this component may be unstable.\nAnd not understanding what you're doing can damage the program.\nIf this happens, restart the program.\n",

@@ -37,7 +37,7 @@ from GFA import GFA
 from FE import FE
 
 #Глобальная переменная версии
-file_manager_version = "4.10.4 Beta"
+file_manager_version = "4.10.5 Beta"
 l = localizations[current_localization]
 
 def FM(run_in_recovery, current_theme):
@@ -1655,10 +1655,10 @@ def FM(run_in_recovery, current_theme):
 
                     if os.path.isdir(path):
                         shutil.rmtree(path)
-                        #logger.info(f"FM - Удалён каталог: {path}")
+                        logger.info(f"FM - Удалён каталог: {path}")
                     else:
                         os.remove(path)
-                        #logger.info(f"FM - Удалён файл: {path}")
+                        logger.info(f"FM - Удалён файл: {path}")
 
                     self.on_refresh()
                 except Exception as e:

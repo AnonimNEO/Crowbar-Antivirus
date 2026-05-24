@@ -13,12 +13,13 @@ from loguru import logger
 #Работа с ОС
 import ctypes
 from ctypes import wintypes
+import psutil
 
 from OF import Psutil
 from languages import localizations
 from config import current_localization
 
-edit_criticality_version = "0.4.0 Beta"
+edit_criticality_version = "0.4.1 Beta"
 l = localizations[current_localization]
 
 #Загрузка необходимых библиотек Windows на уровне модуля
@@ -73,12 +74,7 @@ def get_process_name(process_id):
 
 
 #Попытка получить текущий статус критичности процесса
-def get_process_critical_status(process_id, run_in_recovery):
-    if run_in_recovery:
-        psutil = Psutil()
-    else:
-        import psutil
-
+def get_process_critical_status(process_id):
     process_handle = None
     try:
         #Открываем процесс с правом на запрос информации
@@ -156,9 +152,6 @@ def set_process_critical(process_id, critical):
 
 
 def EC(process_id, critical, debug_mode=True):
-    #Работа с процессами
-    import psutil
-
     #Инициализация функций windows API
     define_functions()
 

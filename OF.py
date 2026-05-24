@@ -30,7 +30,7 @@ from languages import localizations
 from config import *
 
 global load_bush
-other_function_version = "0.8.0 Beta"
+other_function_version = "0.9.0 Beta"
 l = localizations[current_localization]
 
 #Глобальные имена загруженных кустов
@@ -340,6 +340,41 @@ def get_user_name():
     except Exception as e:
         logger.exception(f"OF/get_user_name - {l["get_user_name_error"]}!", e)
         return default_user_name
+
+
+
+#Извлекаем имя файла из пути и/или удаляя аргументы командной строки
+def extract_filename_from_path(path_with_args, get_path=False):
+    if not path_with_args:
+        return ""
+
+    #Удаляем лишние пробелы в начале и конце
+    path_with_args = path_with_args.strip()
+
+    #Если путь в кавычках, извлекаем содержимое
+    if path_with_args.startswith('"'):
+        closing_quote = path_with_args.find('"', 1)
+        if closing_quote != -1:
+            path_with_args = path_with_args[1:closing_quote]
+    else:
+        #Ищем последнее расширение исполняемого файла
+        import re
+        #Ищем путь до первого расширения (.exe, .dll, .com, .bat, .cmd и т.д.)
+        match = re.search(r'([^\s]*\.(exe|dll|com|bat|cmd|scr|vbs|js|ps1|msi|sys|drv))\s*', path_with_args, re.IGNORECASE)
+        if match:
+            path_with_args = match.group(1)
+        #Если расширение не найдено, берём всё до первого пробела
+        else:
+            space_index = path_with_args.find(" ")
+            if space_index != -1:
+                path_with_args = path_with_args[:space_index]
+
+    if get_path:
+        return path_with_args
+
+    #Извлекаем имя файла (последняя часть после последнего обратного слэша)
+    file_name = path_with_args.split("\\")[-1]
+    return file_name.strip()
 
 
 
