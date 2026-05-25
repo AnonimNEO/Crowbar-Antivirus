@@ -33,7 +33,7 @@ from languages import localizations
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path
 
 #global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.7.7 Beta"
+autorun_master_version = "3.7.8 Beta"
 l = localizations[current_localization]
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
@@ -398,7 +398,8 @@ def ARM(run_in_recovery, current_theme):
                                     "value_type": winreg.REG_NONE
                                 })
             except FileNotFoundError:
-                logger.warning(f"ARM - {l["key_not_found"]}: {full_path}")
+                if value_name != "Taskman":
+                    logger.warning(f"ARM - {l["key_not_found"]}: {full_path}")
             except Exception as e:
                 logger.exception(f"ARM - {l["read_key_error"]} {full_path}", e)
             
