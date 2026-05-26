@@ -67,6 +67,9 @@ default_theme = "dark"
 #Автозапуск LoadProtection
 start_lp = False
 
+#Старт движка скриптов
+start_cash = True
+
 #Способ перезагрузки win32com, os, subprocess, bat
 restart_windows = "win32com"
 

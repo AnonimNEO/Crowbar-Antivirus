@@ -325,7 +325,7 @@ except Exception as e:
     not_console = True
     logger.exception(f"T - {l["component_import_error"]} Console", e)
 
-#from CASH import CASH
+from CASH import CASH
 
 try:
     if not_pystray and not_cm and not not_tkinter:
@@ -548,6 +548,7 @@ def Crowbar():
                     ), "AP"),
                     create_menu_item(not_console, l["Console"], lambda: open_console({
                         "run_component": run_component,
+                        "run_component_process": run_component_process,
                         "run_in_recovery": run_in_recovery,
                         "current_theme": current_theme,
                         "AP": AP,
@@ -606,9 +607,9 @@ def Crowbar():
                 if start_interface == "window" or start_interface == "only-windows":
                     run_component(CM, run_in_recovery, current_theme)
 
-                #if start_hcas:
-                #    hcas_thread = threading.Thread(target=CASH, args=(run_in_recovery,), daemon=True)
-                #    hcas_thread.start()
+                if start_cash:
+                    hcas_thread = threading.Thread(target=CASH, args=(run_in_recovery,), daemon=True)
+                    hcas_thread.start()
 
                 while True:
                     time.sleep(1)
