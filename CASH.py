@@ -173,7 +173,7 @@ except Exception as e:
 
 
 
-crowbar_antivirus_scripts_handler_version = "0.3.4 Alpha"
+crowbar_antivirus_scripts_handler_version = "0.3.5 Alpha"
 
 current_theme = theme[default_theme]
 
@@ -259,6 +259,7 @@ def CASH(run_in_recovery, debug_mode=False):
                     "logger": logger,
                     "sys": sys,
                     "os": os,
+                    "messagebox": "messagebox",
                     "run_in_recovery": run_in_recovery,
                     "run_component": run_component,
                     "run_component_process": run_component_process,
