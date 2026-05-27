@@ -397,12 +397,12 @@ try:
         )
         messagebox.showerror(random_string(), critical_error)
 except Exception as e:
-    logger.exception(f"T - ошибка при проверке критических повреждений", e)
+    logger.exception(f"T - {l["checking_damage_error"]}", e)
 
 #Глобальные Переменные
 global T_log_txt, start_interface, run_in_recovery, current_theme
 font_trey = "Default"
-trey_version = "2.4.3 Beta build 3"
+trey_version = "2.4.3 Beta build 6"
 on_board_pc_version = l["not_stable"]
 
 def Crowbar():

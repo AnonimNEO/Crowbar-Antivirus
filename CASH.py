@@ -173,7 +173,7 @@ except Exception as e:
 
 
 
-crowbar_antivirus_scripts_handler_version = "0.3.5 Alpha"
+crowbar_antivirus_scripts_handler_version = "0.4.1 Alpha"
 
 current_theme = theme[default_theme]
 
@@ -248,6 +248,9 @@ def CASH(run_in_recovery, debug_mode=False):
                         #Попытка с игнорированием ошибок
                         with open(file_path, "r", encoding="utf-8", errors="ignore") as script:
                             code = script.read()
+
+                #code = CC22(code, clyth, True)
+
                 config = get_script_config(code)
                 
                 if debug_mode:

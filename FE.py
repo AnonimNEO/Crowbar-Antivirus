@@ -14,11 +14,12 @@ from loguru import logger
 import os
 
 from languages import localizations
-from config import program_authentication_clyth, current_localization
+from config import program_authentication_clyth, current_localization, clyth
 from RS import random_string
+#from CC22 import CC22
 from OF import pac
 
-file_editor_version = "0.2.0 Beta"
+file_editor_version = "0.3.0 Beta"
 l = localizations[current_localization]
 
 class FileEditor:
@@ -267,7 +268,7 @@ class FileEditor:
     def open_file(self):
         file_path = filedialog.askopenfilename(
             title=random_string(),
-            filetypes=[(l["text_file"], "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l["all_files"], "*.*")]
+            filetypes=[(l["text_file"], "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l["crowbar_scripts"], "*.cas"), (l["all_files"], "*.*")]
         )
         if file_path:
             self.load_file(file_path)
@@ -282,6 +283,10 @@ class FileEditor:
 
             with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
+
+            #file_name = extract_filename_from_path(file_path)
+            #if file_name[-4:] == ".cas":
+            #    content = CC22(code, clyth, True)
 
             self.text_widget.delete(1.0, tk.END)
             self.text_widget.insert(1.0, content)
@@ -300,6 +305,9 @@ class FileEditor:
             return
         try:
             content = self.text_widget.get(1.0, tk.END)
+            #file_name = extract_filename_from_path(self.current_file)
+            #if file_name[-4:] == ".cas":
+            #    content = CC22(code, clyth)
             with open(self.current_file, "w", encoding="utf-8") as file:
                 file.write(content)
             self.is_modified = False

@@ -76,6 +76,7 @@ localizations = {
         "multiprocessing_error": "Критическая ошибка при многопоточности",
         "restart_program": "Перезапустить программу",
         "admin_error": "Ошибка при получении прав администратора",
+        "checking_damage_error": "ошибка при проверке критических повреждений",
         #ARM
         "scheduler_error": "Не удалось подключиться к планировщику задач",
         "edit_task_error": "Ошибка изменения состояния задачи",
@@ -116,6 +117,10 @@ localizations = {
         "for": "для",
         "arm_help_text": 'Во вкладке планировщик отображается так много задач, потому что вирусы могли модернизировать задачи, но такое крайне редко, поэтому вы можете отключить отображение задач без графа "создан". Для этого нажмите на пункт в верхней панели окна: вид->Показывать только задачи с датой.',
         "arm_critical_error": f"В Компоненте AutoRunMaster произошла неизвестная ошибка!",
+        "danger": "Угроза",
+        "suspend_process_for_name": "Заморозить процессы с именем",
+        "kill_process_for_name": "Убить процессы с именем",
+        "action_error": "ошибка при действии",
         #Console
         "crowbar_console": "Консоль Разработчика Антивируса Монтировка",
         "crowbar_console_text": "Будьте осторожны, данный компонент может быть не стабилен\nА не понимание, что выделаете можете привести к повреждению программы\nЕсли это произошло перезапустите программу.\n",
@@ -319,6 +324,7 @@ localizations = {
         "next": "Далее",
         "fe_critical_error": "В Компоненте FileEditor произошла неизвестная ошибка!",
         "cuttlefish": "Сепия",
+        "crowbar_scripts": "Скрипты Антивируса Монтировка",
         #FR
         "created": "Создан",
         "replaced": "заменено",
@@ -657,11 +663,6 @@ localizations = {
         "for": "for",
         "arm_help_text": 'The Scheduler tab displays so many tasks because viruses could modify tasks, but this is extremely rare, so you can disable the display of tasks without the "created" column. To do this, Click the item in the top panel of the window: view->Show only tasks with date.',
         "arm_critical_error": f"An unknown error occurred in the AutoRunMaster component!",
-        "danger": "Угроза",
-        "suspend_process_for_name": "Заморозить процессы с именем",
-        "kill_process_for_name": "Убить процессы с именем",
-        "action_error": "ошибка при действии",
-        "": "",
         #Console
         "crowbar_console": "Crowbar Antivirus Developer Console",
         "crowbar_console_text": "Be careful, this component may be unstable.\nAnd not understanding what you're doing can damage the program.\nIf this happens, restart the program.\n",
