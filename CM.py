@@ -108,8 +108,7 @@ except Exception as e:
         pass
 
 from config import theme, default_theme, program_authentication_clyth, current_localization
-from languages import localizations
-l = localizations[current_localization]
+from languages import l
 
 global run_in_recovery, current_theme, crowbar_menu_version
 crowbar_menu_version = "2.3.2 Beta"

@@ -665,7 +665,7 @@ def crowbar_settings(current_theme):
                 if not save_settings(settings_data, config_comments_to_save): raise Exception(l("save_settings_error"))
 
                 #Распаковка исходного кода
-                SAU_GUI.after(0, lambda: [compilation_label.config(text=l("unpacking_source_code"), progress_bar.config(value=40))])
+                SAU_GUI.after(0, lambda: (compilation_label.config(text=l("unpacking_source_code")), progress_bar.config(value=40)))
                 if not extract_archive(ARCHIVE_PATH): raise Exception(l("unpacking_source_code_error"))
 
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=l("preparing_files")), progress_bar.config(value=50)])

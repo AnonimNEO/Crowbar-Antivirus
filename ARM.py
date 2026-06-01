@@ -351,7 +351,8 @@ def ARM(run_in_recovery, current_theme):
                                 "value_type": reg_type
                             })
                         except FileNotFoundError:
-                            logger.warning(f"ARM - {l("key_not_found")}: {full_path}\\{value_name}")
+                            if key != "Taskman":
+                                logger.warning(f"ARM - {l("key_not_found")}: {full_path}\\{value_name}")
                         except Exception as e:
                             logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}", e)
                             ARM_data.append({

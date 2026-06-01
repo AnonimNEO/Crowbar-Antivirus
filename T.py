@@ -8,11 +8,6 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-try:
-    from config import current_localization
-except Exception as e:
-    current_localization = "ru"
-
 #Локализация
 from languages import l
 
@@ -650,7 +645,3 @@ if __name__ == "__main__":
         admin_error = f"T - {l("admin_error")}"
         logger.exception(admin_error, e)
         messagebox.showerror(random_string(), f"{admin_error}:\n{e}")
-
-else:
-    logger.critical(f"T - {l("attempt_import_t")} {l("emergency_restart")}...")
-    restart_ca()
