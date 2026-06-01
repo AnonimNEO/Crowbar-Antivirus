@@ -21,13 +21,12 @@ import re
 from RS import random_string
 from OF import pac, apply_global_theme
 from config import theme, default_theme, program_authentication_clyth, current_localization
-from languages import localizations
+from languages import l
 
 run_version = "1.1.1 Beta"
 run_width_window = 400
 run_height_window = 200
 run_size_window = f"{run_width_window}x{run_height_window}"
-l = localizations[current_localization]
 
 class ApplicationLauncher:
     def __init__(self, RUN_GUI):
@@ -38,22 +37,22 @@ class ApplicationLauncher:
 
         #Пресеты
         self.presets = [
-            {"name": f"---{l["standard"]} {l["utilities"]}---", "command": ""},
-            {"name": l["regedit"], "command": "regedit.exe"},
-            {"name": l["taskmgr"], "command": "taskmgr.exe"},
-            {"name": l["notepad"], "command": "notepad.exe"},
-            {"name": l["explorer"], "command": "explorer.exe"},
-            {"name": l["cmd"], "command": "cmd.exe"},
-            {"name": l["powershell"], "command": "powershell.exe"},
-            {"name": f"---{l["commands"]}---", "command": ""},
+            {"name": f"---{l("standard")} {l("utilities")}---", "command": ""},
+            {"name": l("regedit"), "command": "regedit.exe"},
+            {"name": l("taskmgr"), "command": "taskmgr.exe"},
+            {"name": l("notepad"), "command": "notepad.exe"},
+            {"name": l("explorer"), "command": "explorer.exe"},
+            {"name": l("cmd"), "command": "cmd.exe"},
+            {"name": l("powershell"), "command": "powershell.exe"},
+            {"name": f"---{l("commands")}---", "command": ""},
             {"name": "SFC /SCANNOW", "command": "SFC /SCANNOW"},
-            {"name": l["cancel_reboot"], "command": "shutdown /a"},
-            {"name": l["reboot_pc"], "command": "shutdown /r"},
-            {"name": l["shutdown_pc"], "command": "shutdown /s"},
-            {"name": l["end_session"], "command": "shutdown /l"}
+            {"name": l("cancel_reboot"), "command": "shutdown /a"},
+            {"name": l("reboot_pc"), "command": "shutdown /r"},
+            {"name": l("shutdown_pc"), "command": "shutdown /s"},
+            {"name": l("end_session"), "command": "shutdown /l"}
         ]
 
-        self.mode = tk.StringVar(value=l["professional"])
+        self.mode = tk.StringVar(value=l("professional"))
         self.current_buttons = []
 
         self.create_menu()
@@ -66,7 +65,7 @@ class ApplicationLauncher:
         self.create_simplified_mode()
 
         #Переключение на профессиональный режим по умолчанию
-        self.switch_mode(l["professional"])
+        self.switch_mode(l("professional"))
 
         #Привязка события изменения размера окна
         self.RUN_GUI.bind("<Configure>", self.on_window_resize)
@@ -79,19 +78,19 @@ class ApplicationLauncher:
         menu_frame.pack(side=tk.TOP, fill=tk.X)
         menu_frame.pack_propagate(False)
 
-        label = tk.Label(menu_frame, text=l["mode"], font=("Default", 10))
+        label = tk.Label(menu_frame, text=l("mode"))
         label.pack(side=tk.LEFT, padx=10, pady=8)
 
         mode_combo = ttk.Combobox(
             menu_frame,
             textvariable=self.mode,
-            values=[l["professional"], l["simplified"]],
+            values=[l("professional"), l("simplified")],
             state="readonly",
             width=20
         )
         mode_combo.pack(side=tk.LEFT, padx=5, pady=8)
         mode_combo.bind("<<ComboboxSelected>>", lambda e: self.switch_mode(
-            l["professional"] if self.mode.get() == l["professional"] else l["simplified"]
+            l("professional") if self.mode.get() == l("professional") else l("simplified")
         ))
 
 
@@ -101,16 +100,15 @@ class ApplicationLauncher:
         input_frame = tk.Frame(self.professional_frame)
         input_frame.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
-        self.input_field = tk.Entry(input_frame, font=("Default", 11))
+        self.input_field = tk.Entry(input_frame)
         self.input_field.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5))
         self.input_field.bind("<Return>", lambda e: self.run_command())
 
         ok_button = tk.Button(
             input_frame,
-            text=l["ok"],
+            text=l("ok"),
             command=self.run_command,
             width=5,
-            font=("Default", 11)
         )
         ok_button.pack(side=tk.LEFT)
 
@@ -119,7 +117,6 @@ class ApplicationLauncher:
             self.professional_frame,
             values=[p["name"] for p in self.presets],
             state="readonly",
-            font=("Default", 10),
             height=8
         )
         self.preset_combo.pack(fill=tk.X, padx=5, pady=5)
@@ -129,14 +126,13 @@ class ApplicationLauncher:
         log_frame = tk.Frame(self.professional_frame)
         log_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        tk.Label(log_frame, text=f"{l["error"]}:", font=("Default", 9)).pack(anchor=tk.W)
+        tk.Label(log_frame, text=f"{l("error")}:").pack(anchor=tk.W)
 
         scrollbar = tk.Scrollbar(log_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         self.log_text = tk.Text(
             log_frame,
-            font=("Default", 9),
             yscrollcommand=scrollbar.set,
             height=10
         )
@@ -186,7 +182,7 @@ class ApplicationLauncher:
 
     #Переключаем режим
     def switch_mode(self, mode):
-        if mode == l["professional"]:
+        if mode == l("professional"):
             self.professional_frame.pack(fill=tk.BOTH, expand=True)
             self.simplified_frame.pack_forget()
             self.RUN_GUI.resizable(False, False)
@@ -229,18 +225,18 @@ class ApplicationLauncher:
             if self.is_command_or_dir(command):
                 #Это команда
                 subprocess.Popen(command, shell=True)
-                logger.info(f"Run - {l["launch"]} {l["commands"]}: {command}")
+                logger.info(f"Run - {l("launch")} {l("commands")}: {command}")
             else:
                 #Это путь к файлу
                 if os.path.exists(command):
                     os.startfile(command)
-                    logger.info(f"Run - {l["launch"]} {l["file2"]}: {command}")
+                    logger.info(f"Run - {l("launch")} {l("file2")}: {command}")
                 else:
-                    comment = f"Run - {l["not_found"]} {l["file"]}: {command}"
+                    comment = f"Run - {l("not_found")} {l("file")}: {command}"
                     logger.error(comment)
                     self.log(comment)
         except Exception as e:
-            comment = f"Run - {l["start_error"]} {l["file2"]}:\n{e}"
+            comment = f"Run - {l("start_error")} {l("file2")}:\n{e}"
             logger.error(comment)
             self.log(comment)
 
@@ -253,13 +249,13 @@ class ApplicationLauncher:
         try:
             subprocess.Popen(command, shell=True)
         except Exception as e:
-            logger.exception(l["start_command_error"], e)
-            self.log(l["start_command_error"])
+            logger.exception(l("start_command_error"), e)
+            self.log(l("start_command_error"))
 
 
 
     def on_window_resize(self, event=None):
-        if self.mode.get() == l["simplified"]:
+        if self.mode.get() == l("simplified"):
             #Динамическое изменение размера шрифта в зависимости от размера окна
             width = self.RUN_GUI.winfo_width()
             height = self.RUN_GUI.winfo_height()
@@ -292,16 +288,16 @@ def Run(current_theme):
     #Меню
     menubar = Menu(RUN_GUI)
     theme_menu = Menu(menubar, tearoff=0)
-    theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_run("dark"))
-    theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_run("white"))
-    theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_run("red"))
-    theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_run("lime"))
-    theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_run("black"))
-    theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_run("gray"))
-    theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_run("orange"))
+    theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_run("dark"))
+    theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_run("white"))
+    theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_run("red"))
+    theme_menu.add_checkbutton(label=l("green"), command=lambda: restart_run("lime"))
+    theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_run("black"))
+    theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_run("gray"))
+    theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_run("orange"))
 
     #Пункт "Темы"
-    menubar.add_cascade(label=l["themes"], menu=theme_menu)
+    menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
     RUN_GUI.attributes("-topmost", True) 
 
@@ -313,15 +309,15 @@ def Run(current_theme):
         GUI.attributes("-topmost", new_state)
 
     def update_topmost_label(menubar, GUI):
-        status = l["on2"] if higher.get() else l["off2"]
+        status = l("on2") if higher.get() else l("off2")
         #Индекс command в menubar
-        menubar.entryconfig(2, label=f"{l["topmost"]}: {status}")
+        menubar.entryconfig(2, label=f"{l("topmost")}: {status}")
         GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-    menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(RUN_GUI))
+    menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(RUN_GUI))
     update_topmost_label(menubar, RUN_GUI)
 
-    menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
+    menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
 
     RUN_GUI.config(menu=menubar)
 

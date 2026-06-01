@@ -1,4 +1,4 @@
-from config import all_line, program_authentication_clyth
+from config import all_line, program_authentication_clyth, current_localization
 years_copyleft = "2024 - 2026"
 
 #Локализации
@@ -77,6 +77,8 @@ localizations = {
         "restart_program": "Перезапустить программу",
         "admin_error": "Ошибка при получении прав администратора",
         "checking_damage_error": "ошибка при проверке критических повреждений",
+        "emergency_restart": "Аварийный перезапуск",
+        "attempt_import_t": "Попытка запуска программы как отдельного модуля!",
         #ARM
         "scheduler_error": "Не удалось подключиться к планировщику задач",
         "edit_task_error": "Ошибка изменения состояния задачи",
@@ -123,7 +125,7 @@ localizations = {
         "action_error": "ошибка при действии",
         #Console
         "crowbar_console": "Консоль Разработчика Антивируса Монтировка",
-        "crowbar_console_text": "Будьте осторожны, данный компонент может быть не стабилен\nА не понимание, что выделаете можете привести к повреждению программы\nЕсли это произошло перезапустите программу.\n",
+        "crowbar_console_text": "Будьте осторожны, данный компонент может быть не стабилен\nА не понимание, что вы делаете может привести к повреждению программы\nЕсли это произошло перезапустите программу.\n",
         "attempt_command": "попытка выполнить команду",
         "exit_with_console_text": "Не не Я не дам тебе обойти капчу (как минимум попытаюсь)",
         #EC
@@ -663,6 +665,7 @@ localizations = {
         "for": "for",
         "arm_help_text": 'The Scheduler tab displays so many tasks because viruses could modify tasks, but this is extremely rare, so you can disable the display of tasks without the "created" column. To do this, Click the item in the top panel of the window: view->Show only tasks with date.',
         "arm_critical_error": f"An unknown error occurred in the AutoRunMaster component!",
+        "reading2": "чтения",
         #Console
         "crowbar_console": "Crowbar Antivirus Developer Console",
         "crowbar_console_text": "Be careful, this component may be unstable.\nAnd not understanding what you're doing can damage the program.\nIf this happens, restart the program.\n",
@@ -1093,3 +1096,7 @@ localizations = {
         "guest": "Guest",
     },
 }
+
+#Возвращаем нужный текст или сам ключ если нужного текста нет в текущем языке
+def l(key, language=current_localization):
+    return localizations.get(language, {}).get(key) or key

@@ -16,12 +16,11 @@ from loguru import logger
 import os
 
 from config import *
-from languages import localizations
+from languages import l
 from OF import pac, Psutil, apply_global_theme, extract_filename_from_path
 from RS import random_string
 
-process_manager_version = "1.8.2 Beta"
-l = localizations[current_localization]
+process_manager_version = "1.8.3 Beta"
 
 #Действие с процессами
 def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, run_in_recovery=False):
@@ -54,7 +53,7 @@ def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, ru
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
         except Exception as e:
-            logger.exception(f"PM - {l["at"]} {action} PID {pid}", e)
+            logger.exception(f"PM - {l("at")} {action} PID {pid}", e)
 
     #Обновляем таблицу один раз после обработки всех процессов
     if PM_GUI_ELEMENTS:
@@ -69,14 +68,14 @@ def PM(run_in_recovery, current_theme):
         "tree": None,
         "tabs": {},
         "vsb": None,
-        "current_tab": l["all_process"],
+        "current_tab": l("all_process"),
         "treeview_data": [],
         "update_interval": time_to_update_process_list * 1000,
         "sort_column": "PID",
         "sort_direction": "asc",
         "search_query": "",
         #Начальные значения ширины колонок
-        "column_widths": {"PID": 50, l["process2"]: 150, f"{l["path"]} {l["to_file"]}": 250, l["critical"]: 80, l["status"]: 80, l["user2"]: 150}
+        "column_widths": {"PID": 50, l("process2"): 150, f"{l("path")} {l("to_file")}": 250, l("critical"): 80, l("status"): 80, l("user2"): 150}
     }
 
     if not run_in_recovery:
@@ -109,25 +108,25 @@ def PM(run_in_recovery, current_theme):
         #Получаем информацию о процессе
         def get_process_info(proc):
             try:
-                status = l["frozen"] if proc.status() == psutil.STATUS_STOPPED else l["started"]
+                status = l("frozen") if proc.status() == psutil.STATUS_STOPPED else l("started")
 
                 #РЕАЛИЗОВАТЬ ПРОВЕРКУ НА АДМИНИСТРАТОРА
                 is_elevated = False
 
                 return {
                     "PID": proc.pid,
-                    l["process2"]: proc.name(),
-                    f"{l["path"]} {l["to_file"]}": proc.exe() if proc.exe() else l["no_data"],
-                    l["user2"]: proc.username() if proc.username() else l["no_data"],
-                    l["critical"] : get_process_critical_status(proc.pid),
-                    l["status"]: status,
-                    l["admin"]: is_elevated,
+                    l("process2"): proc.name(),
+                    f"{l("path")} {l("to_file")}": proc.exe() if proc.exe() else l("no_data"),
+                    l("user2"): proc.username() if proc.username() else l("no_data"),
+                    l("critical") : get_process_critical_status(proc.pid),
+                    l("status"): status,
+                    l("admin"): is_elevated,
                 }
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 return None
             except Exception as e:
                 process_name = get_process_name(proc.pid)
-                logger.exception(f"PM - {l["info_process_error"]} {process_name} (pid:{proc.pid})", e)
+                logger.exception(f"PM - {l("info_process_error")} {process_name} (pid:{proc.pid})", e)
                 return None
 
 
@@ -143,9 +142,9 @@ def PM(run_in_recovery, current_theme):
             if list_type == "all_list":
                 return all_processes
             elif list_type == "critical_list":
-                return [p for p in all_processes if p[l["critical"]]]
+                return [p for p in all_processes if p[l("critical")]]
             elif list_type == "suspend_list":
-                return [p for p in all_processes if p[l["status"]] == l["frozen"]]
+                return [p for p in all_processes if p[l("status")] == l("frozen")]
             return []
 
 
@@ -186,7 +185,7 @@ def PM(run_in_recovery, current_theme):
             #Делаем окно модальным (пока оно открыто, нельзя взаимодействовать с основным окном
             search_window.grab_set()
 
-            ttk.Label(search_window, text=l["enter_text_for_search"]).pack(pady=5, padx=10, anchor="w")
+            ttk.Label(search_window, text=l("enter_text_for_search")).pack(pady=5, padx=10, anchor="w")
 
             #Текстовое поле с начальным значением
             search_text = tk.StringVar(value=PM_GUI_ELEMENTS["search_query"])
@@ -210,8 +209,8 @@ def PM(run_in_recovery, current_theme):
             button_frame = ttk.Frame(search_window)
             button_frame.pack(pady=10)
 
-            ttk.Button(button_frame, text=l["cancel2"], command=cancel_search).pack(side="left", padx=5)
-            ttk.Button(button_frame, text=l["ok"], command=perform_search).pack(side="left", padx=5)
+            ttk.Button(button_frame, text=l("cancel2"), command=cancel_search).pack(side="left", padx=5)
+            ttk.Button(button_frame, text=l("ok"), command=perform_search).pack(side="left", padx=5)
 
             #Привязка Enter к кнопке "ОК"
             search_window.bind("<Return>", lambda e: perform_search())
@@ -241,11 +240,11 @@ def PM(run_in_recovery, current_theme):
             #Словарь для преобразования столбцов в ключи, по которым нужно сортировать
             key_map = {
                 "PID": "PID",
-                l["process2"]: l["process2"],
-                f"{l["path"]} {l["to_file"]}": f"{l["path"]} {l["to_file"]}",
-                l["user2"]: l["user2"],
-                l["critical"]: l["critical"],
-                l["status"]: l["status"],
+                l("process2"): l("process2"),
+                f"{l("path")} {l("to_file")}": f"{l("path")} {l("to_file")}",
+                l("user2"): l("user2"),
+                l("critical"): l("critical"),
+                l("status"): l("status"),
             }
 
             #Получаем фактический ключ для сортировки
@@ -266,7 +265,7 @@ def PM(run_in_recovery, current_theme):
                         return 0 #Возвращаем 0, если не удается преобразовать в число
                 return value
 
-            #Сортируем данные. reverse=True, если направление "desc" (по убыванию)
+            #Сортируем данные, reverse=True, если направление "desc" (по убыванию)
             data.sort(key=sort_func, reverse=(direction == "desc"))
             return data
 
@@ -318,7 +317,7 @@ def PM(run_in_recovery, current_theme):
             PM_GUI_ELEMENTS["tree"].tag_configure("suspended", background="gray", foreground="white")
             PM_GUI_ELEMENTS["tree"].tag_configure("admin", background="orange", foreground="black")
 
-            columns = ("PID", l["process2"], f"{l["path"]} {l["to_file"]}", l["user2"], l["critical"], l["status"])
+            columns = ("PID", l("process2"), f"{l("path")} {l("to_file")}", l("user2"), l("critical"), l("status"))
             PM_GUI_ELEMENTS["tree"]["columns"] = columns
             PM_GUI_ELEMENTS["tree"]["show"] = "headings"
 
@@ -368,11 +367,11 @@ def PM(run_in_recovery, current_theme):
 
             #Загрузка исходных данных
             raw_data = []
-            if current_tab == l["all_process"]:
+            if current_tab == l("all_process"):
                 raw_data = get_process_list("all_list")
-            elif current_tab == l["critical_process"]:
+            elif current_tab == l("critical_process"):
                 raw_data = get_process_list("critical_list")
-            elif current_tab == l["suspend_process"]:
+            elif current_tab == l("suspend_process"):
                 raw_data = get_process_list("suspend_list")
 
             if raw_data is None:
@@ -401,11 +400,11 @@ def PM(run_in_recovery, current_theme):
                 all_pids.append(PM_data["PID"])
 
                 tags = []
-                if PM_data.get(l["critical"]):
+                if PM_data.get(l("critical")):
                     tags.append("critical")
-                if PM_data.get(l["status"]) == l["frozen"]:
+                if PM_data.get(l("status")) == l("frozen"):
                     tags.append("suspended")
-                if PM_data.get(l["admin"]):
+                if PM_data.get(l("admin")):
                     tags.append("admin")
 
                 #iid (идентификатор элемента) устанавливаем как PID
@@ -491,20 +490,20 @@ def PM(run_in_recovery, current_theme):
             menu = tk.Menu(manager, tearoff=0)
 
             count = len(selected_pids)
-            suffix = f" ({count} {l["things"]}.)" if count > 1 else ""
+            suffix = f" ({count} {l("things")}.)" if count > 1 else ""
 
             if selected_pids:
                 #Стандартные действия
-                menu.add_command(label=f"{l["kill_processes"]} {suffix}",
+                menu.add_command(label=f"{l("kill_processes")} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "kill", selected_pids, run_in_recovery))
-                menu.add_command(label=f"{l["suspend"]} {suffix}",
+                menu.add_command(label=f"{l("suspend")} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "suspend", selected_pids, run_in_recovery))
-                menu.add_command(label=f"{l["resume"]} {suffix}",
+                menu.add_command(label=f"{l("resume")} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "resume", selected_pids, run_in_recovery))
                 menu.add_separator()
-                menu.add_command(label=f"{l["make_it_critical"]} {suffix}",
+                menu.add_command(label=f"{l("make_it_critical")} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_true", selected_pids, run_in_recovery))
-                menu.add_command(label=f"{l["remove_criticality"]} {suffix}",
+                menu.add_command(label=f"{l("remove_criticality")} {suffix}",
                                  command=lambda: action_process(PM_GUI_ELEMENTS, "edit_critical_to_false", selected_pids, run_in_recovery))
 
                 #если выбран ровно один процесс
@@ -520,17 +519,17 @@ def PM(run_in_recovery, current_theme):
                         try:
                             process.wait(timeout=3) #Ждёт максимум 3 секунды
                         except psutil.TimeoutExpired:
-                            comment = f"PM - {l["process"]} {process_name} ({selected_pids[0]}) {l["process_dont_close"]}"
+                            comment = f"PM - {l("process")} {process_name} ({selected_pids[0]}) {l("process_dont_close")}"
                             logger.error(comment)
                             messagebox.showerror(random_string(), comment)
                         delete_file(process_file)
 
-                    menu.add_command(label=l["kill_delete_file_process"], command=lambda: kill_delete_process(psutil.Process(int(selected_pids[0]))))
+                    menu.add_command(label=l("kill_delete_file_process"), command=lambda: kill_delete_process(psutil.Process(int(selected_pids[0]))))
                     menu.add_separator()
 
-                    if file_path and file_path != l["no_data"]:
+                    if file_path and file_path != l("no_data"):
                         menu.add_command(
-                            label=f"{l["copy_path"]} {l["to_file"]}",
+                            label=f"{l("copy_path")} {l("to_file")}",
                             command=lambda: copy_to_clipboard(manager, file_path))
 
             try:
@@ -591,7 +590,7 @@ def PM(run_in_recovery, current_theme):
                 action_process(PM_GUI_ELEMENTS, action, list(selected_items), run_in_recovery)
 
         def help_pm():
-            messagebox.showinfo(random_string(), l["pm_help_text"])
+            messagebox.showinfo(random_string(), l("pm_help_text"))
 
         def restart_pm(user_theme):
             global current_theme
@@ -611,25 +610,25 @@ def PM(run_in_recovery, current_theme):
         menubar = tk.Menu(PM_GUI)
         #Создаем выпадающее меню "Действия"
         actions_menu = tk.Menu(menubar, tearoff=0)
-        actions_menu.add_command(label=l["search"], accelerator="Ctrl+F", command=lambda: open_search_dialog(PM_GUI_ELEMENTS))
-        actions_menu.add_command(label=l["cancel_search"], accelerator="Esc", command=lambda: stop_search(PM_GUI_ELEMENTS))
-        menubar.add_cascade(label=l["actions"], menu=actions_menu)
+        actions_menu.add_command(label=l("search"), accelerator="Ctrl+F", command=lambda: open_search_dialog(PM_GUI_ELEMENTS))
+        actions_menu.add_command(label=l("cancel_search"), accelerator="Esc", command=lambda: stop_search(PM_GUI_ELEMENTS))
+        menubar.add_cascade(label=l("actions"), menu=actions_menu)
 
         #Пункт "Помощь"
-        menubar.add_command(label=l["help"], command=help_pm)
+        menubar.add_command(label=l("help"), command=help_pm)
 
         #Меню
         theme_menu = tk.Menu(menubar, tearoff=0)
-        theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_pm("dark"))
-        theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_pm("white"))
-        theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_pm("red"))
-        theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_pm("lime"))
-        theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_pm("black"))
-        theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_pm("gray"))
-        theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_pm("orange"))
+        theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_pm("dark"))
+        theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_pm("white"))
+        theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_pm("red"))
+        theme_menu.add_checkbutton(label=l("green"), command=lambda: restart_pm("lime"))
+        theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_pm("black"))
+        theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_pm("gray"))
+        theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_pm("orange"))
 
         #Пункт "Темы"
-        menubar.add_cascade(label=l["themes"], menu=theme_menu)
+        menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
         PM_GUI.attributes("-topmost", True) 
 
@@ -641,15 +640,15 @@ def PM(run_in_recovery, current_theme):
             GUI.attributes("-topmost", new_state)
 
         def update_topmost_label(menubar, GUI):
-            status = l["on2"] if higher.get() else l["off2"]
+            status = l("on2") if higher.get() else l("off2")
             #Индекс command в menubar
-            menubar.entryconfig(4, label=f"{l["topmost"]}: {status}")
+            menubar.entryconfig(4, label=f"{l("topmost")}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(PM_GUI))
+        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(PM_GUI))
         update_topmost_label(menubar, PM_GUI)
 
-        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
+        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
 
         PM_GUI.config(menu=menubar)
 
@@ -676,14 +675,14 @@ def PM(run_in_recovery, current_theme):
         PM_GUI_ELEMENTS["notebook"].bind("<<NotebookTabChanged>>", lambda e: on_tab_change(e, PM_GUI_ELEMENTS))
 
         #Создаём вкладки
-        tab_names = [l["all_process"], l["critical_process"], l["suspend_process"]]
+        tab_names = [l("all_process"), l("critical_process"), l("suspend_process")]
         for tab_name in tab_names:
             frame = ttk.Frame(PM_GUI_ELEMENTS["notebook"], padding="5 5 5 5")
             PM_GUI_ELEMENTS["notebook"].add(frame, text=tab_name)
             PM_GUI_ELEMENTS["tabs"][tab_name] = frame
 
         #Создание начальной Таблицы и Скроллбара
-        initial_frame = PM_GUI_ELEMENTS["tabs"][l["all_process"]]
+        initial_frame = PM_GUI_ELEMENTS["tabs"][l("all_process")]
         PM_GUI_ELEMENTS["tree"] = ttk.Treeview(initial_frame, selectmode="browse")
         PM_GUI_ELEMENTS["vsb"] = ttk.Scrollbar(initial_frame, orient="vertical", command=PM_GUI_ELEMENTS["tree"].yview)
         PM_GUI_ELEMENTS["tree"].configure(yscrollcommand=PM_GUI_ELEMENTS["vsb"].set)
@@ -698,7 +697,7 @@ def PM(run_in_recovery, current_theme):
 
         PM_GUI.mainloop()
     except Exception as e:
-        logger.exception(l["pm_critical_error"], e)
+        logger.exception(l("pm_critical_error"), e)
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

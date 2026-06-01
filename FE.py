@@ -13,14 +13,13 @@ from tkinter import filedialog, messagebox
 from loguru import logger
 import os
 
-from languages import localizations
+from languages import l
 from config import program_authentication_clyth, current_localization, clyth
 from RS import random_string
 #from CC22 import CC22
 from OF import pac
 
-file_editor_version = "0.3.0 Beta"
-l = localizations[current_localization]
+file_editor_version = "0.3.1 Beta"
 
 class FileEditor:
     def __init__(self, FE_GUI):
@@ -74,32 +73,32 @@ class FileEditor:
 
         #Меню "Файл"
         file_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=l["file"], menu=file_menu)
-        file_menu.add_command(label=l["open"], command=self.open_file, accelerator="Ctrl+O")
-        file_menu.add_command(label=l["save"], command=self.save_file, accelerator="Ctrl+S")
-        file_menu.add_command(label=l["save_as"], command=self.save_as_file, accelerator="Ctrl+Shift+S")
+        menubar.add_cascade(label=l("file"), menu=file_menu)
+        file_menu.add_command(label=l("open"), command=self.open_file, accelerator="Ctrl+O")
+        file_menu.add_command(label=l("save"), command=self.save_file, accelerator="Ctrl+S")
+        file_menu.add_command(label=l("save_as"), command=self.save_as_file, accelerator="Ctrl+Shift+S")
         file_menu.add_separator()
-        file_menu.add_command(label=l["exit"], command=self.on_closing, accelerator="Alt+F4")
+        file_menu.add_command(label=l("exit"), command=self.on_closing, accelerator="Alt+F4")
 
         #Меню "Редактирование"
         edit_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=l["editing"], menu=edit_menu)
-        edit_menu.add_command(label=l["cancel"], command=lambda: self.text_widget.edit_undo(), accelerator="Ctrl+Z")
-        edit_menu.add_command(label=l["repeat"], command=lambda: self.text_widget.edit_redo(), accelerator="Ctrl+Y")
+        menubar.add_cascade(label=l("editing"), menu=edit_menu)
+        edit_menu.add_command(label=l("cancel"), command=lambda: self.text_widget.edit_undo(), accelerator="Ctrl+Z")
+        edit_menu.add_command(label=l("repeat"), command=lambda: self.text_widget.edit_redo(), accelerator="Ctrl+Y")
         edit_menu.add_separator()
-        edit_menu.add_command(label=l["cut"], command=self.cut_text, accelerator="Ctrl+X")
-        edit_menu.add_command(label=l["copy"], command=self.copy_text, accelerator="Ctrl+C")
-        edit_menu.add_command(label=l["paste"], command=self.paste_text, accelerator="Ctrl+V")
+        edit_menu.add_command(label=l("cut"), command=self.cut_text, accelerator="Ctrl+X")
+        edit_menu.add_command(label=l("copy"), command=self.copy_text, accelerator="Ctrl+C")
+        edit_menu.add_command(label=l("paste"), command=self.paste_text, accelerator="Ctrl+V")
         edit_menu.add_separator()
-        edit_menu.add_command(label=l["select_all"], command=self.select_all, accelerator="Ctrl+A")
+        edit_menu.add_command(label=l("select_all"), command=self.select_all, accelerator="Ctrl+A")
 
         #Меню "Вид"
         view_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=l["view"], menu=view_menu)
+        menubar.add_cascade(label=l("view"), menu=view_menu)
 
         #Подменю "Шрифт"
         font_menu = tk.Menu(view_menu, tearoff=0)
-        view_menu.add_cascade(label=l["font"], menu=font_menu)
+        view_menu.add_cascade(label=l("font"), menu=font_menu)
 
         fonts = ["Courier", "Arial", "Times New Roman", "Helvetica", "Verdana", "Consolas"]
         for font in fonts:
@@ -107,7 +106,7 @@ class FileEditor:
 
         #Подменю "Размер шрифта"
         size_menu = tk.Menu(view_menu, tearoff=0)
-        view_menu.add_cascade(label=l["font_size"], menu=size_menu)
+        view_menu.add_cascade(label=l("font_size"), menu=size_menu)
 
         sizes = [8, 10, 11, 12, 14, 16, 18, 20, 24]
         for size in sizes:
@@ -117,14 +116,14 @@ class FileEditor:
 
         #Подменю "Тема"
         theme_menu = tk.Menu(view_menu, tearoff=0)
-        view_menu.add_cascade(label=l["themes"], menu=theme_menu)
+        view_menu.add_cascade(label=l("themes"), menu=theme_menu)
 
         themes = {
-            l["white"]: {"bg": "white", "fg": "black"},
-            l["dark"]: {"bg": "#2b2b2b", "fg": "#ffffff"},
-            l["green"]: {"bg": "#0a0a0a", "fg": "#00ff00"},
-            l["blue"]: {"bg": "#1e1e30", "fg": "#00bfff"},
-            l["cuttlefish"]: {"bg": "#f4ebd9", "fg": "#5c4033"}
+            l("white"): {"bg": "white", "fg": "black"},
+            l("dark"): {"bg": "#2b2b2b", "fg": "#ffffff"},
+            l("green"): {"bg": "#0a0a0a", "fg": "#00ff00"},
+            l("blue"): {"bg": "#1e1e30", "fg": "#00bfff"},
+            l("cuttlefish"): {"bg": "#f4ebd9", "fg": "#5c4033"}
         }
 
         for theme_name, colors in themes.items():
@@ -141,24 +140,24 @@ class FileEditor:
             GUI.attributes("-topmost", higher.get())
 
         def update_topmost_label(menubar, GUI):
-            status = l["on2"] if higher.get() else l["off2"]
-            menubar.entryconfig(4, label=f"{l["topmost"]}: {status}")
+            status = l("on2") if higher.get() else l("off2")
+            menubar.entryconfig(4, label=f"{l("topmost")}: {status}")
             GUI.after(100, lambda:update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda:toggle_topmost(self.FE_GUI))
-        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
+        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda:toggle_topmost(self.FE_GUI))
+        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
         update_topmost_label(menubar, self.FE_GUI)
 
     def create_context_menu(self):
         self.context_menu = tk.Menu(self.FE_GUI, tearoff=0)
-        self.context_menu.add_command(label=l["cancel"], command=lambda: self.text_widget.edit_undo())
-        self.context_menu.add_command(label=l["repeat"], command=lambda: self.text_widget.edit_redo())
+        self.context_menu.add_command(label=l("cancel"), command=lambda: self.text_widget.edit_undo())
+        self.context_menu.add_command(label=l("repeat"), command=lambda: self.text_widget.edit_redo())
         self.context_menu.add_separator()
-        self.context_menu.add_command(label=l["cut"], command=self.cut_text)
-        self.context_menu.add_command(label=l["copy"], command=self.copy_text)
-        self.context_menu.add_command(label=l["paste"], command=self.paste_text)
+        self.context_menu.add_command(label=l("cut"), command=self.cut_text)
+        self.context_menu.add_command(label=l("copy"), command=self.copy_text)
+        self.context_menu.add_command(label=l("paste"), command=self.paste_text)
         self.context_menu.add_separator()
-        self.context_menu.add_command(label=l["select_all"], command=self.select_all)
+        self.context_menu.add_command(label=l("select_all"), command=self.select_all)
 
         #Привязываем показ контекстного меню на ПКМ
         self.text_widget.bind("<Button-3>", self.show_context_menu)
@@ -235,7 +234,7 @@ class FileEditor:
     def create_status_bar(self):
         self.status_bar = tk.Label(
             self.FE_GUI,
-            text=l["new_file"],
+            text=l("new_file"),
             bd=1,
             relief=tk.SUNKEN,
             anchor=tk.W
@@ -251,7 +250,7 @@ class FileEditor:
             self.status_bar.config(text=f"{filename}{modified_indicator}")
         else:
             modified_indicator = " *" if self.is_modified else ""
-            self.status_bar.config(text=f"{l["new_file"]}{modified_indicator}")
+            self.status_bar.config(text=f"{l("new_file")}{modified_indicator}")
 
 
 
@@ -268,7 +267,7 @@ class FileEditor:
     def open_file(self):
         file_path = filedialog.askopenfilename(
             title=random_string(),
-            filetypes=[(l["text_file"], "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l["crowbar_scripts"], "*.cas"), (l["all_files"], "*.*")]
+            filetypes=[(l("text_file"), "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l("crowbar_scripts"), "*.cas"), (l("all_files"), "*.*")]
         )
         if file_path:
             self.load_file(file_path)
@@ -278,7 +277,7 @@ class FileEditor:
     def load_file(self, file_path):
         try:
             if not os.path.exists(file_path):
-                messagebox.showerror(random_string(), f"{l["file"]} {l["not_found"]}: {file_path}")
+                messagebox.showerror(random_string(), f"{l("file")} {l("not_found")}: {file_path}")
                 return
 
             with open(file_path, "r", encoding="utf-8") as file:
@@ -312,7 +311,7 @@ class FileEditor:
                 file.write(content)
             self.is_modified = False
             self.update_status_bar()
-            messagebox.showinfo(random_string(), f"{l["file"]} {l["success_saved"]}!")
+            messagebox.showinfo(random_string(), f"{l("file")} {l("success_saved")}!")
         except Exception as e:
             messagebox.showerror(random_string(), str(e))
 
@@ -322,7 +321,7 @@ class FileEditor:
         file_path = filedialog.asksaveasfilename(
             title=random_string(),
             defaultextension=".txt",
-            filetypes=[(l["text_file"], "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l["all_files"], "*.*")]
+            filetypes=[(l("text_file"), "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l("all_files"), "*.*")]
         )
         if file_path:
             try:
@@ -332,7 +331,7 @@ class FileEditor:
                 self.current_file = file_path
                 self.is_modified = False
                 self.update_status_bar()
-                messagebox.showinfo(random_string(), f"{l["file"]} {l["success_saved"]}!")
+                messagebox.showinfo(random_string(), f"{l("file")} {l("success_saved")}!")
             except Exception as e:
                 messagebox.showerror(random_string(), str(e))
 
@@ -372,7 +371,7 @@ class FileEditor:
 
     def on_closing(self):
         if self.is_modified:
-            response = messagebox.askyesnocancel(random_string(), l["save_changes?"])
+            response = messagebox.askyesnocancel(random_string(), l("save_changes?"))
             if response is None: #Отмена
                 return
             elif response: #Да
@@ -395,15 +394,15 @@ class FileEditor:
         self.case_var = tk.BooleanVar(value=True)
         self.word_var = tk.BooleanVar(value=False)
 
-        self.case_check = tk.Checkbutton(self.search_panel, text=l["match_case"], variable=self.case_var, command=self.perform_search)
-        self.word_check = tk.Checkbutton(self.search_panel, text=l["whole_words"], variable=self.word_var, command=self.perform_search)
+        self.case_check = tk.Checkbutton(self.search_panel, text=l("match_case"), variable=self.case_var, command=self.perform_search)
+        self.word_check = tk.Checkbutton(self.search_panel, text=l("whole_words"), variable=self.word_var, command=self.perform_search)
 
         self.case_check.pack(side=tk.LEFT, padx=5)
         self.word_check.pack(side=tk.LEFT, padx=5)
 
         #Кнопки навигации
-        self.prev_button = tk.Button(self.search_panel, text=l["back"], command=self.search_prev)
-        self.next_button = tk.Button(self.search_panel, text=l["next"], command=self.search_next)
+        self.prev_button = tk.Button(self.search_panel, text=l("back"), command=self.search_prev)
+        self.next_button = tk.Button(self.search_panel, text=l("next"), command=self.search_next)
         self.prev_button.pack(side=tk.LEFT, padx=2)
         self.next_button.pack(side=tk.LEFT, padx=2)
 
@@ -527,7 +526,7 @@ def FE(file_path=None):
             editor.load_file(file_path)
         FE_GUI.mainloop()
     except Exception as e:
-        logger.exception(l["fe_critical_error"], e)
+        logger.exception(l("fe_critical_error"), e)
 
 if __name__ == "__main__":
     FE()

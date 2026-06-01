@@ -21,11 +21,10 @@ import os
 
 from RS import random_string
 from OF import pac, apply_global_theme, get_user_name
-from languages import localizations
+from languages import l
 from config import theme, default_theme, program_authentication_clyth, current_localization
-l = localizations[current_localization]
 
-scarecrow_protection_version = "0.3.8 Beta"
+scarecrow_protection_version = "0.3.9 Beta"
 
 def SP(run_in_recovery, current_disc_r, current_theme):
     try:
@@ -257,10 +256,10 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                 self.button_frame.pack(side=tk.BOTTOM, pady=10)
 
                 #Кнопки
-                self.run_button = tk.Button(self.button_frame, text=l["simulation"], command=self.run_simulation)
+                self.run_button = tk.Button(self.button_frame, text=l("simulation"), command=self.run_simulation)
                 self.run_button.pack(side=tk.LEFT, padx=10)
 
-                self.delete_button = tk.Button(self.button_frame, text=l["removal"], command=self.delete_simulation)
+                self.delete_button = tk.Button(self.button_frame, text=l("removal"), command=self.delete_simulation)
                 self.delete_button.pack(side=tk.LEFT, padx=10)
 
                 #Фрейм для чекбоксов со скроллбаром
@@ -316,9 +315,9 @@ def SP(run_in_recovery, current_disc_r, current_theme):
             def create_path(self, path):
                 try:
                     os.makedirs(path, exist_ok=True)
-                    logger.info(f"SP - {l["create_dir"]}: {path}")
+                    logger.info(f"SP - {l("create_dir")}: {path}")
                 except OSError as e:
-                    logger.error(f"SP - {l["create_dir_error"]} {path}:\n{e}")
+                    logger.error(f"SP - {l("create_dir_error")} {path}:\n{e}")
 
 
 
@@ -326,9 +325,9 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                 try:
                     with open(path, "w"):
                         pass #Создаём пустой файл
-                    logger.info(f"SP - {l["create_file"]}: {path}")
+                    logger.info(f"SP - {l("create_file")}: {path}")
                 except OSError as e:
-                    logger.error(f"SP - {l["create_file_error"]} {path}:\n{e}")
+                    logger.error(f"SP - {l("create_file_error")} {path}:\n{e}")
 
 
 
@@ -336,9 +335,9 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                try:
                     with winreg.CreateKeyEx(winreg.HKEY_LOCAL_MACHINE, key_path, 0, winreg.KEY_ALL_ACCESS) as key:
                         winreg.SetValueEx(key, value_name, 0, value_type, value_data)
-                    logger.info(f"SP - {l["create_key"]}: {key_path}\\{value_name} = {value_data}")
+                    logger.info(f"SP - {l("create_key")}: {key_path}\\{value_name} = {value_data}")
                except OSError as e:
-                    logger.error(f"SP - {l["create_key_error"]} {key_path}\\{value_name} = {value_data}:\n{e}")
+                    logger.error(f"SP - {l("create_key_error")} {key_path}\\{value_name} = {value_data}:\n{e}")
 
 
 
@@ -346,9 +345,9 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                 try:
                     if os.path.exists(path):
                         shutil.rmtree(path)
-                        logger.info(f"SP - {l["delete_dir"]}: {path}")
+                        logger.info(f"SP - {l("delete_dir")}: {path}")
                 except OSError as e:
-                    logger.error(f"SP - {l["delete_dir_error"]} {path}:\n{e}")
+                    logger.error(f"SP - {l("delete_dir_error")} {path}:\n{e}")
 
 
 
@@ -356,9 +355,9 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                 try:
                     if os.path.exists(path):
                         os.remove(path)
-                        logger.info(f"SP - {l["file_delete"]}: {path}")
+                        logger.info(f"SP - {l("file_delete")}: {path}")
                 except OSError as e:
-                    logger.error(f"SP - {l["file_delete_error"]} {path}:\n{e}")
+                    logger.error(f"SP - {l("file_delete_error")} {path}:\n{e}")
 
 
 
@@ -366,18 +365,18 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                 try:
                     with winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, key_path, 0, winreg.KEY_ALL_ACCESS) as key:
                         winreg.DeleteValue(key, value_name)
-                    logger.info(f"SP - {l["delete_key"]}: {key_path}\\{value_name}")
+                    logger.info(f"SP - {l("delete_key")}: {key_path}\\{value_name}")
                 except FileNotFoundError:
-                    logger.info(f"SP - {l["key_not_found"]}: {key_path}\\{value_name}")
+                    logger.info(f"SP - {l("key_not_found")}: {key_path}\\{value_name}")
                 except OSError as e:
-                    logger.error(f"SP - {l["delete_key_error"]} {key_path}\\{value_name}:\n{e}")
+                    logger.error(f"SP - {l("delete_key_error")} {key_path}\\{value_name}:\n{e}")
 
 
 
             def run_simulation(self):
                 for program, info in PROGRAM_INFO.items():
                     if self.checkbox_vars[program].get():
-                        logger.info(f"SP - {l["start_simulation"]} {program}")
+                        logger.info(f"SP - {l("start_simulation")} {program}")
                         if "path" in info:
                             for path in info["path"]:
                                 self.create_path(path)
@@ -388,16 +387,16 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                             for key_path, key_values in info["registry_keys"].items():
                                 for value_name, value_data in key_values.items():
                                     self.create_registry_key(key_path, value_name, value_data)
-                        logger.info(f"SP - {l["simulation_for"]} {pr<ogram} {l["completed"]}")
-                messagebox.showinfo(random_string(), l["simulation_completed"])
+                        logger.info(f"SP - {l("simulation_for")} {pr<ogram} {l("completed")}")
+                messagebox.showinfo(random_string(), l("simulation_completed"))
 
 
 
             def delete_simulation(self):
-                if messagebox.askyesno(random_string(), l["sp_confirmation"]):
+                if messagebox.askyesno(random_string(), l("sp_confirmation")):
                     for program, info in PROGRAM_INFO.items():
                         if self.checkbox_vars[program].get():
-                            logger.info(f"SP - {l["delete_simulation"]} {program}")
+                            logger.info(f"SP - {l("delete_simulation")} {program}")
                             if "path" in info:
                                 for path in info["path"]:
                                     self.delete_path(path)
@@ -408,8 +407,8 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                                 for key_path, key_values in info["registry_keys"].items():
                                     for value_name, _ in key_values.items():
                                         self.delete_registry_key(key_path, value_name)
-                            logger.info(f"SP - {l["delete_simulation_for"]} {program} {l["completed"]}")
-                    messagebox.showinfo(random_string(), l["delete_completed"])
+                            logger.info(f"SP - {l("delete_simulation_for")} {program} {l("completed")}")
+                    messagebox.showinfo(random_string(), l("delete_completed"))
 
         def restart_sp(user_theme):
             global current_theme
@@ -426,15 +425,15 @@ def SP(run_in_recovery, current_disc_r, current_theme):
         #Меню
         menubar = Menu(SP_GUI)
         theme_menu = Menu(menubar, tearoff=0)
-        theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_sp("dark"))
-        theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_sp("white"))
-        theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_sp("red"))
-        theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_sp("black"))
-        theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_sp("gray"))
-        theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_sp("orange"))
+        theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_sp("dark"))
+        theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_sp("white"))
+        theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_sp("red"))
+        theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_sp("black"))
+        theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_sp("gray"))
+        theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_sp("orange"))
 
         #Пункт "Темы"
-        menubar.add_cascade(label=l["themes"], menu=theme_menu)
+        menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
         SP_GUI.attributes("-topmost", True)
 
@@ -449,21 +448,21 @@ def SP(run_in_recovery, current_disc_r, current_theme):
             GUI.attributes("-topmost", new_state)
 
         def update_topmost_label(menubar, GUI):
-            status = l["on2"] if higher.get() else l["off2"]
+            status = l("on2") if higher.get() else l("off2")
             #Индекс command в menubar
-            menubar.entryconfig(2, label=f"{l["topmost"]}: {status}")
+            menubar.entryconfig(2, label=f"{l("topmost")}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(SP_GUI))
+        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(SP_GUI))
         update_topmost_label(menubar, SP_GUI)
 
-        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
+        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
 
         SP_GUI.config(menu=menubar)
 
         SP_GUI.mainloop()
     except Exception as e:
-        logger.exception(l["sp_critical_error"], e)
+        logger.exception(l("sp_critical_error"), e)
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

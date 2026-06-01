@@ -29,12 +29,11 @@ from FE import FE
 from GFA import GFA
 from config import *
 from RS import random_string
-from languages import localizations
+from languages import l
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path
 
 #global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.7.8 Beta"
-l = localizations[current_localization]
+autorun_master_version = "3.7.9 Beta"
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -47,8 +46,8 @@ class TaskSchedulerManager:
         except Exception as e:
             self.scheduler = None
             self.root_folder = None
-            logger.exception(f"ARM - {l["scheduler_error"]}", e)
-            messagebox.showerror(random_string(), f"{l["scheduler_error"]}.\n{e}")
+            logger.exception(f"ARM - {l("scheduler_error")}", e)
+            messagebox.showerror(random_string(), f"{l("scheduler_error")}.\n{e}")
 
     #Вспомогательная функция для получения каталога задач
     def get_folder(self, task_path):
@@ -110,7 +109,7 @@ class TaskSchedulerManager:
             )
             return True
         except Exception as e:
-            logger.exception(f"ARM - {l["edit_task_error"]} {task_path_full}", e)
+            logger.exception(f"ARM - {l("edit_task_error")} {task_path_full}", e)
             return False
 
     #Удаляет задачу через COM
@@ -124,7 +123,7 @@ class TaskSchedulerManager:
             folder.DeleteTask(task_name, 0)
             return True
         except Exception as e:
-            logger.exception(f"ARM - {l["delete_task_error"]} {task_path_full}", e)
+            logger.exception(f"ARM - {l("delete_task_error")} {task_path_full}", e)
             return False
 
 
@@ -152,7 +151,7 @@ def ARM(run_in_recovery, current_theme):
         "tree": None,
         "tabs": {},
         "vsb": None,
-        "current_tab": l["custom"],
+        "current_tab": l("custom"),
         "treeview_data": [],
         "focus_after_update": None
     }
@@ -161,7 +160,7 @@ def ARM(run_in_recovery, current_theme):
     if run_in_recovery:
         current_disc, found_disc = get_current_disc(run_in_recovery)
         if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
-            user_name = simpledialog.askstring(title=random_string(), prompt=f"{l["user_not_found"]} {default_user_name}\n{l["enter_user_name"]}: ")
+            user_name = simpledialog.askstring(title=random_string(), prompt=f"{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}: ")
         else:
             user_name = default_user_name
         #Путь к каталогу автозагрузки оффлайн-системы
@@ -178,13 +177,13 @@ def ARM(run_in_recovery, current_theme):
     ARM_CORE_GLOBALS = {
         "user_startup_path": user_startup,
         "REG_KEYS": {
-            l["custom"]: None, #Для файлов
-            l["registry"]: [
+            l("custom"): None, #Для файлов
+            l("registry"): [
                 (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", "Run"),
                 (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\RunOnce", "RunOnce"),
                 (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run", "Run")
             ],
-            l["system"]: [
+            l("system"): [
                 (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Shell"),
                 (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Userinit"),
                 (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Taskman"),
@@ -227,19 +226,19 @@ def ARM(run_in_recovery, current_theme):
         #Форматируем Unix-таймштамп в читаемую строку
         def format_time(timestamp):
             if timestamp == 0:
-                return l["error"]
+                return l("error")
             return datetime.fromtimestamp(timestamp).strftime("%d-%m-%Y %H:%M:%S")
 
 
 
         #В зависимости от вкладки и типа элемента возвращает имя файла или путь
         def get_filename_from_item(item_data, current_tab):
-            if current_tab == l["custom"]:
-                return item_data.get(f"{l["name"]} {l["file2"]}", "")
-            elif current_tab in [l["registry"], l["system"], "AppInit_DLLs", "CmdLine"]:
-                return item_data.get(f"{l["name"]} {l["parameter"]}", "")
-            elif current_tab == l["scheduler"]:
-                return item_data.get(l["path"], "")
+            if current_tab == l("custom"):
+                return item_data.get(f"{l("name")} {l("file2")}", "")
+            elif current_tab in [l("registry"), l("system"), "AppInit_DLLs", "CmdLine"]:
+                return item_data.get(f"{l("name")} {l("parameter")}", "")
+            elif current_tab == l("scheduler"):
+                return item_data.get(l("path"), "")
             else:
                 return ""
 
@@ -255,25 +254,25 @@ def ARM(run_in_recovery, current_theme):
                         try:
                             stats = item.stat()
                             ARM_data.append({
-                                f"{l["name"]} {l["file2"]}": item.name,
-                                f"{l["date"]} {l["creation"]}": format_time(stats.st_ctime),
-                                l["danger"]: "50%",
-                                f"{l["date"]} {l["changes"]}": format_time(stats.st_mtime),
-                                f"{l["date"]} {l["discoveries"]}": format_time(stats.st_atime),
-                                f"{l["path"]} {l["parameter"]}": str(item)
+                                f"{l("name")} {l("file2")}": item.name,
+                                f"{l("date")} {l("creation")}": format_time(stats.st_ctime),
+                                l("danger"): "50%",
+                                f"{l("date")} {l("changes")}": format_time(stats.st_mtime),
+                                f"{l("date")} {l("discoveries")}": format_time(stats.st_atime),
+                                f"{l("path")} {l("parameter")}": str(item)
                             })
                         except Exception as e:
-                            logger.exception(f"ARM - {l["metadata_error"]} {item.name}", e)
+                            logger.exception(f"ARM - {l("metadata_error")} {item.name}", e)
                             ARM_data.append({
-                                f"{l["name"]} {l["file2"]}": item.name,
-                                f"{l["date"]} {l["creation"]}": l["error"],
-                                f"{l["date"]} {l["changes"]}": l["error"],
-                                f"{l["date"]} {l["discoveries"]}": l["error"],
-                                f"{l["path"]} {l["parameter"]}": str(item)
+                                f"{l("name")} {l("file2")}": item.name,
+                                f"{l("date")} {l("creation")}": l("error"),
+                                f"{l("date")} {l("changes")}": l("error"),
+                                f"{l("date")} {l("discoveries")}": l("error"),
+                                f"{l("path")} {l("parameter")}": str(item)
                             })
             except Exception as e:
-                logger.exception(f"ARM - {l["startup_error"]}", e)
-                messagebox.showerror(random_string(), f"{l["startup_error"]}:\n{e}")
+                logger.exception(f"ARM - {l("startup_error")}", e)
+                messagebox.showerror(random_string(), f"{l("startup_error")}:\n{e}")
             return ARM_data
 
 
@@ -342,25 +341,25 @@ def ARM(run_in_recovery, current_theme):
                         try:
                             value, reg_type = winreg.QueryValueEx(key, value_name)
                             ARM_data.append({
-                                f"{l["name"]} {l["parameter"]}": value_name,
-                                f"{l["meaning"]} {l["parameter"]}": str(value),
-                                l["danger"]: check_value(value_name, value),
-                                f"{l["type"]} {l["parameter"]}": REG_TYPE_MAP.get(reg_type),
-                                f"{l["path"]} {l["parameter"]}": full_path,
+                                f"{l("name")} {l("parameter")}": value_name,
+                                f"{l("meaning")} {l("parameter")}": str(value),
+                                l("danger"): check_value(value_name, value),
+                                f"{l("type")} {l("parameter")}": REG_TYPE_MAP.get(reg_type),
+                                f"{l("path")} {l("parameter")}": full_path,
                                 "hkey": hkey_const,
                                 "subkey": subkey_path,
                                 "value_type": reg_type
                             })
                         except FileNotFoundError:
-                            logger.warning(f"ARM - {l["key_not_found"]}: {full_path}\\{value_name}")
+                            logger.warning(f"ARM - {l("key_not_found")}: {full_path}\\{value_name}")
                         except Exception as e:
-                            logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
+                            logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}", e)
                             ARM_data.append({
-                                f"{l["name"]} {l["parameter"]}": value_name,
-                                f"{l["meaning"]} {l["parameter"]}": l["error"],
-                                l["danger"]: check_value(value_name, value),
-                                f"{l["type"]} {l["parameter"]}": l["error"],
-                                f"{l["path"]} {l["parameter"]}": full_path,
+                                f"{l("name")} {l("parameter")}": value_name,
+                                f"{l("meaning")} {l("parameter")}": l("error"),
+                                l("danger"): check_value(value_name, value),
+                                f"{l("type")} {l("parameter")}": l("error"),
+                                f"{l("path")} {l("parameter")}": full_path,
                                 "hkey": hkey_const,
                                 "subkey": subkey_path,
                                 "value_type": winreg.REG_NONE
@@ -371,11 +370,11 @@ def ARM(run_in_recovery, current_theme):
                             try:
                                 value_name, value, reg_type = winreg.EnumValue(key, i)
                                 ARM_data.append({
-                                    f"{l["name"]} {l["parameter"]}": value_name,
-                                    f"{l["meaning"]} {l["parameter"]}": str(value),
-                                    l["danger"]: check_value(value_name, value),
-                                    f"{l["type"]} {l["parameter"]}": REG_TYPE_MAP.get(reg_type),
-                                    f"{l["path"]} {l["parameter"]}": full_path,
+                                    f"{l("name")} {l("parameter")}": value_name,
+                                    f"{l("meaning")} {l("parameter")}": str(value),
+                                    l("danger"): check_value(value_name, value),
+                                    f"{l("type")} {l("parameter")}": REG_TYPE_MAP.get(reg_type),
+                                    f"{l("path")} {l("parameter")}": full_path,
                                     "hkey": hkey_const,
                                     "subkey": subkey_path,
                                     "value_type": reg_type
@@ -386,22 +385,22 @@ def ARM(run_in_recovery, current_theme):
                             except FileNotFoundError:
                                 pass
                             except Exception as e:
-                                logger.exception(f"ARM - {l["read_key_error"]} {full_path}\\{value_name}", e)
+                                logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}", e)
                                 ARM_data.append({
-                                    f"{l["name"]} {l["parameter"]}": value_name,
-                                    f"{l["meaning"]} {l["parameter"]}": l["error"],
-                                    l["danger"]: "50%",
-                                    f"{l["type"]} {l["parameter"]}": l["error"],
-                                    f"{l["path"]} {l["parameter"]}": full_path,
+                                    f"{l("name")} {l("parameter")}": value_name,
+                                    f"{l("meaning")} {l("parameter")}": l("error"),
+                                    l("danger"): "50%",
+                                    f"{l("type")} {l("parameter")}": l("error"),
+                                    f"{l("path")} {l("parameter")}": full_path,
                                     "hkey": hkey_const,
                                     "subkey": subkey_path,
                                     "value_type": winreg.REG_NONE
                                 })
             except FileNotFoundError:
                 if value_name != "Taskman":
-                    logger.warning(f"ARM - {l["key_not_found"]}: {full_path}")
+                    logger.warning(f"ARM - {l("key_not_found")}: {full_path}")
             except Exception as e:
-                logger.exception(f"ARM - {l["read_key_error"]} {full_path}", e)
+                logger.exception(f"ARM - {l("read_key_error")} {full_path}", e)
             
             return ARM_data
 
@@ -411,7 +410,7 @@ def ARM(run_in_recovery, current_theme):
         def get_registry_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
             ARM_data = []
-            for hkey_const, subkey_path, _ in reg_keys[l["registry"]]:
+            for hkey_const, subkey_path, _ in reg_keys[l("registry")]:
                 ARM_data.extend(read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path))
             return ARM_data
 
@@ -421,7 +420,7 @@ def ARM(run_in_recovery, current_theme):
         def get_system_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
             ARM_data = []
-            for hkey_const, subkey_path, value_name in reg_keys[l["system"]]:
+            for hkey_const, subkey_path, value_name in reg_keys[l("system")]:
                 ARM_data.extend(read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path, value_name))
             return ARM_data
 
@@ -472,15 +471,15 @@ def ARM(run_in_recovery, current_theme):
             try:
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE | winreg.KEY_READ) as key:
                     winreg.SetValueEx(key, name, 0, reg_type, initial_value)
-                    logger.success(f"ARM - {l["create_key"]}: {name} {l["with_type"]} {reg_type_str} {l["in"]} {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\")
+                    logger.success(f"ARM - {l("create_key")}: {name} {l("with_type")} {reg_type_str} {l("in")} {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\")
                     ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "name", "value": name}
                     return True
             except PermissionError:
-                messagebox.showerror(random_string(), l["permission_error"])
+                messagebox.showerror(random_string(), l("permission_error"))
                 return False
             except Exception as e:
-                logger.exception(f"ARM - {l["create_key_error"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
-                messagebox.showerror(random_string(), f'{l["create_key_error"]} "{name}".\n{e}')
+                logger.exception(f"ARM - {l("create_key_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
+                messagebox.showerror(random_string(), f'{l("create_key_error")} "{name}".\n{e}')
                 return False
 
 
@@ -521,18 +520,18 @@ def ARM(run_in_recovery, current_theme):
 
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE) as key:
                     winreg.SetValueEx(key, name, 0, reg_type, value_to_set)
-                    logger.success(f"ARM - {l["update_key"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
+                    logger.success(f"ARM - {l("update_key")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
                     ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                     return True
 
             except PermissionError:
-                messagebox.showerror(random_string(), l["permission_error"])
+                messagebox.showerror(random_string(), l("permission_error"))
                 return False
             except ValueError as e:
                 #logger.error(f"ARM - Ошибка преобразования значения для параметра реестра: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}:\n{e}")
                 return False
             except Exception as e:
-                comment = f"ARM - {l["update_key_error"]}: {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}\\{name}"
+                comment = f"ARM - {l("update_key_error")}: {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}\\{name}"
                 messagebox.showerror(random_string(), f"{comment}\n{e}")
                 logger.exception(comment, e)
                 return False
@@ -551,15 +550,15 @@ def ARM(run_in_recovery, current_theme):
 
                 with winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE) as key:
                     winreg.DeleteValue(key, name)
-                    logger.success(f"ARM - {l["delete_key"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
+                    logger.success(f"ARM - {l("delete_key")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
                     return True
             except PermissionError:
-                logger.error(f"ARM - {l["delete_key_error"]}, {l["permission_error"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
-                messagebox.showerror(random_string(), l["permission_error"])
+                logger.error(f"ARM - {l("delete_key_error")}, {l("permission_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
+                messagebox.showerror(random_string(), l("permission_error"))
                 return False
             except Exception as e:
-                messagebox.showerror(random_string(), f'{l["delete_key_error"]} "{name}".\n{e}')
-                logger.exception(f"ARM - {l["delete_key_error"]}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
+                messagebox.showerror(random_string(), f'{l("delete_key_error")} "{name}".\n{e}')
+                logger.exception(f"ARM - {l("delete_key_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
                 return False
 
 
@@ -572,18 +571,18 @@ def ARM(run_in_recovery, current_theme):
                     os.remove(file)
                     return True
                 else:
-                    messagebox.showinfo(random_string(), l["file_not_found"])
+                    messagebox.showinfo(random_string(), l("file_not_found"))
                     return True
             except PermissionError:
-                logger.error(f"ARM - {l["permission_error"]}: {file_path}")
-                messagebox.showerror(random_string(), l["permission_error"])
+                logger.error(f"ARM - {l("permission_error")}: {file_path}")
+                messagebox.showerror(random_string(), l("permission_error"))
                 return False
             except FileNotFoundError:
-                messagebox.showinfo(random_string(), l["file_not_found"])
+                messagebox.showinfo(random_string(), l("file_not_found"))
                 return True
             except Exception as e:
-                logger.exception(f"ARM - {l["file_delete_error"]}: {file_path}", e)
-                messagebox.showerror(random_string(), f'{l["file_delete_error"]} "{file.name}".\n{e}')
+                logger.exception(f"ARM - {l("file_delete_error")}: {file_path}", e)
+                messagebox.showerror(random_string(), f'{l("file_delete_error")} "{file.name}".\n{e}')
                 return False
 
 
@@ -614,7 +613,7 @@ def ARM(run_in_recovery, current_theme):
                     tree.write(f, encoding="utf-16", xml_declaration=True)
                 return True
             except Exception as e:
-                logger.exception(f"ARM - {l["save_xml_task_error"]} {file_path}", e)
+                logger.exception(f"ARM - {l("save_xml_task_error")} {file_path}", e)
                 return False
 
 
@@ -635,7 +634,7 @@ def ARM(run_in_recovery, current_theme):
                         is_enabled = task.Enabled
 
                         #Попытка получить действие (Command)
-                        action_path = f"{l["no"]} ExecAction"
+                        action_path = f"{l("no")} ExecAction"
                         definition = task.Definition
 
                         for action in definition.Actions:
@@ -655,32 +654,32 @@ def ARM(run_in_recovery, current_theme):
                         except Exception:
                             date_created = "01-01-1970 00:00:00"
 
-                        action_path = l["unknown"]
+                        action_path = l("unknown")
                         if task.Definition.Actions.Count > 0:
                             action = task.Definition.Actions.Item(1)
                             if action.Type == 0:
                                 #Извлекаем путь к исполняемому файлу из свойства Path самого действия
-                                raw_path = getattr(action, "Path", l["unknown"])
-                                if raw_path != l["unknown"]:
+                                raw_path = getattr(action, "Path", l("unknown"))
+                                if raw_path != l("unknown"):
                                     action_path = os.path.abspath(raw_path)
 
                         ARM_data.append({
-                            l["name"]: name,
-                            l["state"]: l["on"] if is_enabled else l["off"],
-                            l["path"]: action_path,
-                            l["author"]: author,
-                            f"{l["date"]} {l["creation"]}": date_created,
+                            l("name"): name,
+                            l("state"): l("on") if is_enabled else l("off"),
+                            l("path"): action_path,
+                            l("author"): author,
+                            f"{l("date")} {l("creation")}": date_created,
                             "TaskPath": full_path,
                             "Enabled_raw": is_enabled
                         })
                     except Exception as e:
-                        logger.exception(f"ARM - {l["task_error"]} {task.Path}", e)
+                        logger.exception(f"ARM - {l("task_error")} {task.Path}", e)
                         ARM_data.append({
-                            l["name"]: task.Path,
-                            l["state"]: l["error"],
-                            l["path"]: "Ошибка чтения",
-                            l["author"]: l["error"],
-                            f"{l["date"]} {l["creation"]}": None,
+                            l("name"): task.Path,
+                            l("state"): l("error"),
+                            l("path"): f"{l("error")} {l("reading_error")}",
+                            l("author"): l("error"),
+                            f"{l("date")} {l("creation")}": None,
                             "TaskPath": task.Path,
                             "Enabled_raw": False
                         })
@@ -690,7 +689,7 @@ def ARM(run_in_recovery, current_theme):
                 tasks_dir = get_tasks_directory()
 
                 if not tasks_dir.exists():
-                    logger.error(f"ARM - {l["task-dir_error"]}: {tasks_dir}")
+                    logger.error(f"ARM - {l("task-dir_error")}: {tasks_dir}")
                     return ARM_data
 
                 for root, _, files in os.walk(tasks_dir):
@@ -705,8 +704,8 @@ def ARM(run_in_recovery, current_theme):
                             #Инициализируем переменные по умолчанию
                             name = file_name
                             is_enabled = True #По умолчанию задачи включены, если тег отсутствует
-                            action_path = f"{l["no"]} ExecAction"
-                            author = f"{l["systems"]}/{l["unknown"]}"
+                            action_path = f"{l("no")} ExecAction"
+                            author = f"{l("systems")}/{l("unknown")}"
 
                             #Проходим по дереву XML
                             #Так как namespace может меняться, ищем локальные имена тегов
@@ -744,10 +743,10 @@ def ARM(run_in_recovery, current_theme):
                                         break #Берем первое действие
 
                             ARM_data.append({
-                                l["name"]: name,
-                                l["state"]: l["on"] if is_enabled else l["off"],
-                                l["path"]: action_path,
-                                l["author"]: author,
+                                l("name"): name,
+                                l("state"): l("on") if is_enabled else l("off"),
+                                l("path"): action_path,
+                                l("author"): author,
                                 "TaskPath": str(file_path), #Полный путь к файлу XML
                                 "Enabled_raw": is_enabled
                             })
@@ -756,12 +755,12 @@ def ARM(run_in_recovery, current_theme):
                             #Это не XML или файл поврежден
                             continue
                         except Exception as e:
-                            logger.exception(f"ARM - {l["xml_task_error"]} {file_name}", e)
+                            logger.exception(f"ARM - {l("xml_task_error")} {file_name}", e)
                             ARM_data.append({
-                                l["name"]: file_name,
-                                l["state"]: l["error"],
-                                l["path"]: l["error"],
-                                l["author"]: l["error"],
+                                l("name"): file_name,
+                                l("state"): l("error"),
+                                l("path"): l("error"),
+                                l("author"): l("error"),
                                 "TaskPath": str(file_path),
                                 "Enabled_raw": False
                             })
@@ -774,15 +773,15 @@ def ARM(run_in_recovery, current_theme):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
                 if manager.set_task_state_com(task_path_str, enable):
-                    state = l["on"] if enable else l["off"]
-                    logger.success(f'ARM - {l["task"]} "{task_path_str}" {l["success"]} {state} {l["from_com"]}.')
+                    state = l("on") if enable else l("off")
+                    logger.success(f'ARM - {l("task")} "{task_path_str}" {l("success")} {state} {l("from_com")}.')
                     ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                     return True
                 return False
             else:
                 task_path = Path(task_path_str)
                 if not task_path.exists():
-                    messagebox.showerror(random_string(), f"{l["file_not_found"]}:\n{task_path}")
+                    messagebox.showerror(random_string(), f"{l("file_not_found")}:\n{task_path}")
                     return False
                 try:
                     #Регистрируем все пространства имен для сохранения префиксов
@@ -805,14 +804,14 @@ def ARM(run_in_recovery, current_theme):
                     enabled_tag.text = "true" if enable else "false"
 
                     if save_xml_task(tree, task_path):
-                        state = l["on"] if enable else l["off"]
-                        logger.success(f'ARM - {l["task"]} "{task_path.name}" {l["success"]} {state} {l["from_xml"]}.')
+                        state = l("on") if enable else l("off")
+                        logger.success(f'ARM - {l("task")} "{task_path.name}" {l("success")} {state} {l("from_xml")}.')
                         ARM_GUI_ELEMENTS["focus_after_update"] = {"type": "iid", "value": item_id}
                         return True
                     return False
                 except Exception as e:
-                    logger.exception(f"ARM - {l["xml_error"]}", e)
-                    messagebox.showerror(random_string(), f"{l["xml_error"]}:\n{e}")
+                    logger.exception(f"ARM - {l("xml_error")}", e)
+                    messagebox.showerror(random_string(), f"{l("xml_error")}:\n{e}")
                     return False
 
 
@@ -822,7 +821,7 @@ def ARM(run_in_recovery, current_theme):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
                 if manager.delete_task_com(task_path_str):
-                    logger.success(f'ARM - {l["task"]} "{task_path_str}" {l["delete_task_com"]}.')
+                    logger.success(f'ARM - {l("task")} "{task_path_str}" {l("delete_task_com")}.')
                     ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                     return True
                 return False
@@ -832,14 +831,14 @@ def ARM(run_in_recovery, current_theme):
                     if task_path.exists():
                         ARM_GUI_ELEMENTS["focus_after_update"] = get_next_item_iid(ARM_GUI_ELEMENTS, item_id)
                         task_path.unlink()
-                        logger.success(f"ARM - {l["xml_task_delete"]}: {task_path}")
+                        logger.success(f"ARM - {l("xml_task_delete")}: {task_path}")
                         return True
                     else:
-                        messagebox.showerror(random_string(), l["file_not_found"])
+                        messagebox.showerror(random_string(), l("file_not_found"))
                         return False
                 except Exception as e:
-                    logger.exception(f"ARM - {l["xml_task_delete_error"]}", e)
-                    messagebox.showerror(random_string(), f"{l["file_delete_error"]}:\n{e}")
+                    logger.exception(f"ARM - {l("xml_task_delete_error")}", e)
+                    messagebox.showerror(random_string(), f"{l("file_delete_error")}:\n{e}")
                     return False
 
 
@@ -960,23 +959,23 @@ def ARM(run_in_recovery, current_theme):
             columns = []
             headings = {}
 
-            if ARM_GUI_ELEMENTS["current_tab"] == l["custom"]:
-                columns = (f"{l["name"]} {l["file2"]}", f"{l["date"]} {l["creation"]}", l["danger"], f"{l["date"]} {l["changes"]}", f"{l["date"]} {l["discoveries"]}")
+            if ARM_GUI_ELEMENTS["current_tab"] == l("custom"):
+                columns = (f"{l("name")} {l("file2")}", f"{l("date")} {l("creation")}", l("danger"), f"{l("date")} {l("changes")}", f"{l("date")} {l("discoveries")}")
                 headings = dict(zip(columns, columns))
-            elif ARM_GUI_ELEMENTS["current_tab"] == l["registry"]:
-                columns = (f"{l["name"]} {l["parameter"]}", f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["type"]} {l["parameter"]}", f"{l["path"]} {l["parameter"]}")
+            elif ARM_GUI_ELEMENTS["current_tab"] == l("registry"):
+                columns = (f"{l("name")} {l("parameter")}", f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("type")} {l("parameter")}", f"{l("path")} {l("parameter")}")
                 headings = dict(zip(columns, columns))
-            elif ARM_GUI_ELEMENTS["current_tab"] == l["system"]:
-                columns = (f"{l["name"]} {l["parameter"]}", f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["type"]} {l["parameter"]}", f"{l["path"]} {l["parameter"]}")
+            elif ARM_GUI_ELEMENTS["current_tab"] == l("system"):
+                columns = (f"{l("name")} {l("parameter")}", f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("type")} {l("parameter")}", f"{l("path")} {l("parameter")}")
                 headings = dict(zip(columns, columns))
             elif ARM_GUI_ELEMENTS["current_tab"] == "AppInit_DLLs":
-                columns = [f"{l["name"]} {l["parameter"]}", l["bit"], f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["path"]} {l["parameter"]}"]
+                columns = [f"{l("name")} {l("parameter")}", l("bit"), f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("path")} {l("parameter")}"]
                 headings = dict(zip(columns, columns))
             elif ARM_GUI_ELEMENTS["current_tab"] == "CmdLine":
-                columns = (f"{l["name"]} {l["parameter"]}", f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["type"]} {l["parameter"]}", f"{l["path"]} {l["parameter"]}")
+                columns = (f"{l("name")} {l("parameter")}", f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("type")} {l("parameter")}", f"{l("path")} {l("parameter")}")
                 headings = dict(zip(columns, columns))
-            elif ARM_GUI_ELEMENTS["current_tab"] == l["scheduler"]:
-                columns = (l["name"], l["state"], l["path"], l["author"])
+            elif ARM_GUI_ELEMENTS["current_tab"] == l("scheduler"):
+                columns = (l("name"), l("state"), l("path"), l("author"))
                 headings = dict(zip(columns, columns))
 
             ARM_GUI_ELEMENTS["tree"]["columns"] = columns
@@ -998,13 +997,13 @@ def ARM(run_in_recovery, current_theme):
                         ARM_GUI_ELEMENTS["tree"].column(columns[2], width=15, anchor=tk.W)
                         ARM_GUI_ELEMENTS["tree"].column(columns[3], width=150, anchor=tk.W)
                         ARM_GUI_ELEMENTS["tree"].column(columns[4], width=75, anchor=tk.W)
-                if ARM_GUI_ELEMENTS["current_tab"] in [l["registry"], l["system"], "CmdLine"]:
+                if ARM_GUI_ELEMENTS["current_tab"] in [l("registry"), l("system"), "CmdLine"]:
                         ARM_GUI_ELEMENTS["tree"].column(columns[0], width=100, anchor=tk.W)
                         ARM_GUI_ELEMENTS["tree"].column(columns[1], width=250, anchor=tk.W)
                         ARM_GUI_ELEMENTS["tree"].column(columns[2], width=15, anchor=tk.W)
                         ARM_GUI_ELEMENTS["tree"].column(columns[3], width=50, anchor=tk.W)
                         ARM_GUI_ELEMENTS["tree"].column(columns[4], width=75, anchor=tk.W)
-                if ARM_GUI_ELEMENTS["current_tab"] == l["scheduler"]:
+                if ARM_GUI_ELEMENTS["current_tab"] == l("scheduler"):
                     ARM_GUI_ELEMENTS["tree"].column(columns[0], width=175, anchor=tk.W)
                     ARM_GUI_ELEMENTS["tree"].column(columns[1], width=65, anchor=tk.W)
                     ARM_GUI_ELEMENTS["tree"].column(columns[2], width=300, anchor=tk.W)
@@ -1028,7 +1027,7 @@ def ARM(run_in_recovery, current_theme):
                 elif focus_info["type"] == "name":
                     name_to_find = focus_info["value"]
                     current_cols = tree["columns"]
-                    name_col_index = current_cols.index(f"{l["name"]} {l["parameter"]}") if f"{l["name"]} {l["parameter"]}" in current_cols else -1
+                    name_col_index = current_cols.index(f"{l("name")} {l("parameter")}") if f"{l("name")} {l("parameter")}" in current_cols else -1
 
                     if name_col_index != -1:
                         for item_id in tree.get_children(""):
@@ -1060,33 +1059,33 @@ def ARM(run_in_recovery, current_theme):
             for item in tree.get_children():
                 tree.delete(item)
 
-            if current_tab == l["custom"]:
+            if current_tab == l("custom"):
                 ARM_GUI_ELEMENTS["treeview_data"] = get_user_startup(ARM_CORE_GLOBALS)
-                columns = [f"{l["name"]} {l["file2"]}", f"{l["date"]} {l["creation"]}", l["danger"], f"{l["date"]} {l["changes"]}", f"{l["date"]} {l["discoveries"]}"]
-            elif current_tab == l["registry"]:
+                columns = [f"{l("name")} {l("file2")}", f"{l("date")} {l("creation")}", l("danger"), f"{l("date")} {l("changes")}", f"{l("date")} {l("discoveries")}"]
+            elif current_tab == l("registry"):
                 ARM_GUI_ELEMENTS["treeview_data"] = get_registry_startup(ARM_CORE_GLOBALS)
-                columns = [f"{l["name"]} {l["parameter"]}", f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["type"]} {l["parameter"]}", f"{l["path"]} {l["parameter"]}"]
-            elif current_tab == l["system"]:
+                columns = [f"{l("name")} {l("parameter")}", f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("type")} {l("parameter")}", f"{l("path")} {l("parameter")}"]
+            elif current_tab == l("system"):
                 ARM_GUI_ELEMENTS["treeview_data"] = get_system_startup(ARM_CORE_GLOBALS)
-                columns = [f"{l["name"]} {l["parameter"]}", f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["type"]} {l["parameter"]}", f"{l["path"]} {l["parameter"]}"]
+                columns = [f"{l("name")} {l("parameter")}", f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("type")} {l("parameter")}", f"{l("path")} {l("parameter")}"]
             elif current_tab == "AppInit_DLLs":
                 ARM_GUI_ELEMENTS["treeview_data"] = get_dll_startup(ARM_CORE_GLOBALS)
-                columns = [f"{l["name"]} {l["parameter"]}", l["bit"], f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["path"]} {l["parameter"]}"]
+                columns = [f"{l("name")} {l("parameter")}", l("bit"), f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("path")} {l("parameter")}"]
             elif current_tab == "CmdLine":
                 ARM_GUI_ELEMENTS["treeview_data"] = get_cmdline_startup(ARM_CORE_GLOBALS)
-                columns = [f"{l["name"]} {l["parameter"]}", f"{l["meaning"]} {l["parameter"]}", l["danger"], f"{l["type"]} {l["parameter"]}", f"{l["path"]} {l["parameter"]}"]
-            elif current_tab == l["scheduler"]:
+                columns = [f"{l("name")} {l("parameter")}", f"{l("meaning")} {l("parameter")}", l("danger"), f"{l("type")} {l("parameter")}", f"{l("path")} {l("parameter")}"]
+            elif current_tab == l("scheduler"):
                 raw_tasks = get_task_scheduler_startup()
 
                 if show_only_with_date.get():
                     ARM_GUI_ELEMENTS["treeview_data"] = [
                         t for t in raw_tasks
-                        if t.get(f"{l["date"]} {l["creation"]}") and t.get(f"{l["date"]} {l["creation"]}") not in ["", l["error"], "01-01-1970 00:00:00"]
+                        if t.get(f"{l("date")} {l("creation")}") and t.get(f"{l("date")} {l("creation")}") not in ["", l("error"), "01-01-1970 00:00:00"]
                     ]
                 else:
                     ARM_GUI_ELEMENTS["treeview_data"] = raw_tasks
 
-                columns = [l["name"], l["state"], l["path"], l["author"]]
+                columns = [l("name"), l("state"), l("path"), l("author")]
             else:
                 ARM_GUI_ELEMENTS["treeview_data"] = []
                 columns = []
@@ -1125,83 +1124,83 @@ def ARM(run_in_recovery, current_theme):
 
             menu = tk.Menu(master, tearoff=0)
 
-            if current_tab != l["system"] and current_tab != l["custom"] and current_tab != l["scheduler"] and current_tab != "CmdLine":
+            if current_tab != l("system") and current_tab != l("custom") and current_tab != l("scheduler") and current_tab != "CmdLine":
                 create_menu = tk.Menu(menu, tearoff=0)
 
-                if current_tab in [l["registry"], "AppInit_DLLs"]:
-                    if current_tab == l["registry"]:
-                        hkey_const, subkey_path, _ = reg_keys[l["registry"]][0]
+                if current_tab in [l("registry"), "AppInit_DLLs"]:
+                    if current_tab == l("registry"):
+                        hkey_const, subkey_path, _ = reg_keys[l("registry")][0]
                     elif current_tab == "AppInit_DLLs":
                         hkey_const, subkey_path, _, _ = reg_keys["AppInit_DLLs"][0]
 
                     for reg_type_str in CREATABLE_REG_TYPES:
                         create_menu.add_command(
-                            label=f"{l["parameter"]} {reg_type_str}",
+                            label=f"{l("parameter")} {reg_type_str}",
                             command=lambda type=reg_type_str: prompt_for_new_reg_value(ARM_GUI_ELEMENTS, hkey_const, subkey_path, type)
                         )
-                    menu.add_cascade(label=l["create"], menu=create_menu)
+                    menu.add_cascade(label=l("create"), menu=create_menu)
                     menu.add_separator()
 
             if item_data:
-                if current_tab == l["custom"]:
-                    file_path = item_data[f"{l["path"]} {l["parameter"]}"]
-                    file_name = item_data[f"{l["name"]} {l["file2"]}"]
+                if current_tab == l("custom"):
+                    file_path = item_data[f"{l("path")} {l("parameter")}"]
+                    file_name = item_data[f"{l("name")} {l("file2")}"]
 
-                    menu.add_command(label=l["edit_file"], command=lambda: FE(file_path))
-                    menu.add_command(label=f"{l["copy_path"]} (Ctrl+C)", command=lambda: copy_to_clipboard(master, file_path))
-                    menu.add_command(label=f"{l["copy"]} {l["name"]} (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, file_name))
+                    menu.add_command(label=l("edit_file"), command=lambda: FE(file_path))
+                    menu.add_command(label=f"{l("copy_path")} (Ctrl+C)", command=lambda: copy_to_clipboard(master, file_path))
+                    menu.add_command(label=f"{l("copy")} {l("name")} (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, file_name))
                     menu.add_separator()
-                    menu.add_command(label=f"{l["suspend_process_for_name"]} {file_name}", command=lambda:action_process_by_name(file_name, "suspend"))
-                    menu.add_command(label=f"{l["kill_process_for_name"]} {file_name}", command=lambda:action_process_by_name(file_name, "kill"))
+                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend"))
+                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill"))
                     menu.add_separator()
-                    menu.add_command(label=f"{l["delete"]} {l["file"]} (Delete)", command=lambda: confirm_and_delete_file(ARM_GUI_ELEMENTS, file_path, file_name, item_id))
+                    menu.add_command(label=f"{l("delete")} {l("file")} (Delete)", command=lambda: confirm_and_delete_file(ARM_GUI_ELEMENTS, file_path, file_name, item_id))
 
-                elif current_tab in [l["registry"], l["system"], "AppInit_DLLs", "CmdLine"]:
-                    reg_name = item_data[f"{l["name"]} {l["parameter"]}"]
-                    reg_path = item_data[f"{l["path"]} {l["parameter"]}"]
-                    reg_value = item_data[f"{l["meaning"]} {l["parameter"]}"]
+                elif current_tab in [l("registry"), l("system"), "AppInit_DLLs", "CmdLine"]:
+                    reg_name = item_data[f"{l("name")} {l("parameter")}"]
+                    reg_path = item_data[f"{l("path")} {l("parameter")}"]
+                    reg_value = item_data[f"{l("meaning")} {l("parameter")}"]
 
                     file_name = extract_filename_from_path(reg_value)
                     file_path_without_args = extract_filename_from_path(reg_value, True)
 
-                    menu.add_command(label=l["get_full_access"], command=lambda:GFA(reg_path, run_in_recovery))
-                    menu.add_command(label=f"{l["copy_path"]} (Ctrl+C)", command=lambda: copy_to_clipboard(master, reg_path))
-                    menu.add_command(label=f"{l["copy"]} {l["name"]} {l["parameter"]} (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, reg_name))
+                    menu.add_command(label=l("get_full_access"), command=lambda:GFA(reg_path, run_in_recovery))
+                    menu.add_command(label=f"{l("copy_path")} (Ctrl+C)", command=lambda: copy_to_clipboard(master, reg_path))
+                    menu.add_command(label=f"{l("copy")} {l("name")} {l("parameter")} (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, reg_name))
                     menu.add_separator()
-                    menu.add_command(label=f"{l["suspend_process_for_name"]} {file_name}", command=lambda:action_process_by_name(file_name, "suspend"))
-                    menu.add_command(label=f"{l["kill_process_for_name"]} {file_name}", command=lambda:action_process_by_name(file_name, "kill"))
+                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend"))
+                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill"))
                     menu.add_separator()
-                    menu.add_command(label=f"{l["delete"]} {l["file"]} {file_name}", command=lambda:confirm_and_delete_file(ARM_GUI_ELEMENTS, file_patg_without_args, file_name, item_id))
+                    menu.add_command(label=f"{l("delete")} {l("file")} {file_name}", command=lambda:confirm_and_delete_file(ARM_GUI_ELEMENTS, file_patg_without_args, file_name, item_id))
                     menu.add_separator()
                     if item_data.get("value_type") not in [winreg.REG_NONE, None]:
-                        menu.add_command(label=f"{l["change"]} (E)", command=lambda: open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id))
+                        menu.add_command(label=f"{l("change")} (E)", command=lambda: open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id))
                     else:
-                         menu.add_command(label=f"{l["change"]} (E)", state=tk.DISABLED)
+                         menu.add_command(label=f"{l("change")} (E)", state=tk.DISABLED)
 
-                elif current_tab == l["scheduler"]:
-                    task_name = item_data[l["name"]]
+                elif current_tab == l("scheduler"):
+                    task_name = item_data[l("name")]
                     task_path_full = item_data["TaskPath"]
-                    task_action_path = item_data[l["path"]]
+                    task_action_path = item_data[l("path")]
                     is_enabled = item_data["Enabled_raw"]
 
                     file_name = extract_filename_from_path(task_action_path)
 
-                    menu.add_command(label=f"{l["copy_path"]} (Ctrl+C)", command=lambda: copy_to_clipboard(master, task_action_path))
+                    menu.add_command(label=f"{l("copy_path")} (Ctrl+C)", command=lambda: copy_to_clipboard(master, task_action_path))
                     menu.add_separator()
 
                     if is_enabled:
-                        menu.add_command(label=f"{l["turn_off"]} (O)", command=lambda: confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, False, item_id))
-                        menu.add_command(label=f"{l["turn_on"]} (O)", state=tk.DISABLED)
+                        menu.add_command(label=f"{l("turn_off")} (O)", command=lambda: confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, False, item_id))
+                        menu.add_command(label=f"{l("turn_on")} (O)", state=tk.DISABLED)
                     else:
-                        menu.add_command(label=f"{l["turn_off"]} (O)", state=tk.DISABLED)
-                        menu.add_command(label=f"{l["turn_on"]} (O)", command=lambda: confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, True, item_id))
+                        menu.add_command(label=f"{l("turn_off")} (O)", state=tk.DISABLED)
+                        menu.add_command(label=f"{l("turn_on")} (O)", command=lambda: confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, True, item_id))
                     menu.add_separator()
-                    menu.add_command(label=f"{l["suspend_process_for_name"]} {file_name}", command=lambda:action_process_by_name(file_name, "suspend"))
-                    menu.add_command(label=f"{l["kill_process_for_name"]} {file_name}", command=lambda:action_process_by_name(file_name, "kill"))
+                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend"))
+                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill"))
                     menu.add_separator()
-                    menu.add_command(label=f"{l["delete"]} {l["file"]} {file_name}", command=lambda: confirm_and_delete_file(ARM_GUI_ELEMENTS, task_action_path, file_name, item_id))
+                    menu.add_command(label=f"{l("delete")} {l("file")} {file_name}", command=lambda: confirm_and_delete_file(ARM_GUI_ELEMENTS, task_action_path, file_name, item_id))
                     menu.add_separator()
-                    menu.add_command(label=f"{l["delete"]} (Delete)", command=lambda: confirm_and_delete_task(ARM_GUI_ELEMENTS, task_path_full, task_name, item_id))
+                    menu.add_command(label=f"{l("delete")} (Delete)", command=lambda: confirm_and_delete_task(ARM_GUI_ELEMENTS, task_path_full, task_name, item_id))
 
             try:
                 menu.tk_popup(event.x_root, event.y_root)
@@ -1224,7 +1223,7 @@ def ARM(run_in_recovery, current_theme):
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
                 except Exception as e:
-                    logger.exception(f"ARM/PM - {l["action_error"]} {action}", e)
+                    logger.exception(f"ARM/PM - {l("action_error")} {action}", e)
 
 
 
@@ -1238,18 +1237,18 @@ def ARM(run_in_recovery, current_theme):
         #Диалог редактирования
         def open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id):
             master = ARM_GUI_ELEMENTS["master"]
-            name = item_data[f"{l["name"]} {l["parameter"]}"]
-            current_value = str(item_data.get(f"{l["meaning"]} {l["parameter"]}", ""))
+            name = item_data[f"{l("name")} {l("parameter")}"]
+            current_value = str(item_data.get(f"{l("meaning")} {l("parameter")}", ""))
             reg_type = item_data["value_type"]
             hkey_const = item_data["hkey"]
             subkey_path = item_data["subkey"]
 
             if reg_type == winreg.REG_MULTI_SZ:
-                current_value = "\n".join(item_data.get(f"{l["meaning"]} {l["parameter"]}", []))
+                current_value = "\n".join(item_data.get(f"{l("meaning")} {l("parameter")}", []))
 
             new_value = simpledialog.askstring(
                 random_string(),
-                f'{l["editing"]} {l["parameter"]}:\n{name} ({REG_TYPE_MAP.get(reg_type, l["unknown"])})',
+                f'{l("editing")} {l("parameter")}:\n{name} ({REG_TYPE_MAP.get(reg_type, l("unknown"))})',
                 initialvalue=current_value,
                 parent=master
             )
@@ -1269,12 +1268,12 @@ def ARM(run_in_recovery, current_theme):
 
         #Подтверждение и удаление параметра реестра
         def confirm_and_delete_reg_value(ARM_GUI_ELEMENTS, item_data, item_id):
-            name = item_data[f"{l["name"]} {l["parameter"]}"]
-            path = item_data[f"{l["path"]} {l["parameter"]}"]
+            name = item_data[f"{l("name")} {l("parameter")}"]
+            path = item_data[f"{l("path")} {l("parameter")}"]
             hkey_const = item_data["hkey"]
             subkey_path = item_data["subkey"]
 
-            if messagebox.askyesno(random_string(), f"{l["delete_file?"]}:\n{path}\\{name}?"):
+            if messagebox.askyesno(random_string(), f"{l("delete_file?")}:\n{path}\\{name}?"):
                 if delete_reg_value(hkey_const, subkey_path, name, item_id, ARM_GUI_ELEMENTS):
                     load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
@@ -1285,7 +1284,7 @@ def ARM(run_in_recovery, current_theme):
             master = ARM_GUI_ELEMENTS["master"]
             name = simpledialog.askstring(
                 random_string(),
-                f"{l["enter_new_name_key"]} ({reg_type_str}) {l["for"]}\n{ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:",
+                f"{l("enter_new_name_key")} ({reg_type_str}) {l("for")}\n{ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}:",
                 parent=master
             )
             if name:
@@ -1354,34 +1353,34 @@ def ARM(run_in_recovery, current_theme):
 
             if not item_data: return
 
-            if keysym == "e" and not is_ctrl and current_tab not in [l["custom"], l["scheduler"]]:
+            if keysym == "e" and not is_ctrl and current_tab not in [l("custom"), l("scheduler")]:
                 if item_data.get("value_type") not in [winreg.REG_NONE, None]:
                     open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id)
                 return "break"
 
-            elif keysym == "o" and not is_ctrl and current_tab == l["scheduler"]:
-                task_name = item_data[l["name"]]
+            elif keysym == "o" and not is_ctrl and current_tab == l("scheduler"):
+                task_name = item_data[l("name")]
                 task_path_full = item_data["TaskPath"]
                 is_enabled = item_data["Enabled_raw"]
                 confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, not is_enabled, item_id)
                 return "break"
 
-            elif keysym == "Delete" and current_tab not in [l["system"], "AppInit_DLLs", "CmdLine"]:
-                if current_tab == l["custom"]:
-                    confirm_and_delete_file(ARM_GUI_ELEMENTS, item_data[f"{l["path"]} {l["parameter"]}"], item_data[f"{l["name"]} {l["file2"]}"], item_id)
-                elif current_tab == l["registry"]:
+            elif keysym == "Delete" and current_tab not in [l("system"), "AppInit_DLLs", "CmdLine"]:
+                if current_tab == l("custom"):
+                    confirm_and_delete_file(ARM_GUI_ELEMENTS, item_data[f"{l("path")} {l("parameter")}"], item_data[f"{l("name")} {l("file2")}"], item_id)
+                elif current_tab == l("registry"):
                     confirm_and_delete_reg_value(ARM_GUI_ELEMENTS, item_data, item_id)
-                elif current_tab == l["scheduler"]:
-                    confirm_and_delete_task(ARM_GUI_ELEMENTS, item_data["TaskPath"], item_data[l["name"]], item_id)
+                elif current_tab == l("scheduler"):
+                    confirm_and_delete_task(ARM_GUI_ELEMENTS, item_data["TaskPath"], item_data[l("name")], item_id)
                 return "break"
 
             elif keysym == "c" and is_ctrl:
                 if is_shift:
-                    if current_tab != l["scheduler"]:
-                        name_key = f"{l["name"]} {l["file2"]}" if current_tab == l["custom"] else f"{l["name"]} {l["parameter"]}"
+                    if current_tab != l("scheduler"):
+                        name_key = f"{l("name")} {l("file2")}" if current_tab == l("custom") else f"{l("name")} {l("parameter")}"
                         copy_to_clipboard(ARM_GUI_ELEMENTS["master"], item_data.get(name_key, ""))
                 else:
-                    path_key = l["path"] if current_tab == l["scheduler"] else f"{l["path"]} {l["parameter"]}"
+                    path_key = l("path") if current_tab == l("scheduler") else f"{l("path")} {l("parameter")}"
                     copy_to_clipboard(ARM_GUI_ELEMENTS["master"], item_data.get(path_key, ""))
                 return "break"
 
@@ -1424,7 +1423,7 @@ def ARM(run_in_recovery, current_theme):
 
 
         def help_arm():
-            messagebox.showinfo(random_string(), l["arm_help_text"])
+            messagebox.showinfo(random_string(), l("arm_help_text"))
 
 
 
@@ -1439,14 +1438,14 @@ def ARM(run_in_recovery, current_theme):
 
         ARM_GUI.protocol("WM_DELETE_WINDOW", on_closing)
 
-        ARM_GUI_ELEMENTS["current_tab"] = l["custom"]
+        ARM_GUI_ELEMENTS["current_tab"] = l("custom")
         ARM_GUI_ELEMENTS["treeview_data"] = []
         ARM_GUI_ELEMENTS["focus_after_update"] = None
 
         menubar = tk.Menu(ARM_GUI)
         view_menu = tk.Menu(menubar, tearoff=0)
         view_menu.add_checkbutton(
-            label=l["show_date"],
+            label=l("show_date"),
             variable=show_only_with_date,
             command=lambda: load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
         )
@@ -1459,22 +1458,22 @@ def ARM(run_in_recovery, current_theme):
             apply_global_theme(ARM_GUI, current_theme)
 
         #Пункт "Вид"
-        menubar.add_cascade(label=l["view"], menu=view_menu)
+        menubar.add_cascade(label=l("view"), menu=view_menu)
 
         #Пункт "Помощь"
-        menubar.add_cascade(label=l["help"], command=help_arm)
+        menubar.add_cascade(label=l("help"), command=help_arm)
 
         theme_menu = Menu(menubar, tearoff=0)
-        theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_arm("dark"))
-        theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_arm("white"))
-        theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_arm("red"))
-        theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_arm("lime"))
-        theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_arm("black"))
-        theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_arm("gray"))
-        theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_arm("orange"))
+        theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_arm("dark"))
+        theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_arm("white"))
+        theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_arm("red"))
+        theme_menu.add_checkbutton(label=l("green"), command=lambda: restart_arm("lime"))
+        theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_arm("black"))
+        theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_arm("gray"))
+        theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_arm("orange"))
 
         #Пункт "Темы"
-        menubar.add_cascade(label=l["themes"], menu=theme_menu)
+        menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
         ARM_GUI.attributes("-topmost", True)
 
@@ -1489,27 +1488,27 @@ def ARM(run_in_recovery, current_theme):
             GUI.attributes("-topmost", new_state)
 
         def update_topmost_label(menubar, GUI):
-            status = l["on2"] if higher.get() else l["off2"]
+            status = l("on2") if higher.get() else l("off2")
             #Индекс command в menubar
-            menubar.entryconfig(4, label=f"{l["topmost"]}: {status}")
+            menubar.entryconfig(4, label=f"{l("topmost")}: {status}")
             GUI.after(200, lambda: update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda: toggle_topmost(ARM_GUI))
+        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(ARM_GUI))
         update_topmost_label(menubar, ARM_GUI)
 
-        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
+        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
 
         ARM_GUI_ELEMENTS["notebook"] = ttk.Notebook(ARM_GUI)
         ARM_GUI_ELEMENTS["notebook"].pack(pady=10, padx=10, fill="both", expand=True)
         ARM_GUI_ELEMENTS["notebook"].bind("<<NotebookTabChanged>>", lambda e: on_tab_change(e, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS))
 
-        tab_names = [l["custom"], l["registry"], l["system"], "AppInit_DLLs", "CmdLine", l["scheduler"]]
+        tab_names = [l("custom"), l("registry"), l("system"), "AppInit_DLLs", "CmdLine", l("scheduler")]
         for tab_name in tab_names:
             frame = ttk.Frame(ARM_GUI_ELEMENTS["notebook"], padding="5 5 5 5")
             ARM_GUI_ELEMENTS["notebook"].add(frame, text=tab_name)
             ARM_GUI_ELEMENTS["tabs"][tab_name] = frame
 
-        initial_frame = ARM_GUI_ELEMENTS["tabs"][l["custom"]]
+        initial_frame = ARM_GUI_ELEMENTS["tabs"][l("custom")]
         ARM_GUI_ELEMENTS["tree"] = ttk.Treeview(initial_frame, selectmode="browse")
         ARM_GUI_ELEMENTS["vsb"] = ttk.Scrollbar(initial_frame, orient="vertical", command=ARM_GUI_ELEMENTS["tree"].yview)
         ARM_GUI_ELEMENTS["tree"].configure(yscrollcommand=ARM_GUI_ELEMENTS["vsb"].set)
@@ -1524,8 +1523,8 @@ def ARM(run_in_recovery, current_theme):
         ARM_GUI.config(menu=menubar)
         ARM_GUI.mainloop()
     except Exception as e:
-        logger.exception(l["arm_critical_error"], e)
-        messagebox.showerror(random_string(), f"{l["arm_critical_error"]}\n{e}")
+        logger.exception(l("arm_critical_error"), e)
+        messagebox.showerror(random_string(), f"{l("arm_critical_error")}\n{e}")
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

@@ -18,19 +18,18 @@ import getpass
 import shutil
 import os
 
-from languages import localizations
+from languages import l
 from OF import get_user_name, get_current_disc
 from RS import random_string
 from config import *
 
 global log_path, clear_temp_log
-clear_cache_version = "0.7.0 Beta"
-l = localizations[current_localization]
+clear_cache_version = "0.7.1 Beta"
 
 @logger.catch
 def CC(run_in_recovery):
     try:
-        logger.info(f"CC - {l["start_clean"]}...")
+        logger.info(f"CC - {l("start_clean")}...")
         #Получаем имя пользователя
         username = get_user_name()
         if run_in_recovery:
@@ -55,7 +54,7 @@ def CC(run_in_recovery):
                     files_deleted.append(item)
             except Exception as e:
                 files_not_deleted.append(item)
-                logger.exception(f"CC - {l["file_delete_error"]} {l["from"]} %Temp% - {item}", e)
+                logger.exception(f"CC - {l("file_delete_error")} {l("from")} %Temp% - {item}", e)
 
         #Получаем текущее время и дату для имени лог-файла
         current_time = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
@@ -63,16 +62,16 @@ def CC(run_in_recovery):
         if not os.path.exists(log_path):
             os.makedirs(log_path)
         with open(log_filename, "w") as log_file:
-            log_file.write(f"{l["delete_files_error"]}:\n")
+            log_file.write(f"{l("delete_files_error")}:\n")
             for file in files_not_deleted:
                 log_file.write(f"{file}\n")
-            log_file.write(f"\n{l["delete_files_success"]}:\n")
+            log_file.write(f"\n{l("delete_files_success")}:\n")
             for file in files_deleted:
                 log_file.write(f"{file}\n")
 
-        cc_log_text = f"CC - {l["cc_log_dir"]} - {log_path}\\{log_filename}"
+        cc_log_text = f"CC - {l("cc_log_dir")} - {log_path}\\{log_filename}"
         logger.info(cc_log_text)
         messagebox.showinfo(random_string(), cc_log_text)
 
     except Exception as e:
-        logger.exception(l["cc_critical_error"], e)
+        logger.exception(l("cc_critical_error"), e)

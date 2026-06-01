@@ -19,10 +19,9 @@ import os
 
 from RS import random_string
 from config import program_authentication_clyth, current_localization
-from languages import localizations
+from languages import l
 
-exit_version = "1.1.0 Beta"
-l = localizations[current_localization]
+exit_version = "1.1.1 Beta"
 dyrachok_path = r"C:\ProgramData\dyrachok.txt"
 
 @logger.catch
@@ -31,8 +30,8 @@ def check_access_file():
         with open(dyrachok_path, "r") as f:
             content = f.read()
         if "debil" in content:
-            logger.critical(f"E - {l["dyrachok_test_log_text"]}.")
-            messagebox.showwarning(random_string(), l["dyrachok_test_text"])
+            logger.critical(f"E - {l("dyrachok_test_log_text")}.")
+            messagebox.showwarning(random_string(), l("dyrachok_test_text"))
             return False
         else:
             #logger.success("E - Проверка на дурочка прошла успешно.")
@@ -44,49 +43,49 @@ def check_access_file():
 
 @logger.catch
 def tiktok_question():
-    if messagebox.askyesno(random_string(), l["watch_tiktok?"]):
+    if messagebox.askyesno(random_string(), l("watch_tiktok?")):
         try:
             with open(dyrachok_path, "w") as f:
                 f.write("debil")
-            messagebox.showinfo(random_string(), l["dyrachok_test_text"])
+            messagebox.showinfo(random_string(), l("dyrachok_test_text"))
         except Exception as e:
-            comment = f"E - {l["exit_error"]}"
+            comment = f"E - {l("exit_error")}"
             logger.exception(comment, e)
             messagebox.showerror(random_string(), f"{comment}\n{e}")
             return False
     else:
-        logger.info(l["exit_program"])
+        logger.info(l("exit_program"))
         os._exit(0)
 
 
 
 def bad_capcha():
-    messagebox.showerror(random_string(), l["bad_capcha"])
+    messagebox.showerror(random_string(), l("bad_capcha"))
 
 
 
 def math_window():
     n = random.randint(256, 1024)
-    number_input = tk.simpledialog.askinteger(random_string(), f"{l["enter_result_example"]}: √({n} * {n})")
+    number_input = tk.simpledialog.askinteger(random_string(), f"{l("enter_result_example")}: √({n} * {n})")
 
     if number_input == n:
         #logger.info("E - ввод примера верен.")
         tiktok_question()
     else:
-        logger.critical(f"E - {l["bad_result_example"]}.")
+        logger.critical(f"E - {l("bad_result_example")}.")
         bad_capcha()
 
 
 
 def captcha_window():
     n = random.randint(256, 1024)
-    captcha_input = tk.simpledialog.askinteger(random_string(), f"{l["enter_number"]}: {n}")
+    captcha_input = tk.simpledialog.askinteger(random_string(), f"{l("enter_number")}: {n}")
 
     if captcha_input == n:
         #logger.info("E - ввод числа верен.")
         math_window()
     else:
-        logger.critical(f"E - {l["bad_enter_number"]}")
+        logger.critical(f"E - {l("bad_enter_number")}")
         bad_capcha()
 
 
@@ -94,10 +93,10 @@ def captcha_window():
 def E():
     try:
         if check_access_file():
-            if messagebox.askyesno(random_string(), f"{l["pac"]} - {program_authentication_clyth}\n\n{l["want_exit?"]}"):
-                logger.info(f"E - {l["attempting_to_exit"]}.")
+            if messagebox.askyesno(random_string(), f"{l("pac")} - {program_authentication_clyth}\n\n{l("want_exit?")}"):
+                logger.info(f"E - {l("attempting_to_exit")}.")
                 captcha_window()
             else:
-                logger.info(f"E - {l["cancel_exit"]}.")
+                logger.info(f"E - {l("cancel_exit")}.")
     except Exception as e:
         logger.exception(f"{e_critical_error}\n{e}")

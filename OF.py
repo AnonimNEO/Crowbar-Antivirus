@@ -26,12 +26,11 @@ from io import BytesIO
 
 #from OBPC import OBPC
 from RS import random_string
-from languages import localizations
+from languages import l
 from config import *
 
 global load_bush
-other_function_version = "0.9.0 Beta"
-l = localizations[current_localization]
+other_function_version = "0.9.1 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -73,7 +72,7 @@ class Psutil:
 
 
 def pac():
-    messagebox.showinfo(random_string(), l["pac_text"])
+    messagebox.showinfo(random_string(), l("pac_text"))
 
 
 
@@ -82,9 +81,9 @@ def run_component(func, *args):
     try:
         thread = threading.Thread(target=func, args=args, daemon=True)
         thread.start()
-        logger.info(f"OF/run_component - {l["start_thread"]} {func.__name__}")
+        logger.info(f"OF/run_component - {l("start_thread")} {func.__name__}")
     except Exception as e:
-        logger.error(f"OF/run_component - {l["start_thread_error"]} {func.__name__}: {e}")
+        logger.error(f"OF/run_component - {l("start_thread_error")} {func.__name__}: {e}")
 
 
 
@@ -94,15 +93,15 @@ def run_component_process(func, *args):
         process = multiprocessing.Process(target=func, args=args)
         process.daemon = True
         process.start()
-        logger.info(f"OF/run_component - {l["start_process"]} {func.__name__}")
+        logger.info(f"OF/run_component - {l("start_process")} {func.__name__}")
     except Exception as e:
-        logger.error(f"OF/run_component - {l["start_process_error"]} {func.__name__}: {e}")
+        logger.error(f"OF/run_component - {l("start_process_error")} {func.__name__}: {e}")
 
 
 
 @logger.catch()
 def restart_ca():
-    logger.info(f"OF/restart_ca - {l["restart_ca"]}...")
+    logger.info(f"OF/restart_ca - {l("restart_ca")}...")
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
@@ -253,7 +252,7 @@ def get_current_disc(run_in_recovery=False):
             drives = [f"{d}:\\" for d in "ABCDEFGHIJKLMNOPQRSTUVWYZ"]
             for drive in drives:
                 if os.path.exists(os.path.join(drive, "Windows")):
-                    logger.info(f"OF - {l["system_found"]} {drive}")
+                    logger.info(f"OF - {l("system_found")} {drive}")
                     return drive, True
             return "X:\\", False
 
@@ -265,7 +264,7 @@ def get_current_disc(run_in_recovery=False):
                 return p.mountpoint, True
         return "C:\\", False
     except Exception as e:
-        logger.exception(f"OF\\get_current_disc - {l["unknown_error"]}", e)
+        logger.exception(f"OF\\get_current_disc - {l("unknown_error")}", e)
         return "X:\\", False
 
 
@@ -280,7 +279,7 @@ def load_bush(current_disc, user=False):
     else:
         #Формируем пути к файлам
         if not os.path.isdir(f"{current_disc}\\Users\\{default_user_name}\\"):
-            user_name = simpledialog.askstring(title=random_string(), prompt=f"{l["user_not_found"]} {default_user_name}\n{l["enter_user_name"]}:")
+            user_name = simpledialog.askstring(title=random_string(), prompt=f"{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}:")
         else:
             user_name = default_user_name
 
@@ -294,7 +293,7 @@ def load_bush(current_disc, user=False):
 
     for name, path in hive_paths.items():
         if not os.path.exists(path):
-            logger.critical(f"OF/load_bush - {l["bush_not_found"]}: {path}")
+            logger.critical(f"OF/load_bush - {l("bush_not_found")}: {path}")
             continue
 
         #Если куст уже в списке активных, пропустим
@@ -306,10 +305,10 @@ def load_bush(current_disc, user=False):
             winreg.LoadKey(winreg.HKEY_LOCAL_MACHINE, name, path)
 
             active_loaded_hives.append(name)
-            logger.info(f"OF/load_bush - {l["bush"]} {name} {l["success_load"]} {path}")
+            logger.info(f"OF/load_bush - {l("bush")} {name} {l("success_load")} {path}")
             success_count += 1
         except Exception as e:
-            logger.exception(f"OF/load_bush - {l["load_bush_error"]} {path}\\{name}", e)
+            logger.exception(f"OF/load_bush - {l("load_bush_error")} {path}\\{name}", e)
 
     #Возвращаем True, если загрузили хотя бы один куст
     return success_count > 0
@@ -325,9 +324,9 @@ def unload_bush():
         try:
             winreg.unloadkey(winreg.HKEY_LOCAL_MACHINE, name)
             active_loaded_hives.remove(name)
-            logger.success(f"OF/unload_bush - {l["bush"]} {name} {l["success_unload"]}.")
+            logger.success(f"OF/unload_bush - {l("bush")} {name} {l("success_unload")}.")
         except Exception as e:
-            logger.exception(f"OF/unload_bush - {l["unload_bush_error"]} {name}", e)
+            logger.exception(f"OF/unload_bush - {l("unload_bush_error")} {name}", e)
 
 
 
@@ -338,7 +337,7 @@ def get_user_name():
         user_name = os.getlogin()
         return user_name
     except Exception as e:
-        logger.exception(f"OF/get_user_name - {l["get_user_name_error"]}!", e)
+        logger.exception(f"OF/get_user_name - {l("get_user_name_error")}!", e)
         return default_user_name
 
 
@@ -388,8 +387,8 @@ def open_with():
             try:
                 subprocess.Popen([app_path, target_file_path])
             except Exception as e:
-                logger.exception(f'OF/open_with - {l["open_file_error"]} "{target_file_path}" {l["with_program"]} "{app_path}"', e)
-                messagebox.showerror(random_string(), f"{l["open_file_error"]} {l["with_program"]}:\n{e}")
+                logger.exception(f'OF/open_with - {l("open_file_error")} "{target_file_path}" {l("with_program")} "{app_path}"', e)
+                messagebox.showerror(random_string(), f"{l("open_file_error")} {l("with_program")}:\n{e}")
 
 
 
@@ -400,7 +399,7 @@ def reg_file(reg_file, reg_code):
     try:
         os.startfile(reg_file)
     except Exception as e:
-        logger.exception(f"OF/reg_file - {l["start_error"]} {reg_file}", e)
+        logger.exception(f"OF/reg_file - {l("start_error")} {reg_file}", e)
 
 
 
@@ -411,4 +410,4 @@ def run_command(command):
         process = subprocess.run(command, shell=True)
         return process.returncode
     except Exception as e:
-        logger.exception(f"OF/run_command - {l["start_command_error"]} - {command}", e)
+        logger.exception(f"OF/run_command - {l("start_command_error")} - {command}", e)

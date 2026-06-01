@@ -112,7 +112,7 @@ from languages import localizations
 l = localizations[current_localization]
 
 global run_in_recovery, current_theme, crowbar_menu_version
-crowbar_menu_version = "2.3.1 Beta"
+crowbar_menu_version = "2.3.2 Beta"
 
 @logger.catch
 def CM(run_in_recovery, current_theme, current_disc=None):
@@ -206,13 +206,13 @@ def CM(run_in_recovery, current_theme, current_disc=None):
         tab_control = ttk.Notebook(CM_GUI)
 
         tab_components = ttk.Frame(tab_control)
-        tab_control.add(tab_components, text=l["components"])
+        tab_control.add(tab_components, text=l("components"))
         tab_utilities = ttk.Frame(tab_control)
-        tab_control.add(tab_utilities, text=l["utilities"])
+        tab_control.add(tab_utilities, text=l("utilities"))
         tab_protect = ttk.Frame(tab_control)
-        tab_control.add(tab_protect, text=l["protect"])
+        tab_control.add(tab_protect, text=l("protect"))
         tab_manage = ttk.Frame(tab_control)
-        tab_control.add(tab_manage, text=l["control"])
+        tab_control.add(tab_manage, text=l("control"))
 
         tab_components.configure(style="TFrame")
         tab_utilities.configure(style="TFrame")
@@ -225,26 +225,26 @@ def CM(run_in_recovery, current_theme, current_disc=None):
         small_buttons = []
 
         #Вкладка "Компоненты"
-        label_comp = ttk.Label(tab_components, text=l["components"], font="Default 24")
+        label_comp = ttk.Label(tab_components, text=l("components"), font="Default 24")
         label_comp.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
         header_labels.append(label_comp)
 
-        arm_btn = ttk.Button(tab_components, text=l["ARM"],
+        arm_btn = ttk.Button(tab_components, text=l("ARM"),
                      command=lambda:run_component_process(ARM, run_in_recovery, current_theme))
         arm_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(arm_btn)
 
-        pm_btn = ttk.Button(tab_components, text=l["PM"],
+        pm_btn = ttk.Button(tab_components, text=l("PM"),
                      command=lambda:run_component_process(PM, run_in_recovery, current_theme))
         pm_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(pm_btn)
 
-        fm_btn = ttk.Button(tab_components, text=l["FM"],
+        fm_btn = ttk.Button(tab_components, text=l("FM"),
                      command=lambda:run_component_process(FM, run_in_recovery, current_theme))
         fm_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fm_btn)
 
-        ua_btn = ttk.Button(tab_components, text=l["UA"],
+        ua_btn = ttk.Button(tab_components, text=l("UA"),
                      command=lambda:UA(run_in_recovery))
         ua_btn.grid(row=2, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(ua_btn)
@@ -252,31 +252,31 @@ def CM(run_in_recovery, current_theme, current_disc=None):
 
 
         #Вкладка "Утилиты"
-        label_util = ttk.Label(tab_utilities, text=l["utilities"])
+        label_util = ttk.Label(tab_utilities, text=l("utilities"))
         label_util.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
         header_labels.append(label_util)
 
-        fr_btn = ttk.Button(tab_utilities, text=l["FR"],
+        fr_btn = ttk.Button(tab_utilities, text=l("FR"),
                      command=lambda:run_component(FR, run_in_recovery, current_theme))
         fr_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fr_btn)
 
-        cc_btn = ttk.Button(tab_utilities, text=l["CC"],
+        cc_btn = ttk.Button(tab_utilities, text=l("CC"),
                      command=lambda:CC(run_in_recovery))
         cc_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(cc_btn)
 
-        run_btn = ttk.Button(tab_utilities, text=l["Run"],
+        run_btn = ttk.Button(tab_utilities, text=l("Run"),
                      command=lambda:run_component_process(Run, current_theme))
         run_btn.grid(row=2, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
         small_buttons.append(run_btn)
 
-        r_btn = ttk.Button(tab_utilities, text=l["R"],
+        r_btn = ttk.Button(tab_utilities, text=l("R"),
                      command=R)
         r_btn.grid(row=3, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(r_btn)
 
-        ow_btn = ttk.Button(tab_utilities, text=l["open_with"],
+        ow_btn = ttk.Button(tab_utilities, text=l("open_with"),
                      command=lambda:open_with())
         ow_btn.grid(row=3, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(ow_btn)
@@ -284,7 +284,7 @@ def CM(run_in_recovery, current_theme, current_disc=None):
 
 
         #Вкладка "Защита"
-        label_prot = ttk.Label(tab_protect, text=l["protect"])
+        label_prot = ttk.Label(tab_protect, text=l("protect"))
         label_prot.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
         header_labels.append(label_prot)
 
@@ -293,7 +293,7 @@ def CM(run_in_recovery, current_theme, current_disc=None):
         #rlp_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         #regular_buttons.append(lp_btn)
 
-        sp_btn = ttk.Button(tab_protect, text=l["SP"],
+        sp_btn = ttk.Button(tab_protect, text=l("SP"),
                       command=lambda:run_component(SP, run_in_recovery, current_disc_r, current_theme))
         sp_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(sp_btn)
@@ -301,16 +301,16 @@ def CM(run_in_recovery, current_theme, current_disc=None):
 
 
         #Вкладка "Управление"
-        label_manage = ttk.Label(tab_manage, text=l["control"])
+        label_manage = ttk.Label(tab_manage, text=l("control"))
         label_manage.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
         header_labels.append(label_manage)
 
-        um_btn = ttk.Button(tab_manage, text=l["UM"],
+        um_btn = ttk.Button(tab_manage, text=l("UM"),
                       command=lambda:run_component(UM, current_theme))
         um_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(um_btn)
 
-        fe_btn = ttk.Button(tab_manage, text=l["FE"],
+        fe_btn = ttk.Button(tab_manage, text=l("FE"),
                             command=lambda: run_component(FE))
         fe_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fe_btn)
@@ -331,22 +331,22 @@ def CM(run_in_recovery, current_theme, current_disc=None):
 
         tab_control.pack(fill="both", expand=True)
 
-        copyleft_label = ttk.Label(CM_GUI, text=f"{l["CM"]} {crowbar_menu_version}", anchor="w")
+        copyleft_label = ttk.Label(CM_GUI, text=f"{l("CM")} {crowbar_menu_version}", anchor="w")
         copyleft_label.pack(side="bottom", anchor="w", padx=10, pady=10)
 
         #Меню
         menubar = Menu(CM_GUI)
         theme_menu = Menu(menubar, tearoff=0)
-        theme_menu.add_checkbutton(label=l["dark"], command=lambda: restart_cm("dark"))
-        theme_menu.add_checkbutton(label=l["white"], command=lambda: restart_cm("white"))
-        theme_menu.add_checkbutton(label=l["red"], command=lambda: restart_cm("red"))
-        theme_menu.add_checkbutton(label=l["green"], command=lambda: restart_cm("lime"))
-        theme_menu.add_checkbutton(label=l["contrast"], command=lambda: restart_cm("black"))
-        theme_menu.add_checkbutton(label=l["gray"], command=lambda: restart_cm("gray"))
-        theme_menu.add_checkbutton(label=l["orange"], command=lambda: restart_cm("orange"))
+        theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_cm("dark"))
+        theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_cm("white"))
+        theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_cm("red"))
+        theme_menu.add_checkbutton(label=l("green"), command=lambda: restart_cm("lime"))
+        theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_cm("black"))
+        theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_cm("gray"))
+        theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_cm("orange"))
 
         #Пункт "Темы"
-        menubar.add_cascade(label=l["themes"], menu=theme_menu)
+        menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
         if run_in_recovery:
             higher = tk.BooleanVar(value=False)
@@ -358,14 +358,14 @@ def CM(run_in_recovery, current_theme, current_disc=None):
             higher.set(not higher.get())
             GUI.attributes("-topmost", higher.get())
 
-        menubar.add_command(label=f"{l["topmost"]}: {l["on2"]}", command=lambda:toggle_topmost(CM_GUI))
+        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda:toggle_topmost(CM_GUI))
 
         def update_topmost_label(menubar, GUI):
-            status = l["on2"] if higher.get() else l["off2"]
-            menubar.entryconfig(2, label=f"{l["topmost"]}: {status}")
+            status = l("on2") if higher.get() else l("off2")
+            menubar.entryconfig(2, label=f"{l("topmost")}: {status}")
             GUI.after(100, lambda:update_topmost_label(menubar, GUI))
 
-        menubar.add_command(label=f"{l["pac"]} - {program_authentication_clyth}", command=pac)
+        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
 
         #if run_in_recovery:
         #    def change_user():
@@ -382,7 +382,7 @@ def CM(run_in_recovery, current_theme, current_disc=None):
 
         CM_GUI.mainloop()
     except Exception as e:
-        logger.exception(l["cm_critical_error"], e)
+        logger.exception(l("cm_critical_error"), e)
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

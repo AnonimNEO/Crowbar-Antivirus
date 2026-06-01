@@ -22,12 +22,11 @@ import os
 
 #Импорт Компонентов
 from config import *
-from languages import localizations
+from languages import l
 from RS import random_string
 
 global about_program_version
-about_program_version = "0.3.0 Beta"
-l = localizations[current_localization]
+about_program_version = "0.3.1 Beta"
 image_references = {}
 
 def AP(autorun_master_version="error",
@@ -66,7 +65,7 @@ def AP(autorun_master_version="error",
             try:
                 image_files = [f for f in os.listdir(images_path) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
             except Exception as e:
-                logger.exception(f"AP - {l["read_dir_error"]} {images_path}", e)
+                logger.exception(f"AP - {l("read_dir_error")} {images_path}", e)
                 return image_labels_container
 
             #Проверяем наличие файлов
@@ -95,7 +94,7 @@ def AP(autorun_master_version="error",
                     image_labels_container.append(label)
 
                 except Exception as e:
-                    logger.exception(f"AP - {l["read_image_error"]} {image_file}", e)
+                    logger.exception(f"AP - {l("read_image_error")} {image_file}", e)
                     continue #если одно изображение не загрузилось, продолжаем с другими
 
             return image_labels_container #Возвращаем список загруженных меток, чтобы знать, создался ли фрейм
@@ -104,33 +103,33 @@ def AP(autorun_master_version="error",
 
         def show_component_versions(event):
             version_component_text = (
-                f"{l["version_component"]}:\n"
-                f"{l["pac"]}: {program_authentication_clyth}\n"
-                f"---{l["general_component"]}---\n"
-                f"{l["program_kernel"]}: {trey_version}\n"
-                f"{l["RLP"]}: {real_time_protect_version}\n"
-                f"{l["ARM"]}: {autorun_master_version}\n"
-                f"{l["PM"]}: {process_manager_version}\n"
-                f"{l["FM"]}: {file_manager_version}\n"
-                f"{l["UA"]}: {unlock_all_version}\n"
-                f"{l["FE"]}: {file_editor_version}\n"
-                f"---{l["mini_component"]}---\n"
-                f"{l["CM"]}: {crowbar_menu_version}\n"
-                f"{l["SP"]}: {scarecrow_protection_version}\n"
-                f"{l["CC"]}: {clear_cache_version}\n"
-                f"{l["UM"]}: {users_manager_version}\n"
-                f"{l["R"]}: {restart_version}\n"
-                f"{l["Run"]}: {run_version}\n"
-                f"{l["OBPC"]}: {on_board_pc_version}\n"
-                f"---{l["system_component"]}---\n"
-                f'{l["CC22"]}: 2.2\n'
-                f"{l["EC"]}: {edit_criticality_version}\n"
-                f"{l["GFA"]}: {get_full_access_version}\n"
-                f"{l["OF"]}: {other_function_version}\n"
-                f"{l["RS"]}: {random_string_version}\n"
-                f"{l["E"]}: {exit_version}\n"
-                f"{l["AP"]}: {about_program_version}\n"
-                f"{l["SAU"]}: {settings_and_update_version}"
+                f"{l("version_component")}:\n"
+                f"{l("pac")}: {program_authentication_clyth}\n"
+                f"---{l("general_component")}---\n"
+                f"{l("program_kernel")}: {trey_version}\n"
+                f"{l("RLP")}: {real_time_protect_version}\n"
+                f"{l("ARM")}: {autorun_master_version}\n"
+                f"{l("PM")}: {process_manager_version}\n"
+                f"{l("FM")}: {file_manager_version}\n"
+                f"{l("UA")}: {unlock_all_version}\n"
+                f"{l("FE")}: {file_editor_version}\n"
+                f"---{l("mini_component")}---\n"
+                f"{l("CM")}: {crowbar_menu_version}\n"
+                f"{l("SP")}: {scarecrow_protection_version}\n"
+                f"{l("CC")}: {clear_cache_version}\n"
+                f"{l("UM")}: {users_manager_version}\n"
+                f"{l("R")}: {restart_version}\n"
+                f"{l("Run")}: {run_version}\n"
+                f"{l("OBPC")}: {on_board_pc_version}\n"
+                f"---{l("system_component")}---\n"
+                f'{l("CC22")}: 2.2\n'
+                f"{l("EC")}: {edit_criticality_version}\n"
+                f"{l("GFA")}: {get_full_access_version}\n"
+                f"{l("OF")}: {other_function_version}\n"
+                f"{l("RS")}: {random_string_version}\n"
+                f"{l("E")}: {exit_version}\n"
+                f"{l("AP")}: {about_program_version}\n"
+                f"{l("SAU")}: {settings_and_update_version}"
             )
             messagebox.showinfo(random_string(), version_component_text)
 
@@ -162,14 +161,14 @@ def AP(autorun_master_version="error",
             frame = tk.Frame(donate_window, bg="black")
             frame.pack(expand=True, padx=20, pady=20)
 
-            label = tk.Label(frame, text=l["support_text"], fg="white", bg="black", font=("Arial", 12))
+            label = tk.Label(frame, text=l("support_text"), fg="white", bg="black", font=("Arial", 12))
             label.pack(pady=(0, 10))
 
             link1 = tk.Label(frame, text="DonationAlerts", fg="red", bg="black", cursor="hand2", font=("Arial", 12, "underline"))
             link1.pack()
             link1.bind("<Button-1>", open_donationalerts)
 
-            label2 = tk.Label(frame, text=l["steam_trade_text"], fg="white", bg="black", font=("Arial", 12))
+            label2 = tk.Label(frame, text=l("steam_trade_text"), fg="white", bg="black", font=("Arial", 12))
             label2.pack(pady=(10, 0))
 
             link2 = tk.Label(frame, text="Steam", fg="red", bg="black", cursor="hand2", font=("Arial", 12, "underline"))
@@ -183,30 +182,30 @@ def AP(autorun_master_version="error",
         about_window.configure(bg="black")
 
         #Текст
-        label = tk.Label(about_window, text=l["about_program_text"], bg="black", fg="white", font=("ComicSans", 16))
+        label = tk.Label(about_window, text=l("about_program_text"), bg="black", fg="white", font=("ComicSans", 16))
         label.pack(pady=20)
 
         image_labels = load_images(about_window)
 
-        version_link = tk.Label(about_window, text=l["version_component"], bg="black", fg="green", cursor="hand2", font=("ComicSans", 16))
+        version_link = tk.Label(about_window, text=l("version_component"), bg="black", fg="green", cursor="hand2", font=("ComicSans", 16))
         version_link.pack(pady=10)
         version_link.bind("<Button-1>", show_component_versions)
 
-        donationalerts_link = tk.Label(about_window, text=l["donation_alerts_text"], bg="black", fg="red", cursor="hand2", font=("ComicSans", 16))
+        donationalerts_link = tk.Label(about_window, text=l("donation_alerts_text"), bg="black", fg="red", cursor="hand2", font=("ComicSans", 16))
         donationalerts_link.pack(pady=10)
         donationalerts_link.bind("<Button-1>", donate_window)
 
-        gpl_link = tk.Label(about_window, text=f"{l["license"]} GPL v3.0", bg="red", fg="white", cursor="hand2", font=("ComicSans", 16))
+        gpl_link = tk.Label(about_window, text=f"{l("license")} GPL v3.0", bg="red", fg="white", cursor="hand2", font=("ComicSans", 16))
         gpl_link.pack(pady=10)
         gpl_link.bind("<Button-1>", open_gpl_licenses)
 
-        website_link = tk.Label(about_window, text=l["website_neo_organization"], bg="blue", fg="yellow", cursor="hand2", font=("ComicSans", 16))
+        website_link = tk.Label(about_window, text=l("website_neo_organization"), bg="blue", fg="yellow", cursor="hand2", font=("ComicSans", 16))
         website_link.pack(pady=10)
         website_link.bind("<Button-1>", open_website)
 
         about_window.mainloop()
     except Exception as e:
-        logger.exception(l["ap_exception_text"], e)
+        logger.exception(l("ap_exception_text"), e)
 
 if __name__ == "__main__":
     AP()
