@@ -8,25 +8,25 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
-from tkinter import ttk, messagebox, Menu
-import tkinter as tk
-#Логирование Ошибок
-from loguru import logger
-#Работа с реестром
-import winreg
-#Работа с файлами
-import shutil
-import os
-
-from RS import random_string
-from OF import pac, apply_global_theme, get_user_name
-from languages import l
-from config import theme, default_theme, program_authentication_clyth, current_localization
-
-scarecrow_protection_version = "0.3.9 Beta"
+scarecrow_protection_version = "0.3.10 Beta"
 
 def SP(run_in_recovery, current_disc_r, current_theme):
+    #Интерфейс
+    from tkinter import ttk, messagebox, Menu
+    import tkinter as tk
+    #Логирование Ошибок
+    from loguru import logger
+    #Работа с реестром
+    import winreg
+    #Работа с файлами
+    import shutil
+    import os
+
+    from RS import random_string
+    from OF import pac, apply_global_theme, get_user_name
+    from languages import l
+    from config import theme, default_theme, program_authentication_clyth, current_localization
+
     try:
         if run_in_recovery:
             current_disc = current_disc_r
@@ -462,7 +462,7 @@ def SP(run_in_recovery, current_disc_r, current_theme):
 
         SP_GUI.mainloop()
     except Exception as e:
-        logger.exception(l("sp_critical_error"), e)
+        logger.exception(l("sp_critical_error"))
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

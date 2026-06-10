@@ -8,25 +8,25 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
-from tkinter import filedialog, messagebox, ttk, Menu
-import tkinter as tk
-#Логирование
-from loguru import logger
-#Работа с файлами
-import subprocess
-import shutil
-import os
-
-from GFA import GFA
-from RS import random_string
-from OF import pac, apply_global_theme, get_current_disc
-from languages import l
-from config import theme, default_theme, program_authentication_clyth, current_localization
-
-file_replacer_version = "0.4.1 Beta"
+file_replacer_version = "0.4.2 Beta"
 
 def FR(run_in_recovery, current_theme):
+    #Интерфейс
+    from tkinter import filedialog, messagebox, ttk, Menu
+    import tkinter as tk
+    #Логирование
+    from loguru import logger
+    #Работа с файлами
+    import subprocess
+    import shutil
+    import os
+
+    from GFA import GFA
+    from RS import random_string
+    from OF import pac, apply_global_theme, get_current_disc
+    from languages import l
+    from config import theme, default_theme, program_authentication_clyth, current_localization
+
     def browse_source(source_var):
         path = filedialog.askopenfilename(title=random_string())
         if path:
@@ -87,7 +87,7 @@ def FR(run_in_recovery, current_theme):
             messagebox.showinfo(random_string(), f"{l("file")} {l("replaced")} {l("on_disc")} {current_disc}")
 
         except Exception as e:
-            logger.error(f"FR - {l("error")}:\n{e}")
+            logger.exception(f"FR - {l("error")}")
             messagebox.showerror(random_string(), f"{l("replace_file_not_found")}:\n{e}")
 
     def restore_file(target_var):
@@ -112,7 +112,7 @@ def FR(run_in_recovery, current_theme):
                 logger.success(f"FR - {l("restore_from_backup")}: {final_tgt}")
                 messagebox.showinfo(random_string(), f"{l("file")} {l("success")} {l("restored")}.")
             except Exception as e:
-                logger.error(f"FR - {l("error")} {l("when_restoring_a_file")}:\n{e}")
+                logger.exception(f"FR - {l("error")} {l("when_restoring_a_file")}")
                 messagebox.showerror(random_string(), str(e))
 
     def restart_fr(user_theme):

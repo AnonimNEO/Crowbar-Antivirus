@@ -33,7 +33,7 @@ from languages import l
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path
 
 #global ARM_data, autorun_master_version, REG_TYPE_MAP, REG_TYPE_MAP_REV, CREATABLE_REG_TYPES, ARM_CORE_GLOBALS, ARM_GUI_ELEMENTS, ultimate_load_cpu, ultimate_load_gpu, ultimate_load_ram, ultimate_load_lam
-autorun_master_version = "3.7.9 Beta"
+autorun_master_version = "3.7.10 Beta"
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -46,10 +46,10 @@ class TaskSchedulerManager:
         except Exception as e:
             self.scheduler = None
             self.root_folder = None
-            logger.exception(f"ARM - {l("scheduler_error")}", e)
+            logger.exception(f"ARM - {l("scheduler_error")}")
             messagebox.showerror(random_string(), f"{l("scheduler_error")}.\n{e}")
 
-    #Вспомогательная функция для получения каталога задач
+    #Функция для получения каталога задач
     def get_folder(self, task_path):
         folder_path = os.path.dirname(task_path)
         if not folder_path:
@@ -109,7 +109,7 @@ class TaskSchedulerManager:
             )
             return True
         except Exception as e:
-            logger.exception(f"ARM - {l("edit_task_error")} {task_path_full}", e)
+            logger.exception(f"ARM - {l("edit_task_error")} {task_path_full}")
             return False
 
     #Удаляет задачу через COM
@@ -123,7 +123,7 @@ class TaskSchedulerManager:
             folder.DeleteTask(task_name, 0)
             return True
         except Exception as e:
-            logger.exception(f"ARM - {l("delete_task_error")} {task_path_full}", e)
+            logger.exception(f"ARM - {l("delete_task_error")} {task_path_full}")
             return False
 
 
@@ -262,7 +262,7 @@ def ARM(run_in_recovery, current_theme):
                                 f"{l("path")} {l("parameter")}": str(item)
                             })
                         except Exception as e:
-                            logger.exception(f"ARM - {l("metadata_error")} {item.name}", e)
+                            logger.exception(f"ARM - {l("metadata_error")} {item.name}")
                             ARM_data.append({
                                 f"{l("name")} {l("file2")}": item.name,
                                 f"{l("date")} {l("creation")}": l("error"),
@@ -271,7 +271,7 @@ def ARM(run_in_recovery, current_theme):
                                 f"{l("path")} {l("parameter")}": str(item)
                             })
             except Exception as e:
-                logger.exception(f"ARM - {l("startup_error")}", e)
+                logger.exception(f"ARM - {l("startup_error")}")
                 messagebox.showerror(random_string(), f"{l("startup_error")}:\n{e}")
             return ARM_data
 
@@ -354,7 +354,7 @@ def ARM(run_in_recovery, current_theme):
                             if key != "Taskman":
                                 logger.warning(f"ARM - {l("key_not_found")}: {full_path}\\{value_name}")
                         except Exception as e:
-                            logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}", e)
+                            logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}")
                             ARM_data.append({
                                 f"{l("name")} {l("parameter")}": value_name,
                                 f"{l("meaning")} {l("parameter")}": l("error"),
@@ -386,7 +386,7 @@ def ARM(run_in_recovery, current_theme):
                             except FileNotFoundError:
                                 pass
                             except Exception as e:
-                                logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}", e)
+                                logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}")
                                 ARM_data.append({
                                     f"{l("name")} {l("parameter")}": value_name,
                                     f"{l("meaning")} {l("parameter")}": l("error"),
@@ -401,7 +401,7 @@ def ARM(run_in_recovery, current_theme):
                 if value_name != "Taskman":
                     logger.warning(f"ARM - {l("key_not_found")}: {full_path}")
             except Exception as e:
-                logger.exception(f"ARM - {l("read_key_error")} {full_path}", e)
+                logger.exception(f"ARM - {l("read_key_error")} {full_path}")
             
             return ARM_data
 
@@ -479,7 +479,7 @@ def ARM(run_in_recovery, current_theme):
                 messagebox.showerror(random_string(), l("permission_error"))
                 return False
             except Exception as e:
-                logger.exception(f"ARM - {l("create_key_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
+                logger.exception(f"ARM - {l("create_key_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
                 messagebox.showerror(random_string(), f'{l("create_key_error")} "{name}".\n{e}')
                 return False
 
@@ -532,9 +532,9 @@ def ARM(run_in_recovery, current_theme):
                 #logger.error(f"ARM - Ошибка преобразования значения для параметра реестра: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}:\n{e}")
                 return False
             except Exception as e:
-                comment = f"ARM - {l("update_key_error")}: {ARM_CORE_GLOBALS['HKEY_MAP'].get(hkey_const)}\\{subkey_path}\\{name}"
+                comment = f"ARM - {l("update_key_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}"
                 messagebox.showerror(random_string(), f"{comment}\n{e}")
-                logger.exception(comment, e)
+                logger.exception(comment)
                 return False
 
 
@@ -558,8 +558,8 @@ def ARM(run_in_recovery, current_theme):
                 messagebox.showerror(random_string(), l("permission_error"))
                 return False
             except Exception as e:
+                logger.exception(f"ARM - {l("delete_key_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}")
                 messagebox.showerror(random_string(), f'{l("delete_key_error")} "{name}".\n{e}')
-                logger.exception(f"ARM - {l("delete_key_error")}: {ARM_CORE_GLOBALS["HKEY_MAP"].get(hkey_const)}\\{subkey_path}\\{name}", e)
                 return False
 
 
@@ -582,7 +582,7 @@ def ARM(run_in_recovery, current_theme):
                 messagebox.showinfo(random_string(), l("file_not_found"))
                 return True
             except Exception as e:
-                logger.exception(f"ARM - {l("file_delete_error")}: {file_path}", e)
+                logger.exception(f"ARM - {l("file_delete_error")}: {file_path}")
                 messagebox.showerror(random_string(), f'{l("file_delete_error")} "{file.name}".\n{e}')
                 return False
 
@@ -614,7 +614,7 @@ def ARM(run_in_recovery, current_theme):
                     tree.write(f, encoding="utf-16", xml_declaration=True)
                 return True
             except Exception as e:
-                logger.exception(f"ARM - {l("save_xml_task_error")} {file_path}", e)
+                logger.exception(f"ARM - {l("save_xml_task_error")} {file_path}")
                 return False
 
 
@@ -653,7 +653,7 @@ def ARM(run_in_recovery, current_theme):
                         try:
                             date_created = str(task.Definition.RegistrationInfo.Date)
                         except Exception:
-                            date_created = "01-01-1970 00:00:00"
+                            date_created = l("error")
 
                         action_path = l("unknown")
                         if task.Definition.Actions.Count > 0:
@@ -674,7 +674,7 @@ def ARM(run_in_recovery, current_theme):
                             "Enabled_raw": is_enabled
                         })
                     except Exception as e:
-                        logger.exception(f"ARM - {l("task_error")} {task.Path}", e)
+                        logger.exception(f"ARM - {l("task_error")} {task.Path}")
                         ARM_data.append({
                             l("name"): task.Path,
                             l("state"): l("error"),
@@ -756,7 +756,7 @@ def ARM(run_in_recovery, current_theme):
                             #Это не XML или файл поврежден
                             continue
                         except Exception as e:
-                            logger.exception(f"ARM - {l("xml_task_error")} {file_name}", e)
+                            logger.exception(f"ARM - {l("xml_task_error")} {file_name}")
                             ARM_data.append({
                                 l("name"): file_name,
                                 l("state"): l("error"),
@@ -811,7 +811,7 @@ def ARM(run_in_recovery, current_theme):
                         return True
                     return False
                 except Exception as e:
-                    logger.exception(f"ARM - {l("xml_error")}", e)
+                    logger.exception(f"ARM - {l("xml_error")}")
                     messagebox.showerror(random_string(), f"{l("xml_error")}:\n{e}")
                     return False
 
@@ -838,7 +838,7 @@ def ARM(run_in_recovery, current_theme):
                         messagebox.showerror(random_string(), l("file_not_found"))
                         return False
                 except Exception as e:
-                    logger.exception(f"ARM - {l("xml_task_delete_error")}", e)
+                    logger.exception(f"ARM - {l("xml_task_delete_error")}")
                     messagebox.showerror(random_string(), f"{l("file_delete_error")}:\n{e}")
                     return False
 
@@ -1224,7 +1224,7 @@ def ARM(run_in_recovery, current_theme):
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue
                 except Exception as e:
-                    logger.exception(f"ARM/PM - {l("action_error")} {action}", e)
+                    logger.exception(f"ARM/PM - {l("action_error")} {action}")
 
 
 
@@ -1524,7 +1524,7 @@ def ARM(run_in_recovery, current_theme):
         ARM_GUI.config(menu=menubar)
         ARM_GUI.mainloop()
     except Exception as e:
-        logger.exception(l("arm_critical_error"), e)
+        logger.exception(l("arm_critical_error"))
         messagebox.showerror(random_string(), f"{l("arm_critical_error")}\n{e}")
 
 if __name__ == "__main__":

@@ -111,7 +111,7 @@ from config import theme, default_theme, program_authentication_clyth, current_l
 from languages import l
 
 global run_in_recovery, current_theme, crowbar_menu_version
-crowbar_menu_version = "2.3.2 Beta"
+crowbar_menu_version = "2.3.3 Beta"
 
 @logger.catch
 def CM(run_in_recovery, current_theme, current_disc=None):
@@ -381,7 +381,7 @@ def CM(run_in_recovery, current_theme, current_disc=None):
 
         CM_GUI.mainloop()
     except Exception as e:
-        logger.exception(l("cm_critical_error"), e)
+        logger.exception(l("cm_critical_error"))
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

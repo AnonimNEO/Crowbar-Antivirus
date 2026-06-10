@@ -19,9 +19,9 @@ from OF import Psutil
 from languages import l
 from config import current_localization
 
-edit_criticality_version = "0.4.2 Beta"
+edit_criticality_version = "0.4.3 Beta"
 
-#Загрузка необходимых библиотек Windows на уровне модуля
+#Загрузка необходимых библиотек windows
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 ntdll = ctypes.WinDLL("ntdll", use_last_error=True)
 
@@ -34,7 +34,7 @@ STATUS_SUCCESS = 0
 #Значение (ULONG): 1 - критический, 0 - некритический
 PROCESS_INFORMATION_CLASS_CRITICAL = 0x1D
 
-#Определение функций Windows API
+#Определяем функции windows API
 def define_functions():
     #kernel32.OpenProcess
     kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
@@ -49,89 +49,76 @@ def define_functions():
     ntdll.NtSetInformationProcess.restype = wintypes.LONG
 
     #ntdll.NtQueryInformationProcess (Для запроса критичности)
-    ntdll.NtQueryInformationProcess.argtypes = [
-        wintypes.HANDLE,
-        wintypes.DWORD, #ProcessInformationClass
-        ctypes.c_void_p, #ProcessInformation
-        wintypes.ULONG, #ProcessInformationLength
-        ctypes.POINTER(wintypes.ULONG) #ReturnLength
-    ]
+    ntdll.NtQueryInformationProcess.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.c_void_p, wintypes.ULONG, ctypes.POINTER(wintypes.ULONG)]
     ntdll.NtQueryInformationProcess.restype = wintypes.LONG
-
-    #ntdll.NtQuerySystemInformation
-    ntdll.NtQuerySystemInformation.argtypes = [wintypes.DWORD, ctypes.c_void_p, wintypes.ULONG,
-                                              ctypes.POINTER(wintypes.ULONG)]
-    ntdll.NtQuerySystemInformation.restype = wintypes.LONG
-
 
 
 #Получаем имя процесса
 def get_process_name(process_id):
-    process = psutil.Process(process_id)
-    return process.name()
+    try:
+        process = psutil.Process(process_id)
+        return process.name()
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        return f"Unknown_PID_{process_id}"
 
 
-
-#Попытка получить текущий статус критичности процесса
+#Получаем текущий статус критичности процесса
 def get_process_critical_status(process_id):
     process_handle = None
     try:
+        define_functions()
+
         #Открываем процесс с правом на запрос информации
         process_handle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION, False, process_id)
 
         if not process_handle:
+            error_code = ctypes.get_last_error()
+            logger.error(f"EC - {l("open_process_error")} (pid: {process_id}). {l("error_code")}: {error_code}")
             return None
 
-        #Переменная для хранения результата (ULONG, 4 байта)
-        critical_value = wintypes.ULONG(0)
-        return_length = wintypes.ULONG(0)
+        #Переменная для хранения результата
+        critical_value = ctypes.c_ulong(0)
+        return_length = ctypes.c_ulong(0)
 
         #Вызываем NtQueryInformationProcess с классом 0x1D
-        result = ntdll.NtQueryInformationProcess(
-            process_handle,
-            PROCESS_INFORMATION_CLASS_CRITICAL,
-            ctypes.byref(critical_value),
-            ctypes.sizeof(critical_value),
-            ctypes.byref(return_length)
-        )
+        result = ntdll.NtQueryInformationProcess(process_handle, PROCESS_INFORMATION_CLASS_CRITICAL, ctypes.byref(critical_value), ctypes.sizeof(critical_value), ctypes.byref(return_length))
 
         if result == STATUS_SUCCESS:
-            return bool(critical_value.value)
+            is_critical = bool(critical_value.value)
+            logger.info(f"EC - {l("process")} (pid: {process_id}) {l("criticality_status")}: {is_critical}")
+            return is_critical
         else:
+            logger.error(f"EC - {l("query_critical_error")}. {l("error_code")}: {hex(result)}")
             return None
 
     except Exception as e:
+        logger.exception(f"EC - {l("get_critical_unknown_error")}")
         return None
     finally:
         if process_handle:
             kernel32.CloseHandle(process_handle)
 
 
-
 #Меняем значение критичности на процессе
 def set_process_critical(process_id, critical):
     process_handle = None
     try:
+        define_functions()
+
         #Получаем handle процесса с правами на изменение и запрос информации
         process_handle = kernel32.OpenProcess(PROCESS_SET_INFORMATION | PROCESS_QUERY_INFORMATION, False, process_id)
 
         if not process_handle:
+            error_code = ctypes.get_last_error()
             process_name = get_process_name(process_id)
-            logger.error(f"EC - {l("open_process_error")} {process_name} (pid: {process_id}). {l("error_code")}: {ctypes.get_last_error()}")
+            logger.error(f"EC - {l("open_process_error")} {process_name} (pid: {process_id}). {l("error_code")}: {error_code}")
             return False
 
         #Значение 1 для True (критический), 0 для False (некритический)
         critical_value = ctypes.c_ulong(1 if critical else 0)
 
         #Вызываем NtSetInformationProcess с классом 0x1D
-        result = ntdll.NtSetInformationProcess(
-            process_handle,
-            PROCESS_INFORMATION_CLASS_CRITICAL,
-            ctypes.byref(critical_value),
-            ctypes.sizeof(critical_value)
-        )
-
-        kernel32.CloseHandle(process_handle)
+        result = ntdll.NtSetInformationProcess(process_handle, PROCESS_INFORMATION_CLASS_CRITICAL, ctypes.byref(critical_value), ctypes.sizeof(critical_value))
 
         if result == STATUS_SUCCESS:
             status = l("installed") if critical else l("removed")
@@ -142,7 +129,7 @@ def set_process_critical(process_id, critical):
             return False
 
     except Exception as e:
-        logger.error(f"EC - {l("edit_critical_unknown_error")}:\n{e}")
+        logger.exception(f"EC - {l("edit_critical_unknown_error")}")
         return False
     finally:
         if process_handle:
@@ -150,22 +137,35 @@ def set_process_critical(process_id, critical):
 
 
 
-def EC(process_id, critical, debug_mode=True):
-    #Инициализация функций windows API
-    define_functions()
-
+def EC(process_id, critical=None, debug_mode=True):
     try:
         process_name = get_process_name(process_id)
-        #Проверяем существование процесса
+
         if not psutil.pid_exists(process_id):
             if debug_mode:
-                logger.error(f"EC - {l("process")} {process_name} (pid: {process_id}) {l("not_found")}!")
-                return
+                logger.debug(f"EC - {l("process")} {process_name} (pid: {process_id}) {l("not_found")}!")
+            return None
 
+        #Если critical=None, только считываем статус
+        if critical is None:
+            current_status = get_process_critical_status(process_id)
+            return current_status
+
+        #Иначе устанавливаем новое значение и проверяем результат
         if set_process_critical(process_id, critical):
-            logger.success(f"EC - {l("criticality_status")} {process_name} (pid: {process_id}) {l("changed_to")} {critical}")
+            #Проверяем, успешно ли изменилось значение
+            verified_status = get_process_critical_status(process_id)
+
+            if verified_status == critical:
+                logger.success(f"EC - {l("criticality_status")} {process_name} (pid: {process_id}) {l("changed_to")} {critical}")
+                return True
+            else:
+                logger.warning(f"EC - {l("criticality_status")} {process_name} (pid: {process_id}) {l("change_verify_failed")}")
+                return False
         else:
             logger.error(f"EC - {l("criticality_status")} {process_name} (pid: {process_id}) {l("no_changed")}")
+            return False
 
     except Exception as e:
-        logger.critical(f"{l("ec_critical_error")}:\n{e}")
+        logger.exception(f"{l("ec_critical_error")}")
+        return None

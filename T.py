@@ -75,7 +75,7 @@ except Exception as e:
 
     logger = Loggers()
 
-    logger.exception(f"T - {l("import_error")} loguru! {l("replacement_is_used")}", e)
+    logger.exception(f"T - {l("import_error")} loguru! {l("replacement_is_used")}")
 
 #Интерфейс
 try:
@@ -83,21 +83,21 @@ try:
     import tkinter as tk
 except Exception as e:
     not_tkinter = True
-    logger.exception(f"T - {l("import_error")} tkinter", e)
+    logger.exception(f"T - {l("import_error")} tkinter")
 
 try:
     #Рисование иконки в трее и вставка картинок
     from PIL import Image, ImageDraw, ImageFont
 except Exception as e:
     not_pillow = True
-    logger.exception(f"T - {l("import_error")} Pillow", e)
+    logger.exception(f"T - {l("import_error")} Pillow")
 
 #Получение прав Администратора
 try:
     from elevate import elevate
 except Exception as e:
     not_elevate = True
-    logger.exception(f"T - {l("import_error")} elevate", e)
+    logger.exception(f"T - {l("import_error")} elevate")
 
 #Движок иконки в трее
 try:
@@ -112,25 +112,25 @@ try:
     from io import BytesIO
 except Exception as e:
     not_bytesio = True
-    logger.exception(f"T - {l("import_error")} BytesIO", e)
+    logger.exception(f"T - {l("import_error")} BytesIO")
 
 try:
     import multiprocessing
 except Exception as e:
     not_multiprocessing = True
-    logger.exception(f"T - {l("import_error")} multiprocessing", e)
+    logger.exception(f"T - {l("import_error")} multiprocessing")
 
 try:
     import threading
 except Exception as e:
     not_threading = True
-    logger.exception(f"T - {l("import_error")} threading", e)
+    logger.exception(f"T - {l("import_error")} threading")
 
 try:
     import signal
 except Exception as e:
     not_signal = True
-    logger.exception(f"T - {l("import_error")} signal", e)
+    logger.exception(f"T - {l("import_error")} signal")
 
 not_ap = False
 not_arm = False
@@ -160,19 +160,19 @@ try:
     from AP import AP
 except Exception as e:
     not_ap = True
-    logger.exception(f"T - {l("component_import_error")} AboutImage", e)
+    logger.exception(f"T - {l("component_import_error")} AboutImage")
 
 try:
     from ARM import ARM, autorun_master_version
 except Exception as e:
     not_arm = True
-    logger.exception(f"T - {l("component_import_error")} AutoRunMaster", e)
+    logger.exception(f"T - {l("component_import_error")} AutoRunMaster")
 
 try:
     from CC import CC, clear_cache_version
 except Exception as e:
     not_cc = True
-    logger.exception(f"T - {l("component_import_error")} ClearCache", e)
+    logger.exception(f"T - {l("component_import_error")} ClearCache")
 
 try:
     from CC22 import CC22
@@ -180,14 +180,14 @@ except Exception as e:
     not_cc2 = True
     def CC22():
         return "error"
-    logger.exception(f"T - {l("component_import_error")} CC22", e)
+    logger.exception(f"T - {l("component_import_error")} CC22")
 
 try:
     from config import *
     import config
 except Exception as e:
     not_config = True
-    logger.exception(f"T - {l("import_error")} config!", e)
+    logger.exception(f"T - {l("import_error")} config!")
 
 try:
     from E import E, exit_version
@@ -195,7 +195,7 @@ except Exception as e:
     not_e = True
     def E():
         pass
-    logger.exception(f"T - {l("component_import_error")} Exit", e)
+    logger.exception(f"T - {l("component_import_error")} Exit")
 
 try:
     from EC import EC, edit_criticality_version
@@ -203,38 +203,38 @@ except Exception as e:
     not_ec = True
     def EC():
         pass
-    logger.exception(f"T - {l("component_import_error")} EditCritical", e)
+    logger.exception(f"T - {l("component_import_error")} EditCritical")
 
 try:
     from FE import FE, file_editor_version
 except Exception as e:
     not_fe = True
-    logger.exception(f"T - {l("component_import_error")} FileEditor", e)
+    logger.exception(f"T - {l("component_import_error")} FileEditor")
 
 try:
     from FM import FM, file_manager_version
 except Exception as e:
     not_fm = True
-    logger.critical(f"T - {l("component_import_error")} FileManager", e)
+    logger.critical(f"T - {l("component_import_error")} FileManager")
 
 try:
     from FR import FR, file_replacer_version
 except Exception as e:
     not_fr = True
-    logger.exception(f"T - {l("component_import_error")} FileReplacer", e)
+    logger.exception(f"T - {l("component_import_error")} FileReplacer")
 
 try:
     from GFA import GFA, get_full_access_version
 except Exception as e:
     def GFA():
         pass
-    logger.exception(f"T - {l("component_import_error")} GetFullAccess", e)
+    logger.exception(f"T - {l("component_import_error")} GetFullAccess")
 
 try:
     from RLP import RLP, real_time_protect_version
 except Exception as e:
     not_rlp = True
-    logger.exception(f"T - {l("component_import_error")} RealTimeProtection", e)
+    logger.exception(f"T - {l("component_import_error")} RealTimeProtection")
 
 try:
     from CM import CM, crowbar_menu_version
@@ -243,7 +243,7 @@ except Exception as e:
     crowbar_menu_version = "error"
     def CM(a=None, b=None, c=None):
         pass
-    logger.exception(f"T - {l("component_import_error")} MountUnlocker", e)
+    logger.exception(f"T - {l("component_import_error")} MountUnlocker")
 
 try:
     from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, other_function_version
@@ -256,13 +256,13 @@ except Exception as e:
         pass
     def pac():
         messagebox.showerror(random_string(), f"{l("pac")} {l("not_available")}!")
-    logger.exception(f"T - {l("component_import_error")} OtherFunction", e)
+    logger.exception(f"T - {l("component_import_error")} OtherFunction")
 
 try:
     from PM import PM, process_manager_version
 except Exception as e:
     not_pm = True
-    logger.exception(f"T - {l("component_import_error")} ProcessManager", e)
+    logger.exception(f"T - {l("component_import_error")} ProcessManager")
 
 try:
     from R import R, restart_version
@@ -270,7 +270,7 @@ except Exception as e:
     not_r = True
     def R():
         pass
-    logger.exception(f"T - {l("component_import_error")} Restart", e)
+    logger.exception(f"T - {l("component_import_error")} Restart")
 
 try:
     from RS import random_string, random_string_version
@@ -278,25 +278,25 @@ except Exception as e:
     def random_string():
         return "error"
     not_rs = True
-    logger.exception(f"T - {l("component_import_error")} RandomString", e)
+    logger.exception(f"T - {l("component_import_error")} RandomString")
 
 try:
     from Run import Run, run_version
 except Exception as e:
     not_run = True
-    logger.exception(f"T - {l("component_import_error")} Run", e)
+    logger.exception(f"T - {l("component_import_error")} Run")
 
 try:
     from SAU import SAU, settings_and_update_version
 except Exception as e:
     not_sau = True
-    logger.exception(f"T - {l("component_import_error")} SettingsAndUpdate", e)
+    logger.exception(f"T - {l("component_import_error")} SettingsAndUpdate")
 
 try:
     from SP import SP, scarecrow_protection_version
 except Exception as e:
     not_sp = True
-    logger.exception(f"T - {l("component_import_error")} ScarecrowProtection", e)
+    logger.exception(f"T - {l("component_import_error")} ScarecrowProtection")
 
 try:
     from UA import UA, check_and_restore_fonts_if_needed, unlock_all_version
@@ -304,20 +304,20 @@ except Exception as e:
     not_ua = True
     def check_and_restore_fonts_if_needed(a=None):
         pass
-    logger.exception(f"T - {l("component_import_error")} UnlockAll", e)
+    logger.exception(f"T - {l("component_import_error")} UnlockAll")
 
 try:
     from UM import UM, users_manager_version
 except Exception as e:
     not_um = True
-    logger.exception(f"T - {l("component_import_error")} UserManager", e)
+    logger.exception(f"T - {l("component_import_error")} UserManager")
 
 #Импорт консоли разработчика
 try:
     from Console import open_console, crowbar_console_version
 except Exception as e:
     not_console = True
-    logger.exception(f"T - {l("component_import_error")} Console", e)
+    logger.exception(f"T - {l("component_import_error")} Console")
 
 from CASH import CASH
 
@@ -391,12 +391,12 @@ try:
         )
         messagebox.showerror(random_string(), critical_error)
 except Exception as e:
-    logger.exception(f"T - {l("checking_damage_error")}", e)
+    logger.exception(f"T - {l("checking_damage_error")}")
 
 #Глобальные Переменные
 global T_log_txt, start_interface, run_in_recovery, current_theme
 font_trey = "Default"
-trey_version = "2.4.4 Beta build 2"
+trey_version = "2.4.5 Beta"
 on_board_pc_version = l("not_stable")
 
 def Crowbar():
@@ -422,7 +422,7 @@ def Crowbar():
                 logger.info(f"T - {l("run_in_normal")}")
         except Exception as e:
             run_in_recovery = True
-            logger.exception(f"T - {l("environment_error")}", e)
+            logger.exception(f"T - {l("environment_error")}")
 
         if run_in_recovery:
             current_disc, found_disc = get_current_disc(run_in_recovery)
@@ -432,7 +432,7 @@ def Crowbar():
 
     except Exception as e:
         comment = f"T -{runtime_error}"
-        logger.exception(comment, e)
+        logger.exception(comment)
         messagebox.showerror(random_string(), f"{comment}:\n{e}")
 
     check_and_restore_fonts_if_needed(run_in_recovery)
@@ -480,7 +480,7 @@ def Crowbar():
                     try:
                         icon.visible = True
                     except Exception as e:
-                        logger.exception(f"T - {l("trey_error")}", e)
+                        logger.exception(f"T - {l("trey_error")}")
 
                 if run_in_recovery:
                     current_disc_r, found_disc = get_current_disc(run_in_recovery)
@@ -594,7 +594,7 @@ def Crowbar():
 
                         start_icon()
                     except Exception as e:
-                        logger.exception(f"T - {l("icon_start_error")}!", e)
+                        logger.exception(f"T - {l("icon_start_error")}!")
                 if start_lp:
                     run_component(RLP)
 
@@ -608,14 +608,14 @@ def Crowbar():
                 while True:
                     time.sleep(1)
             except Exception as e:
-                logger.exception(f"T - {l("icon_start_error")}!", e)
+                logger.exception(f"T - {l("icon_start_error")}!")
                 CM(run_in_recovery, current_theme, current_disc)
 
         if run_in_recovery:
             CM(run_in_recovery, current_theme, current_disc)
 
     except Exception as e:
-        logger.exception(l("t_critical_error"), e)
+        logger.exception(l("t_critical_error"))
         CM(run_in_recovery, current_theme, current_disc)
     finally:
         if run_in_recovery:
@@ -628,7 +628,7 @@ if __name__ == "__main__":
     try:
         multiprocessing.freeze_support()
     except Exception as e:
-        logger.exception(f"T - {l("multiprocessing_error")}", e)
+        logger.exception(f"T - {l("multiprocessing_error")}")
 
     try:
         if ctypes.windll.shell32.IsUserAnAdmin():
@@ -636,12 +636,12 @@ if __name__ == "__main__":
                 Crowbar()
             except Exception as e:
                 comment = f"T - {l("t_critical_error")}"
-                logger.exception(comment, e)
+                logger.exception(comment)
                 if messagebox.askyesno(random_string(), f"{comment}:\n{e}\n\n{l("restart_program")}?"):
                     Crowbar()
         else:
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
     except Exception as e:
         admin_error = f"T - {l("admin_error")}"
-        logger.exception(admin_error, e)
+        logger.exception(admin_error)
         messagebox.showerror(random_string(), f"{admin_error}:\n{e}")

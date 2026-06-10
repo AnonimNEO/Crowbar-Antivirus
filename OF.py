@@ -30,7 +30,7 @@ from languages import l
 from config import *
 
 global load_bush
-other_function_version = "0.9.1 Beta"
+other_function_version = "0.9.2 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -83,7 +83,7 @@ def run_component(func, *args):
         thread.start()
         logger.info(f"OF/run_component - {l("start_thread")} {func.__name__}")
     except Exception as e:
-        logger.error(f"OF/run_component - {l("start_thread_error")} {func.__name__}: {e}")
+        logger.exception(f"OF/run_component - {l("start_thread_error")} {func.__name__}")
 
 
 
@@ -95,7 +95,7 @@ def run_component_process(func, *args):
         process.start()
         logger.info(f"OF/run_component - {l("start_process")} {func.__name__}")
     except Exception as e:
-        logger.error(f"OF/run_component - {l("start_process_error")} {func.__name__}: {e}")
+        logger.exception(f"OF/run_component - {l("start_process_error")} {func.__name__}")
 
 
 
@@ -264,7 +264,7 @@ def get_current_disc(run_in_recovery=False):
                 return p.mountpoint, True
         return "C:\\", False
     except Exception as e:
-        logger.exception(f"OF\\get_current_disc - {l("unknown_error")}", e)
+        logger.exception(f"OF\\get_current_disc - {l("unknown_error")}")
         return "X:\\", False
 
 
@@ -308,7 +308,7 @@ def load_bush(current_disc, user=False):
             logger.info(f"OF/load_bush - {l("bush")} {name} {l("success_load")} {path}")
             success_count += 1
         except Exception as e:
-            logger.exception(f"OF/load_bush - {l("load_bush_error")} {path}\\{name}", e)
+            logger.exception(f"OF/load_bush - {l("load_bush_error")} {path}\\{name}")
 
     #Возвращаем True, если загрузили хотя бы один куст
     return success_count > 0
@@ -326,7 +326,7 @@ def unload_bush():
             active_loaded_hives.remove(name)
             logger.success(f"OF/unload_bush - {l("bush")} {name} {l("success_unload")}.")
         except Exception as e:
-            logger.exception(f"OF/unload_bush - {l("unload_bush_error")} {name}", e)
+            logger.exception(f"OF/unload_bush - {l("unload_bush_error")} {name}")
 
 
 
@@ -337,7 +337,7 @@ def get_user_name():
         user_name = os.getlogin()
         return user_name
     except Exception as e:
-        logger.exception(f"OF/get_user_name - {l("get_user_name_error")}!", e)
+        logger.exception(f"OF/get_user_name - {l("get_user_name_error")}!")
         return default_user_name
 
 
@@ -399,7 +399,7 @@ def reg_file(reg_file, reg_code):
     try:
         os.startfile(reg_file)
     except Exception as e:
-        logger.exception(f"OF/reg_file - {l("start_error")} {reg_file}", e)
+        logger.exception(f"OF/reg_file - {l("start_error")} {reg_file}")
 
 
 
@@ -410,4 +410,4 @@ def run_command(command):
         process = subprocess.run(command, shell=True)
         return process.returncode
     except Exception as e:
-        logger.exception(f"OF/run_command - {l("start_command_error")} - {command}", e)
+        logger.exception(f"OF/run_command - {l("start_command_error")} - {command}")

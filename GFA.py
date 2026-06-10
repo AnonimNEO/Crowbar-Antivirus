@@ -8,20 +8,20 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-from tkinter import messagebox
-from loguru import logger
-import subprocess
-import os
-
-from RS import random_string
-from languages import localizations
-from config import current_localization
-
-get_full_access_version = "0.4.0 Alpha"
+get_full_access_version = "0.4.1 Alpha"
 l = localizations[current_localization]
 
 #Получаем полные права на файл, каталог или ключ реестра
 def GFA(path, run_in_recovery=False):
+    from tkinter import messagebox
+    from loguru import logger
+    import subprocess
+    import os
+
+    from RS import random_string
+    from languages import localizations
+    from config import current_localization
+
     #if run_in_recovery:
     #    messagebox.showwarning(random_string(), "Невозможно получить права в среде восстановления.")
     #    return False
@@ -37,7 +37,7 @@ def GFA(path, run_in_recovery=False):
             return _grant_file_access(path, username)
 
     except Exception as e:
-        logger.exception(f"GFA - Ошибка выполнения", e)
+        logger.exception(f"GFA - {l("error")}")
         return False
 
 
@@ -73,7 +73,7 @@ def _grant_file_access(path, username):
             return False
 
     except Exception as e:
-        logger.exception(f"GFA - {l["file_error"]}", e)
+        logger.exception(f"GFA - {l["file_error"]}")
         return False
 
 
@@ -125,7 +125,7 @@ def _grant_registry_access(path, full_username):
         try:
             sid = win32security.LookupAccountName(None, full_username)[0]
         except Exception as e:
-            logger.exception(f"GFA - {l["get_sid_error"]} {full_username}", e)
+            logger.exception(f"GFA - {l["get_sid_error"]} {full_username}")
             winreg.CloseKey(key)
             return False
 
@@ -137,7 +137,7 @@ def _grant_registry_access(path, full_username):
                 win32security.DACL_SECURITY_INFORMATION
             )
         except Exception as e:
-            logger.exception(f"GFA - {l["get_description_error"]}", e)
+            logger.exception(f"GFA - {l["get_description_error"]}")
             winreg.CloseKey(key)
             return False
 
@@ -160,7 +160,7 @@ def _grant_registry_access(path, full_username):
                 sid
             )
         except Exception as e:
-            logger.exception(f"GFA - {l["ace_error"]}", e)
+            logger.exception(f"GFA - {l["ace_error"]}")
             winreg.CloseKey(key)
             return False
 
@@ -177,7 +177,7 @@ def _grant_registry_access(path, full_username):
                 None
             )
         except Exception as e:
-            logger.exception(f"GFA - {l["set_access_error"]}", e)
+            logger.exception(f"GFA - {l["set_access_error"]}")
             winreg.CloseKey(key)
             return False
 
@@ -186,7 +186,7 @@ def _grant_registry_access(path, full_username):
         return True
 
     except Exception as e:
-        logger.exception(f"GFA - {l["regedit_error"]}", e)
+        logger.exception(f"GFA - {l["regedit_error"]}")
         return False
 
 

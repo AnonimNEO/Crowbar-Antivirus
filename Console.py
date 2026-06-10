@@ -8,23 +8,22 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-import tkinter as tk
-from tkinter import scrolledtext, messagebox
-from io import StringIO
-#Логирование Ошибок
-from loguru import logger
-import threading
-import random
-import sys
-
-from config import program_authentication_clyth, current_localization
-from languages import l
-from RS import random_string
-import config
-
-crowbar_console_version = "0.1.2 Pre-Alpha"
+crowbar_console_version = "0.1.3 Pre-Alpha"
 
 class CrowbarConsole:
+    import tkinter as tk
+    from tkinter import scrolledtext, messagebox
+    from io import StringIO
+    from loguru import logger
+    import threading
+    import random
+    import sys
+
+    from config import program_authentication_clyth, current_localization
+    from languages import l
+    from RS import random_string
+    import config
+
     def __init__(self, globals_dict=None):
         self.globals_dict = globals_dict if globals_dict else {}
         self.window = None
@@ -118,6 +117,7 @@ class CrowbarConsole:
             self.output_text.config(state=tk.DISABLED)
 
         except Exception as e:
+            logger.exception(f"Console - {l("error")}")
             self.output_text.config(state=tk.NORMAL)
             self.output_text.insert(tk.END, f"Error: {type(e).__name__}: {e}\n")
             self.output_text.config(state=tk.DISABLED)

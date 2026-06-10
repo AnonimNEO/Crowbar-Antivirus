@@ -8,20 +8,20 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-import tkinter as tk
-from tkinter import filedialog, messagebox
-from loguru import logger
-import os
-
-from languages import l
-from config import program_authentication_clyth, current_localization, clyth
-from RS import random_string
-#from CC22 import CC22
-from OF import pac
-
-file_editor_version = "0.3.1 Beta"
+file_editor_version = "0.3.2 Beta"
 
 class FileEditor:
+    import tkinter as tk
+    from tkinter import filedialog, messagebox
+    from loguru import logger
+    import os
+
+    from languages import l
+    from config import program_authentication_clyth, current_localization, clyth
+    from RS import random_string
+    #from CC22 import CC22
+    from OF import pac
+
     def __init__(self, FE_GUI):
         self.FE_GUI = FE_GUI
         self.FE_GUI.title(random_string())
@@ -294,6 +294,7 @@ class FileEditor:
             self.is_modified = False
             self.update_status_bar()
         except Exception as e:
+            logger.exception(f"FE - {l("error")} {l("load_file")}")
             messagebox.showerror(random_string(), str(e))
 
 
@@ -313,6 +314,7 @@ class FileEditor:
             self.update_status_bar()
             messagebox.showinfo(random_string(), f"{l("file")} {l("success_saved")}!")
         except Exception as e:
+            logger.exception(f"FE - {l("error")} {l("save_file")}: {current_file}")
             messagebox.showerror(random_string(), str(e))
 
 
@@ -333,6 +335,7 @@ class FileEditor:
                 self.update_status_bar()
                 messagebox.showinfo(random_string(), f"{l("file")} {l("success_saved")}!")
             except Exception as e:
+                logger.exception(f"FE - {l("error")} {l("save_file")}: {file_path}")
                 messagebox.showerror(random_string(), str(e))
 
 
@@ -526,7 +529,7 @@ def FE(file_path=None):
             editor.load_file(file_path)
         FE_GUI.mainloop()
     except Exception as e:
-        logger.exception(l("fe_critical_error"), e)
+        logger.exception(l("fe_critical_error"))
 
 if __name__ == "__main__":
     FE()

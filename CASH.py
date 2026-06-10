@@ -171,9 +171,7 @@ except Exception as e:
     def UM(a=None, b=None):
         print(f"CASH - {l["component_import_error"]} UserManager")
 
-
-
-crowbar_antivirus_scripts_handler_version = "0.4.1 Alpha"
+crowbar_antivirus_scripts_handler_version = "0.4.2 Alpha"
 
 current_theme = theme[default_theme]
 
@@ -229,7 +227,7 @@ def CASH(run_in_recovery, debug_mode=False):
             #Был передан файл
             file_path = sys.argv[1]
             if debug_mode:
-                logger.debug(f"CASH - Передан файл: {file_path}")
+                logger.debug(f"CASH - {l("file_transferred")}: {file_path}")
             #Получаем расширение файла
             _, file_extension = os.path.splitext(file_path)
             f_e = file_extension.lower() #Преобразуем в нижний регистр
@@ -254,7 +252,7 @@ def CASH(run_in_recovery, debug_mode=False):
                 config = get_script_config(code)
                 
                 if debug_mode:
-                    logger.debug(f"CASH - Конфигурация скрипта: {config}")
+                    logger.debug(f"CASH - {l("script_config")}: {config}")
 
                 #Создаём контекст выполнения с доступными функциями программы
                 exec_globals = {
@@ -304,32 +302,30 @@ def CASH(run_in_recovery, debug_mode=False):
                 try:
                     exec(code, exec_globals)
                 except Exception as e:
-                    logger.exception(f"CASH - Ошибка при выполнении скрипта {file_path}", e)
-                    messagebox.showerror(random_string(), f"Ошибка при выполнении скрипта:\n{e}")
+                    logger.exception(f"CASH - {l("exec_script_error")} {file_path}")
+                    messagebox.showerror(random_string(), f"{l("exec_script_error")}:\n{e}")
 
                 #Используем полученную конфигурацию
                 delete_script_after_exec = config["delete_script_after_exec"]
                 launch_when_program_starts = config["launch_when_program_starts"]
                 enable_while = config["enable_while"]
 
-                if debug_mode:
-                    logger.debug(f"CASH - Выполнение завершено. delete_script={delete_script_after_exec}, launch={launch_when_program_starts}, enable_while={enable_while}")
-
                 if delete_script_after_exec:
                     try:
                         os.remove(file_path)
                         if debug_mode:
-                            logger.debug(f"CASH - Скрипт удалён: {file_path}")
+                            logger.debug(f"CASH - {l("script_deleted")}: {file_path}")
                     except Exception as e:
-                        logger.exception(f"CASH - Ошибка при удалении скрипта: {file_path}", e)
+                        logger.exception(f"CASH - {l("script_deleted_error")}: {file_path}")
 
                 #Если enable_while=False или launch_when_program_starts=False, выходим из цикла
                 if not enable_while or not launch_when_program_starts:
                     break
                 #Если enable_while=True, цикл продолжится и скрипт выполнится снова
-
+                if not enable_while:
+                    logger.success(f"CASH - {l("execution_completed")}.")
             else:
-                messagebox.showwarning(random_string(), "Антивирус Монтировка не имеет команд для данного типа файла")
+                messagebox.showwarning(random_string(), l("command_not_found_for_file"))
                 break
         else:
             break #Выход, если файл не был передан

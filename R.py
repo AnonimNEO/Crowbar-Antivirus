@@ -20,7 +20,7 @@ from languages import l
 from config import *
 
 global restart_windows_bat
-restart_version = "0.9.1 Beta"
+restart_version = "0.9.2 Beta"
 
 @logger.catch
 def R():
@@ -53,7 +53,7 @@ def R():
                 bat_file.write(f"shutdown /r /t {time_to_restart}")
             os.startfile(restart_windows_bat)
     except Exception as e:
-        logger.error(f'R - {l("r_critical_error")} "{restart_windows}"', e)
+        logger.exception(f'R - {l("r_critical_error")} "{restart_windows}"')
         error += 1
         if error == 1:
             logger.info(f"R - {l("next_method")}: os")

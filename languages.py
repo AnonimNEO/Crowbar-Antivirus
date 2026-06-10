@@ -123,6 +123,14 @@ localizations = {
         "suspend_process_for_name": "Заморозить процессы с именем",
         "kill_process_for_name": "Убить процессы с именем",
         "action_error": "ошибка при действии",
+        #CASH
+        "script_deleted": "Скрипт удалён",
+        "script_deleted_error": "Ошибка при удалении скрипта",
+        "execution_completed": "Выполнение завершено",
+        "exec_script_error": "Ошибка при выполнении скрипта",
+        "script_config": "Конфигурация скрипта",
+        "file_transferred": "Передан файл",
+        "command_not_found_for_file": "Антивирус Монтировка не имеет команд для данного типа файла",
         #Console
         "crowbar_console": "Консоль Разработчика Антивируса Монтировка",
         "crowbar_console_text": "Будьте осторожны, данный компонент может быть не стабилен\nА не понимание, что вы делаете может привести к повреждению программы\nЕсли это произошло перезапустите программу.\n",
@@ -327,6 +335,9 @@ localizations = {
         "fe_critical_error": "В Компоненте FileEditor произошла неизвестная ошибка!",
         "cuttlefish": "Сепия",
         "crowbar_scripts": "Скрипты Антивируса Монтировка",
+        "load_file": "при загрузке файла",
+        "save_file": "при сохранении файла",
+        "": "",
         #FR
         "created": "Создан",
         "replaced": "заменено",

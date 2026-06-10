@@ -7,38 +7,37 @@
 #Или в файле COPYING.txt в архиве с установщиком
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
-#Интерфейс
-from tkinter import ttk, messagebox, Menu, simpledialog
-import tkinter as tk
-#Работа с пользователями
-import subprocess
-import os
-import threading
-#Логирование
-from loguru import logger
 
-from config import current_localization
-from languages import l
-from OF import pac, apply_global_theme
-from RS import random_string
-from config import *
-
-users_manager_version = "0.3.2 Beta"
-
-def run_net_command(args):
-    try:
-        subprocess.run(["net"] + args, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-        return True
-    except subprocess.CalledProcessError as e:
-        logger.error(f"UM - {l("net_error")}:\n{e.stderr}")
-        return False
-    except Exception as e:
-        logger.exception(f"UM - {l("system_command_error")}.", e)
-        return False
-
-
+users_manager_version = "0.3.3 Beta"
 
 class UserManager:
+    #Интерфейс
+    from tkinter import ttk, messagebox, Menu, simpledialog
+    import tkinter as tk
+    #Работа с пользователями
+    import subprocess
+    import os
+    import threading
+    #Логирование
+    from loguru import logger
+
+    from config import current_localization
+    from languages import l
+    from OF import pac, apply_global_theme
+    from RS import random_string
+    from config import *
+
+    def run_net_command(self, args):
+        try:
+            subprocess.run(["net"] + args, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            return True
+        except subprocess.CalledProcessError as e:
+            logger.error(f"UM - {l("net_error")}:\n{e.stderr}")
+            return False
+        except Exception as e:
+            logger.exception(f"UM - {l("system_command_error")}.")
+            return False
+
     def __init__(self, UM_GUI):
         self.UM_GUI = UM_GUI
         UM_GUI.title(random_string())
@@ -98,7 +97,7 @@ class UserManager:
             self.update_tree()
 
         except Exception as e:
-            logger.exception(f"UM - {l("get_user_list_error")}", e)
+            logger.exception(f"UM - {l("get_user_list_error")}")
             messagebox.showerror(random_string(), f"{l("get_user_list_error")}:\n{e}")
 
 
@@ -133,13 +132,13 @@ class UserManager:
                 return
 
             try:
-                run_net_command(["user", username, password, "/add"])
+                self.run_net_command(["user", username, password, "/add"])
                 logger.success(f"UM - {l("user")} {username} {l("success_create")}.")
                 self.load_users()
                 create_window.destroy()
             except Exception as e:
                 comment = f"UM - {l("create_user_error")} {username}"
-                logger.exception(comment, e)
+                logger.exception(comment)
                 messagebox.showerror(random_string(), comment)
 
         create_button = tk.Button(create_window, text=l("create_user"), command=confirm_creation)
@@ -159,7 +158,7 @@ class UserManager:
                 messagebox.showwarning(random_string(), f"{l("cant_delete_self")} ({username})!\n{l("what_did_you")}!")
                 continue
 
-            if run_net_command(["user", username, "/delete"]):
+            if self.run_net_command(["user", username, "/delete"]):
                 logger.info(f"UM - {l("user")} {username} {l("deleted")}.")
             else:
                 comment = f"{l("delete_user_error")} {username}."
@@ -214,14 +213,14 @@ class UserManager:
     def _do_reset_password(self, username, new_password):
         try:
             comment = f"{l("change_password_error")} {username}."
-            if run_net_command(["user", username, new_password]):
+            if self.run_net_command(["user", username, new_password]):
                 logger.info(f"UM - {l("password_for_user")} {username} {l("reset2")}.")
             else:
                 logger.error(f"UM - {comment}")
                 messagebox.showerror(random_string(), comment)
         except Exception as e:
             comment = f"{l("change_password_error")} {username}"
-            logger.exception(f"UM - {comment}", e)
+            logger.exception(f"UM - {comment}")
             messagebox.showerror(random_string(), comment)
 
 
@@ -257,7 +256,7 @@ def UM(current_theme):
         UserManager(UM_GUI)
         UM_GUI.mainloop()
     except Exception as e:
-        logger.exception(l("um_critical_error"), e)
+        logger.exception(l("um_critical_error"))
 if __name__ == "__main__":
     current_theme = theme[default_theme]
     UM(current_theme)

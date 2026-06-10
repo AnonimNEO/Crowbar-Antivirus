@@ -8,38 +8,38 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
-from tkinter import ttk, messagebox, Menu, simpledialog
-import tkinter as tk
-#Дата и Время
-from datetime import datetime
-#Логирование
-from loguru import logger
-#Получение имени пользователя
-import getpass
-#Получение свойств файла
-#import win32api
-#import win32con
-#Для поиска
-import fnmatch
-#Для получения списка дисков
-import string
-#Работа с файлами
-import os.path
-import shutil
-import os
-
-from OF import pac, get_user_name, get_current_disc, apply_global_theme
-from languages import l
-from RS import random_string
-from config import *
-from GFA import GFA
-from FE import FE
-
 #Глобальная переменная версии
-file_manager_version = "4.10.6 Beta"
+file_manager_version = "4.10.7 Beta"
 
 def FM(run_in_recovery, current_theme):
+    #Интерфейс
+    from tkinter import ttk, messagebox, Menu, simpledialog
+    import tkinter as tk
+    #Дата и Время
+    from datetime import datetime
+    #Логирование
+    from loguru import logger
+    #Получение имени пользователя
+    import getpass
+    #Получение свойств файла
+    #import win32api
+    #import win32con
+    #Для поиска
+    import fnmatch
+    #Для получения списка дисков
+    import string
+    #Работа с файлами
+    import os.path
+    import shutil
+    import os
+
+    from OF import pac, get_user_name, get_current_disc, apply_global_theme
+    from languages import l
+    from RS import random_string
+    from config import *
+    from GFA import GFA
+    from FE import FE
+
     try:
         #Перезапуск для применения темы
         def restart_fm(user_theme):
@@ -71,7 +71,7 @@ def FM(run_in_recovery, current_theme):
                         "ext": ""
                     })
                 except Exception as e:
-                    logger.exception(f"FM - {l("metadata_error")}", e)
+                    logger.exception(f"FM - {l("metadata_error")}")
 
             #Получаем список файлов/каталогов
             for item in os.listdir(path):
@@ -144,7 +144,7 @@ def FM(run_in_recovery, current_theme):
             try:
                 return datetime.fromtimestamp(timestamp).strftime("%d-%m-%Y %H:%M:%S")
             except Exception:
-                return "Н/Д"
+                return l("no_data")
 
 
 
@@ -509,7 +509,7 @@ def FM(run_in_recovery, current_theme):
                     self.update_path_entry()
                     self.update_toolbar_buttons()
                 except Exception as e:
-                    logger.exception(f"FM - {l("permission_error")} {path}", e)
+                    logger.exception(f"FM - {l("permission_error")} {path}")
                     messagebox.showerror(random_string(), f"{l("permission_error")}: {path}")
 
 
@@ -887,7 +887,7 @@ def FM(run_in_recovery, current_theme):
                         else:
                             os.remove(path)
                     except Exception as e:
-                        logger.exception(f"FM - {l("delete_error")} {path}", e)
+                        logger.exception(f"FM - {l("delete_error")} {path}")
                         messagebox.showerror(random_string(), f"{l("delete_error")} {os.path.basename(path)}:\n{e}")
 
                 #Обновляем и восстанавливаем фокус
@@ -950,7 +950,7 @@ def FM(run_in_recovery, current_theme):
                         elif action == "cut":
                             shutil.move(src_path, dest_path)
                     except Exception as e:
-                        logger.exception(f"FM - {l("paste_error")} {src_path}", e)
+                        logger.exception(f"FM - {l("paste_error")} {src_path}")
 
                 if action == "cut":
                     self.clipboard_data = {"paths": [], "action": None}
@@ -1022,7 +1022,7 @@ def FM(run_in_recovery, current_theme):
                     else:
                         return l("no")
                 except Exception as e:
-                    logger.exception(f"FM - {l("access_check_error_for")} {path}", e)
+                    logger.exception(f"FM - {l("access_check_error_for")} {path}")
                     return l("error")
 
 
@@ -1116,7 +1116,7 @@ def FM(run_in_recovery, current_theme):
                     ]
 
                 except Exception as e:
-                    logger.exception(f"FM - {l("collecting_properties_error")} {item_path}", e)
+                    logger.exception(f"FM - {l("collecting_properties_error")} {item_path}")
                     tree.insert("", "end", values=(l("error"), f"{l("read_file_properties_error")}:\n{e}"))
                     properties_data = []
 
@@ -1228,7 +1228,7 @@ def FM(run_in_recovery, current_theme):
                         tree.after(100, lambda: self.focus_item_by_path(new_path))
 
                     except Exception as e:
-                        logger.exception(f"FM - {l("error")} {l("when_renaming")}", e)
+                        logger.exception(f"FM - {l("error")} {l("when_renaming")}")
                         messagebox.showerror(random_string(), f"{l("error")} {l("when_renaming")}:\n{e}", parent=self.FM_GUI)
 
                 elif action == "create_path":
@@ -1237,7 +1237,7 @@ def FM(run_in_recovery, current_theme):
                         logger.info(f"FM - {l("created")} {l("dir")}: {new_path}")
                         self.on_refresh()
                     except Exception as e:
-                        logger.exception(f"FM - {l("create_dir_error")}", e)
+                        logger.exception(f"FM - {l("create_dir_error")}")
                         messagebox.showerror(random_string(), f"{l("create_dir_error")}:\n{e}", parent=self.FM_GUI)
 
                 elif action == "create_file":
@@ -1255,7 +1255,7 @@ def FM(run_in_recovery, current_theme):
                         logger.info(f"FM - {l("create_file")}:\n{new_path}")
                         self.on_refresh()
                     except Exception as e:
-                        logger.exception(f"FM - {l("create_file_error")}", e)
+                        logger.exception(f"FM - {l("create_file_error")}")
                         messagebox.showerror(random_string(), f"{l("create_file_error")}:\n{e}", parent=self.FM_GUI)
 
 
@@ -1272,7 +1272,7 @@ def FM(run_in_recovery, current_theme):
                         tree.focus(item_path)
                         tree.see(item_path) #Прокрутить до элемента
                 except Exception as e:
-                    logger.exception(f"FM - {l("restore_focus_error")} {item_path}", e)
+                    logger.exception(f"FM - {l("restore_focus_error")} {item_path}")
 
 
 
@@ -1505,7 +1505,7 @@ def FM(run_in_recovery, current_theme):
                             else:
                                 os.remove(dest_path)
                         except Exception as e:
-                            logger.exception(f"FM - {l("replace_file_not_found")}", e)
+                            logger.exception(f"FM - {l("replace_file_not_found")}")
                             messagebox.showerror(random_string(), f"{l("replace_file_not_found")}:\n{e}")
                             return
 
@@ -1525,7 +1525,7 @@ def FM(run_in_recovery, current_theme):
                         self.clipboard_data = {"path": None, "action": None}
 
                 except Exception as e:
-                    logger.exception(f"FM - {l("paste_error")}", e)
+                    logger.exception(f"FM - {l("paste_error")}")
                     messagebox.showerror(random_string(), f"{l("paste_error")} {action}:\n{e}")
 
                 self.on_refresh()
@@ -1640,7 +1640,7 @@ def FM(run_in_recovery, current_theme):
                 try:
                     os.startfile(file_path)
                 except Exception as e:
-                    logger.exception(f"FM - {l("open_file_error")} {file_path}", e)
+                    logger.exception(f"FM - {l("open_file_error")} {file_path}")
                     messagebox.showerror(random_string(), f"{l("open_file_error")}:\n{e}")
 
 
@@ -1661,7 +1661,7 @@ def FM(run_in_recovery, current_theme):
 
                     self.on_refresh()
                 except Exception as e:
-                    logger.exception(f"FM - {l("delete_file_error")} {path}", e)
+                    logger.exception(f"FM - {l("delete_file_error")} {path}")
                     messagebox.showerror(random_string(), f"{l("delete_file_error")}:\n{e}")
 
 
@@ -1840,10 +1840,10 @@ def FM(run_in_recovery, current_theme):
                                     if found_item:
                                         results.append(found_item)
                                 except Exception as e:
-                                    logger.warning(f"FM - {l("info_file_error")} {item_path}:\n{e}")
+                                    logger.exception(f"FM - {l("info_file_error")} {item_path}")
 
                     except Exception as e:
-                        logger.error(f"FM - {l("read_dir_error")} {start_path}:\n{e}")
+                        logger.exception(f"FM - {l("read_dir_error")} {start_path}")
 
                 #Ищем рекурсивно
                 else:
@@ -1866,7 +1866,7 @@ def FM(run_in_recovery, current_theme):
                                         "ext": ""
                                     })
                                 except Exception as e:
-                                    logger.exception(f"FM - {l("info_dir_error")} {dir_path}", e)
+                                    logger.exception(f"FM - {l("info_dir_error")} {dir_path}")
 
                         #Ищем совпадения в именах файлов
                         for file_name in files:
@@ -1878,7 +1878,7 @@ def FM(run_in_recovery, current_theme):
                                     if found_item:
                                         results.append(found_item)
                                 except Exception as e:
-                                    logger.exception(f"FM - {l("info_file_error")} {file_path}", e)
+                                    logger.exception(f"FM - {l("info_file_error")} {file_path}")
 
                 #logger.debug(f"FM - Поиск завершен. Найдено результатов: {len(results)}")
                 return results
@@ -1947,8 +1947,9 @@ def FM(run_in_recovery, current_theme):
         FM_GUI.mainloop()
 
     except Exception as e:
-        logger.critical(l("fm_critical_error"), e)
+        logger.exception(l("fm_critical_error"))
         messagebox.showerror(random_string(), f"{l("fm_critical_error")}\n{e}")
 
 if __name__ == "__main__":
-    FM(False, theme["dark"])
+    from config import theme, default_theme
+    FM(False, theme[default_theme])

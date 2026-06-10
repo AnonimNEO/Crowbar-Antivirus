@@ -8,27 +8,27 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-#Логирование ошибок
-from loguru import logger
-#Интерфейс
-import tkinter as tk
-from tkinter import ttk, Menu
-#Работа с процессами и файлами
-import subprocess
-import os
-import re
-
-from RS import random_string
-from OF import pac, apply_global_theme
-from config import theme, default_theme, program_authentication_clyth, current_localization
-from languages import l
-
-run_version = "1.1.1 Beta"
+run_version = "1.1.2 Beta"
 run_width_window = 400
 run_height_window = 200
 run_size_window = f"{run_width_window}x{run_height_window}"
 
-class ApplicationLauncher:
+class Run_As_Admin:
+    #Логирование ошибок
+    from loguru import logger
+    #Интерфейс
+    import tkinter as tk
+    from tkinter import ttk, Menu
+    #Работа с процессами и файлами
+    import subprocess
+    import os
+    import re
+
+    from RS import random_string
+    from OF import pac, apply_global_theme
+    from config import theme, default_theme, program_authentication_clyth, current_localization
+    from languages import l
+
     def __init__(self, RUN_GUI):
         self.RUN_GUI = RUN_GUI
         self.RUN_GUI.title(random_string())
@@ -236,9 +236,9 @@ class ApplicationLauncher:
                     logger.error(comment)
                     self.log(comment)
         except Exception as e:
-            comment = f"Run - {l("start_error")} {l("file2")}:\n{e}"
+            comment = f"Run - {l("start_error")} {l("file2")}"
             logger.error(comment)
-            self.log(comment)
+            self.log(comment, e)
 
 
 
@@ -249,7 +249,7 @@ class ApplicationLauncher:
         try:
             subprocess.Popen(command, shell=True)
         except Exception as e:
-            logger.exception(l("start_command_error"), e)
+            logger.exception(l("start_command_error"))
             self.log(l("start_command_error"))
 
 
@@ -276,7 +276,7 @@ class ApplicationLauncher:
 def Run(current_theme):
     RUN_GUI = tk.Tk()
     apply_global_theme(RUN_GUI, current_theme)
-    ApplicationLauncher(RUN_GUI)
+    Run_As_Admin(RUN_GUI)
 
     def restart_run(user_theme):
         global current_theme

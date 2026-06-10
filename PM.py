@@ -8,19 +8,7 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
-from tkinter import ttk, messagebox
-import tkinter as tk
-#Логирование
-from loguru import logger
-import os
-
-from config import *
-from languages import l
-from OF import pac, Psutil, apply_global_theme, extract_filename_from_path
-from RS import random_string
-
-process_manager_version = "1.8.3 Beta"
+process_manager_version = "1.8.4 Beta"
 
 #Действие с процессами
 def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, run_in_recovery=False):
@@ -53,7 +41,7 @@ def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, ru
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
         except Exception as e:
-            logger.exception(f"PM - {l("at")} {action} PID {pid}", e)
+            logger.exception(f"PM - {l("at")} {action} PID {pid}")
 
     #Обновляем таблицу один раз после обработки всех процессов
     if PM_GUI_ELEMENTS:
@@ -62,6 +50,18 @@ def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, ru
 
 
 def PM(run_in_recovery, current_theme):
+    #Интерфейс
+    from tkinter import ttk, messagebox
+    import tkinter as tk
+    #Логирование
+    from loguru import logger
+    import os
+
+    from config import *
+    from languages import l
+    from OF import pac, Psutil, apply_global_theme, extract_filename_from_path
+    from RS import random_string
+
     PM_GUI_ELEMENTS = {
         "manager": None,
         "notebook": None,
@@ -126,7 +126,7 @@ def PM(run_in_recovery, current_theme):
                 return None
             except Exception as e:
                 process_name = get_process_name(proc.pid)
-                logger.exception(f"PM - {l("info_process_error")} {process_name} (pid:{proc.pid})", e)
+                logger.exception(f"PM - {l("info_process_error")} {process_name} (pid:{proc.pid})")
                 return None
 
 
@@ -697,7 +697,7 @@ def PM(run_in_recovery, current_theme):
 
         PM_GUI.mainloop()
     except Exception as e:
-        logger.exception(l("pm_critical_error"), e)
+        logger.exception(l("pm_critical_error"))
 
 if __name__ == "__main__":
     current_theme = theme[default_theme]

@@ -23,7 +23,7 @@ from OF import get_offline_reg_path, loaded_hive_names
 from config import current_localization
 from languages import l
 
-unlock_all_version = "1.2.1 Beta"
+unlock_all_version = "1.2.2 Beta"
 
 #Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
@@ -108,7 +108,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
                     logger.success(f'UA - {l("font")} "{font_name}" {l("add_in_registry")}.')
 
             except Exception as e:
-                logger.exception(f'UA -  "{font_file}"', e)
+                logger.exception(f'UA -  "{font_file}"')
 
         #Удаляем записи о шрифтах, которых нет в каталоге
         orphaned_count = 0
@@ -133,7 +133,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
                 except OSError:
                     break
         except Exception as e:
-            logger.exception(f'UA - {l("delete_orphan_font_error")}', e)
+            logger.exception(f'UA - {l("delete_orphan_font_error")}')
 
         logger.info(f"UA - {l("recovery_font_complete")}: {fonts_found}, {l("restored")}: {fonts_restored}, {l("removed_orphans")}: {orphaned_count}")
         return True
@@ -145,7 +145,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
         logger.critical(f"UA - {l("permission_error")}: {registry_key}")
         return False
     except Exception as e:
-        exception(f"UA - {l("recovery_font_error")}", e)
+        exception(f"UA - {l("recovery_font_error")}")
         return False
     finally:
         if key_handle:
@@ -204,7 +204,7 @@ def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, run_
             except FileNotFoundError:
                 logger.debug(f'UA - {l("parameter")} "{param}" {l("not_found_pass")}.')
             except Exception as e:
-                logger.exception(f'UA - {l("reset_error")} "{param}"', e)
+                logger.exception(f'UA - {l("reset_error")} "{param}"')
 
         return True
     except FileNotFoundError:
@@ -214,7 +214,7 @@ def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, run_
         logger.critical(f"UA - {l("permission_error")}: {hive_name}\\{chapter}")
         return False
     except Exception as e:
-        logger.exception(f"UA - {l("read_key_error")} {chapter}", e)
+        logger.exception(f"UA - {l("read_key_error")} {chapter}")
         return False
     finally:
         if key_handle:
@@ -262,7 +262,7 @@ def process_hosts_file(fix=False, exclude_hosts=None):
                 logger.info(f"UA - {l("delete_block")}: {", ".join(blocked_hosts)}")
         return True
     except Exception as e:
-        logger.exception(f"UA - {l("file_error")} hosts", e)
+        logger.exception(f"UA - {l("file_error")} hosts")
         return False
 
 
@@ -324,7 +324,7 @@ def UA(run_in_recovery):
 
         messagebox.showinfo(random_string(), f"{l("au_result")}:\n{ua_text}")
     except Exception as e:
-        logger.exception(l("ua_critical_error"), e)
+        logger.exception(l("ua_critical_error"))
         messagebox.showerror(random_string(), f"{l("ua_critical_error")}\n{e}")
 
     logger.info(f"UA - {l("component_work_complete")}.")
@@ -422,14 +422,14 @@ def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
             logger.critical(f"UA - {l("permission_error")}: {registry_key}")
             return False
         except Exception as e:
-            logger.exception(f"UA - {l("check_fonts_error")}", e)
+            logger.exception(f"UA - {l("check_fonts_error")}")
             return False
         finally:
             if key_handle:
                 winreg.CloseKey(key_handle)
 
     except Exception as e:
-        logger.exception(f"UA - {l("check_fonts_error")}", e)
+        logger.exception(f"UA - {l("check_fonts_error")}")
         return False
 
 if __name__ == "__main__":

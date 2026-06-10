@@ -26,7 +26,7 @@ from languages import l
 from RS import random_string
 
 global about_program_version
-about_program_version = "0.3.1 Beta"
+about_program_version = "0.3.2 Beta"
 image_references = {}
 
 def AP(autorun_master_version="error",
@@ -65,7 +65,7 @@ def AP(autorun_master_version="error",
             try:
                 image_files = [f for f in os.listdir(images_path) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
             except Exception as e:
-                logger.exception(f"AP - {l("read_dir_error")} {images_path}", e)
+                logger.exception(f"AP - {l("read_dir_error")} {images_path}")
                 return image_labels_container
 
             #Проверяем наличие файлов
@@ -94,7 +94,7 @@ def AP(autorun_master_version="error",
                     image_labels_container.append(label)
 
                 except Exception as e:
-                    logger.exception(f"AP - {l("read_image_error")} {image_file}", e)
+                    logger.exception(f"AP - {l("read_image_error")} {image_file}")
                     continue #если одно изображение не загрузилось, продолжаем с другими
 
             return image_labels_container #Возвращаем список загруженных меток, чтобы знать, создался ли фрейм
@@ -205,7 +205,7 @@ def AP(autorun_master_version="error",
 
         about_window.mainloop()
     except Exception as e:
-        logger.exception(l("ap_exception_text"), e)
+        logger.exception(l("ap_exception_text"))
 
 if __name__ == "__main__":
     AP()

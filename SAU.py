@@ -37,7 +37,7 @@ from OF import run_command, apply_global_theme
 #Случайные заголовки
 from RS import random_string
 
-settings_and_update_version = "1.2.1 Beta"
+settings_and_update_version = "1.2.2 Beta"
 
 def compiling_crowbar():
     global COMPILING_COMMAND
@@ -79,7 +79,7 @@ def save_settings(settings_data, config_comments=None):
         logger.success(f"SAU - {l("setting_saved_in")} config.py")
         return True
     except Exception as e:
-        logger.exception(f"SAU - {l("settings_save_error")}", e)
+        logger.exception(f"SAU - {l("settings_save_error")}")
         messagebox.showerror(random_string(), l("settings_save_error"))
         return False
 
@@ -101,7 +101,7 @@ def backup_settings(export=False):
 
         return backup_filepath
     except Exception as e:
-        logger.exception(f"SAU - {l("settings_backup_created_error")}", e)
+        logger.exception(f"SAU - {l("settings_backup_created_error")}")
         messagebox.showerror(random_string(), l("settings_backup_created_error"))
         if export:
             messagebox.showerror(random_string(), f"{l("settings_export_error")}:\n{e}")
@@ -127,7 +127,7 @@ def extract_archive(ARCHIVE_PATH):
         messagebox.showerror(random_string(), l("bad_archive"))
         return False
     except Exception as e:
-        logger.exception(f"SAU - {l("unpacked_archive_error")}", e)
+        logger.exception(f"SAU - {l("unpacked_archive_error")}")
         messagebox.showerror(random_string(), l("unpacked_archive_error"))
         return False
 
@@ -145,7 +145,7 @@ def move_all_files(src_folder, dest_folder):
                 shutil.move(src_path, dest_path)
         logger.info(f"SAU - {l("content")} {src_folder} {l("moved")} {l("in")} {dest_folder}.")
     except Exception as e:
-        logger.exception(f"SAU - {l("moved_error")}", e)
+        logger.exception(f"SAU - {l("moved_error")}")
 
 
 
@@ -167,7 +167,7 @@ def copy_files():
         messagebox.warning(random_string(), f"{l("file_not_found")} {l("for_copy_file")}")
     except Exception as e:
         comment = f"SAU - {l("copy_error")} {l("copy_file_error")}"
-        logger.exception(comment, e)
+        logger.exception(comment)
         messagebox.error(random_string(), comment)
         return False
 
@@ -190,6 +190,7 @@ def copy_files():
         messagebox.showwarning(random_string(), comment)
         return False
     except Exception as e:
+        logger.exception(f"SAU - {l("copy_error")}")
         messagebox.showerror(random_string(), f"{l("copy_error")} {PROGRAM_NAME}.exe\n{l("copy_exe_error")}.")
         return False
 
@@ -215,7 +216,7 @@ def create_lnk(target_path, shortcut_name):
 
         logger.info(f"SAU - {l("create_lnk_success")}.")
     except Exception as e:
-        logger.exception(f"SAU - {l("create_lnk_error")}", e)
+        logger.exception(f"SAU - {l("create_lnk_error")}")
 
 
 
@@ -234,7 +235,7 @@ def add_to_autorun(target_path):
 
         return True
     except Exception as e:
-        logger.exception(f"SAU - {l("add_to_autorun_error")}", e)
+        logger.exception(f"SAU - {l("add_to_autorun_error")}")
         return False
 
 
@@ -453,7 +454,7 @@ def read_config(user_config=False):
     except FileNotFoundError:
         logger.error(f"SAU - {l("file")} config.py")
     except Exception as e:
-        logger.exception(f"SAU - {l("read_comments_error")} config.py", e)
+        logger.exception(f"SAU - {l("read_comments_error")} config.py")
 
     return comments
 
@@ -586,7 +587,7 @@ def crowbar_settings(current_theme):
 
             return True
         except Exception as e:
-            logger.exception(f"SAU - {l("delete_error")} {path}", e)
+            logger.exception(f"SAU - {l("delete_error")} {path}")
             messagebox.showerror(random_string(), f"{l("delete_error")} {path}:\n{e}")
 
 
@@ -625,7 +626,7 @@ def crowbar_settings(current_theme):
                     except Exception as e:
                         is_valid = False
                         error_message = f"{l("parsing_error")}: {e}"
-                        logger.exception(error_message)
+                        logger.exception(l("parsing_error"))
 
             elif var_type == "str_path":
                 is_valid, error_message = validate_path(value)
@@ -746,7 +747,7 @@ def crowbar_settings(current_theme):
             logger.info(f"SAU - {comment}")
             messagebox.showinfo(random_string(), comment)
         except Exception as e:
-            logger.exception(f"SAU - {l("clean_cache_error")}", e)
+            logger.exception(f"SAU - {l("clean_cache_error")}")
             messagebox.showerror(random_string(), l("clean_cache_error"))
 
     status_frame = ttk.Frame(frame)
@@ -771,7 +772,7 @@ def crowbar_settings(current_theme):
         try:
             os.startfile(os.getcwd())
         except Exception as e:
-            logger.exception(f"{l("open_error")} {l("dir")}", e)
+            logger.exception(f"{l("open_error")} {l("dir")}")
 
     def open_log_file():
         try:
@@ -780,7 +781,7 @@ def crowbar_settings(current_theme):
             else:
                 messagebox.showwarning(random_string(), f"{l("not_found")} {l("log")}")
         except Exception as e:
-            logger.exception(f"{l("open_error")} {l("log")}:", e)
+            logger.exception(f"{l("open_error")} {l("log")}")
 
     button_frame = ttk.Frame(frame)
     button_frame.pack(pady=5)
@@ -838,7 +839,7 @@ def SAU(current_theme):
         try:
             crowbar_settings(current_theme)
         except Exception as e:
-            logger.exception(l("sau_critical_error"), e)
+            logger.exception(l("sau_critical_error"))
     else:
         return
 

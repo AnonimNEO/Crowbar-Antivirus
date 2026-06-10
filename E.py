@@ -21,7 +21,7 @@ from RS import random_string
 from config import program_authentication_clyth, current_localization
 from languages import l
 
-exit_version = "1.1.1 Beta"
+exit_version = "1.1.2 Beta"
 dyrachok_path = r"C:\ProgramData\dyrachok.txt"
 
 @logger.catch
@@ -50,7 +50,7 @@ def tiktok_question():
             messagebox.showinfo(random_string(), l("dyrachok_test_text"))
         except Exception as e:
             comment = f"E - {l("exit_error")}"
-            logger.exception(comment, e)
+            logger.exception(comment)
             messagebox.showerror(random_string(), f"{comment}\n{e}")
             return False
     else:
@@ -99,4 +99,4 @@ def E():
             else:
                 logger.info(f"E - {l("cancel_exit")}.")
     except Exception as e:
-        logger.exception(f"{e_critical_error}\n{e}")
+        logger.exception(f"{e_critical_error}")

@@ -24,7 +24,7 @@ from RS import random_string
 from config import *
 
 global log_path, clear_temp_log
-clear_cache_version = "0.7.1 Beta"
+clear_cache_version = "0.7.2 Beta"
 
 @logger.catch
 def CC(run_in_recovery):
@@ -54,7 +54,7 @@ def CC(run_in_recovery):
                     files_deleted.append(item)
             except Exception as e:
                 files_not_deleted.append(item)
-                logger.exception(f"CC - {l("file_delete_error")} {l("from")} %Temp% - {item}", e)
+                logger.exception(f"CC - {l("file_delete_error")} {l("from")} %Temp% - {item}")
 
         #Получаем текущее время и дату для имени лог-файла
         current_time = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
@@ -74,4 +74,4 @@ def CC(run_in_recovery):
         messagebox.showinfo(random_string(), cc_log_text)
 
     except Exception as e:
-        logger.exception(l("cc_critical_error"), e)
+        logger.exception(l("cc_critical_error"))
