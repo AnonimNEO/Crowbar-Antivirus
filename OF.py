@@ -25,12 +25,12 @@ import os
 from io import BytesIO
 
 #from OBPC import OBPC
-from RS import random_string
+from RS import RS
 from languages import l
 from config import *
 
 global load_bush
-other_function_version = "0.9.2 Beta"
+other_function_version = "0.12.1 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -72,7 +72,7 @@ class Psutil:
 
 
 def pac():
-    messagebox.showinfo(random_string(), l("pac_text"))
+    messagebox.showinfo(RS(), l("pac_text"))
 
 
 
@@ -118,12 +118,12 @@ def restart_ca():
 #            logger.critical(f"OF/run_obpc - Ошибка при работе потока Компонента OnBoardPC:\n{e}")
 #            fail_start_obpc += 1
 #            if fail_start_obpc > 3:
-#                messagebox.showerror(random_string(), "Произошла фатальная ошибка при работе с потоком Компонента OnBoardPC!\nПодробнее в лог-файле")
+#                messagebox.showerror(RS(), "Произошла фатальная ошибка при работе с потоком Компонента OnBoardPC!\nПодробнее в лог-файле")
 #                return
 #            logger.info(f"OF/run_obpc - Перезапуск OnBoardPC, попытка №{fail_start_obpc}...")
 #            run_lp(run_in_recovery)
 #    else:
-#        messagebox.showwarning(random_string(), "Компонент Голосовое Управление был запущен при запуске программы.")
+#        messagebox.showwarning(RS(), "Компонент Голосовое Управление был запущен при запуске программы.")
 
 
 
@@ -208,6 +208,95 @@ def apply_global_theme(window, current_theme):
 
 
 
+#Защищает окно tkinter от подозрительно частого или резкого перемещения
+def protect_window_from_moving(GUI, debug_mode=False):
+    #параметры
+    MAX_MOVES_PER_SECOND = 15 #Максимум перемещений в секунду
+    MAX_PIXEL_JUMP = 250 #Максимальный скачок в пикселях
+    DETECTION_WINDOW = 1.5 #Временное окно для анализа (секунды)
+    LOCK_DURATION = 0.6 #Блокировка на n секунд после обнаружения
+
+    #состояние
+    state = {
+        "last_x": GUI.winfo_x(),
+        "last_y": GUI.winfo_y(),
+        "last_time": time(),
+        "move_timestamps": deque(),
+        "safe_x": GUI.winfo_x(),
+        "safe_y": GUI.winfo_y(),
+        "is_locked": False,
+        "lock_time": 0,
+        "attack_count": 0,
+    }
+
+    def on_window_move(event):
+        current_time = time()
+        current_x = GUI.winfo_x()
+        current_y = GUI.winfo_y()
+
+        #Проверяем, не в режиме ли блокировки
+        if state["is_locked"]:
+            if current_time - state["lock_time"] < LOCK_DURATION:
+                #Окно заблокировано - возвращаем в безопасную позицию
+                GUI.geometry(f"+{state["safe_x"]}+{state["safe_y"]}")
+                return
+            else:
+                #Блокировка истекла
+                state["is_locked"] = False
+
+        #Добавляем временную метку события
+        state["move_timestamps"].append(current_time)
+
+        #Удаляем старые события вне временного окна
+        while state["move_timestamps"] and current_time - state["move_timestamps"][0] > DETECTION_WINDOW:
+            state["move_timestamps"].popleft()
+
+        #Вычисляем расстояние от последней позиции
+        dx = abs(current_x - state["last_x"])
+        dy = abs(current_y - state["last_y"])
+        max_jump = max(dx, dy)
+
+        #проверка на атаку
+        is_attack = False
+        attack_reason = ""
+
+        #Слишком много перемещений в секунду
+        if len(state["move_timestamps"]) > MAX_MOVES_PER_SECOND:
+            is_attack = True
+            attack_reason = f"Слишком частые движения ({len(state["move_timestamps"])} за {DETECTION_WINDOW}с)"
+
+        #Резкий скачок позиции
+        if max_jump > MAX_PIXEL_JUMP and (current_time - state["last_time"]) < 0.05:
+            is_attack = True
+            attack_reason = f"Резкий скачок: {max_jump}px за {(current_time - state['last_time'])*1000:.1f}мс"
+
+        if is_attack:
+            state["is_locked"] = True
+            state["lock_time"] = current_time
+            state["attack_count"] += 1
+
+            #Возвращаем окно в безопасную позицию
+            GUI.geometry(f"+{state["safe_x"]}+{state["safe_y"]}")
+
+            if debug_mode:
+                logger.debug(f"PWFM - Атака #{state["attack_count"]}: {attack_reason}")
+                logger.debug(f"PWFM - Окно заблокировано на {LOCK_DURATION} сек")
+
+    #Привязываем событие к окну
+    GUI.bind("<Configure>", on_window_move)
+
+    #Возвращаем функцию для отключения защиты
+    def get_status():
+        return {
+            "attacks_detected": state["attack_count"],
+            "is_locked": state["is_locked"],
+            "safe_position": (state["safe_x"], state["safe_y"])
+        }
+
+    logger.success("PWFM - Защита от перемещения окна активирована")
+
+
+
 #Получаем оффлайн-пути реестра
 @logger.catch()
 def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery):
@@ -279,7 +368,7 @@ def load_bush(current_disc, user=False):
     else:
         #Формируем пути к файлам
         if not os.path.isdir(f"{current_disc}\\Users\\{default_user_name}\\"):
-            user_name = simpledialog.askstring(title=random_string(), prompt=f"{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}:")
+            user_name = simpledialog.askstring(title=RS(), prompt=f"{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}:")
         else:
             user_name = default_user_name
 
@@ -377,18 +466,227 @@ def extract_filename_from_path(path_with_args, get_path=False):
 
 
 
+#Фейковая Активность
+def decoy_mode(cycle=False, debug=True):
+    c = 1
+    while c > 0:
+        fake_ips = []
+        fake_pings = []
+        fake_cmds = []
+        fake_dirs = []
+        fake_files = []
+
+        #Генерируем IP, пинги, команды и ключи реестра
+        for i in range(5):
+            fake_ips.append(f"{RS("ip")}.{RS("ip")}.{RS("ip")}.{RS("ip")}")
+            fake_pings.append(f"ping {RS("ping")}.{RS("ping")}.{RS("ping")}.{RS("ping")}")
+            fake_cmds.append(RS("cmd"))
+            fake_dirs.append(fr"C:\ProgramData\{RS("dir")}")
+
+        try:
+            for i in range(0, 3):
+                subprocess.Popen(f"ipconfig /flushdns && nslookup {fake_ips[i]}", stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
+
+            #Создаём директории
+            for d in fake_dirs:
+                if not os.path.exists(d):
+                    if debug:
+                        logger.debug(f"create dir - {d}")
+                    os.makedirs(d)
+
+            #Создаём файлы в директориях
+            for d in fake_dirs:
+                for j in range(3):
+                    file_path = RS("file", d)
+                    fake_files.append(file_path)
+                    try:
+                        with open(file_path, "w") as file:
+                            file.write(RS("data"))
+                        if debug:
+                            logger.debug(f"create - {f}")
+                    except Exception as e:
+                        logger.exception(f"Не удалось создать файл {file_path}")
+
+            #Пинги
+            for p in fake_pings:
+                subprocess.Popen(p, stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
+            for i in range(3, 5):
+                subprocess.Popen(f"ipconfig /flushdns && nslookup {fake_ips[i]}", stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
+
+            #реестр
+            try:
+                #Генерируем и создаём ключи в реестре
+                for i in range(3):
+                    key_name = f"Software\\{RS(10)}"
+                    registry_keys.append(key_name)
+
+                    try:
+                        key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_name)
+                        if debug:
+                            logger.debug(f"create registry key - {key_name}")
+
+                        #Создаём параметры с информацией о "сборе данных"
+                        params = {
+                            "UserName": get_random_username(),
+                            "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            "SystemInfo": f"System_{RS(8)}",
+                            "LastAccess": datetime.now().strftime("%H:%M:%S"),
+                            "DataHash": RS(16),
+                            "SessionID": f"SID_{randint(1000, 9999)}",
+                            "ProcessPID": str(randint(100, 9999)),
+                            "ComputerName": RS(12),
+                            "IPAddress": fake_ips[i],
+                            "CollectionData": RS("data")
+                        }
+
+                        #Записываем параметры в реестр
+                        for param_name, param_value in params.items():
+                            winreg.SetValueEx(key, param_name, 0, winreg.REG_SZ, param_value)
+                            if debug:
+                                logger.debug(f"{l("create-key")} - {key_name}\\{param_name} = {param_value[:20]}")
+
+                        winreg.CloseKey(key)
+
+                    except Exception as e:
+                        logger.exception(f"{l("create_key_error")} {key_name}")
+
+            except Exception as e:
+                logger.exception()
+
+            for cmd in fake_cmds:
+                subprocess.Popen(cmd, stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
+
+            #удаление ключей
+            for key_name in registry_keys:
+                try:
+                    winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_name)
+                    if debug:
+                        logger.debug(f"remove registry key - {key_name}")
+                except Exception as e:
+                    logger.exception(f"Не удалось удалить ключ реестра {key_name}")
+
+            for cmd in fake_cmds:
+                subprocess.Popen(cmd, stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
+
+            #Удаляем файлы и директории
+            for f in fake_files:
+                try:
+                    if os.path.exists(f):
+                        os.remove(f)
+                        if debug:
+                            logger.debug(f"remove - {f}")
+                except Exception as e:
+                    logger.exception(f"Не удалось удалить файл {f}")
+
+            for d in fake_dirs:
+                try:
+                    if os.path.exists(d):
+                        if debug:
+                            logger.debug(f"remove dir - {d}")
+                        os.rmdir(d)
+                except Exception as e:
+                    logger.exception(f"Не удалось удалить папку {d}")
+
+            if not cycle:
+                c = 0
+        except Exception as e:
+            logger.exception(f"Ошибка при создании фейковой активности!:")
+            if not cycle:
+                try:
+                    from tkinter import messagebox
+                    messagebox.showerror(RS(), f"Ошибка при создании фейковой активности!:\n{e}")
+                except:
+                    pass
+
+
+
+#CMD
+def CMD():
+    cmd = tk.Toplevel()
+    cmd.title(RS())
+    cmd.geometry("700x450")
+
+    #Создаем виджет для вывода
+    console_text = scrolledtext.ScrolledText(cmd, wrap=tk.WORD, font=("Default", 10))
+    console_text.pack(fill="both", expand=True, padx=5, pady=5)
+
+    #Создаем рамку для ввода команд и кнопки
+    input_frame = tk.Frame(cmd)
+    input_frame.pack(fill="x", padx=5, pady=5)
+
+    command_entry = tk.Entry(input_frame, font=("Default", 10))
+    command_entry.pack(side="left", fill="x", expand=True, padx=(0, 5))
+
+    def print_to_console(msg):
+        console_text.insert(tk.END, msg + "\n")
+        console_text.see(tk.END)
+
+    def execute_command():
+        cmd = command_entry.get().strip()
+        if not cmd:
+            return
+        print_to_console(f"> {cmd}")
+        command_entry.delete(0, tk.END)
+
+        #Обработка команд
+        try:
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            output = result.stdout if result.stdout else result.stderr
+            print_to_console(output.strip())
+        except Exception as e:
+            print_to_console(f"{l("error")}:\n{e}")
+
+    execute_button = tk.Button(input_frame, text=l("execute"), command=execute_command)
+    execute_button.pack(side="right")
+
+    #Обработка нажатия Enter в поле ввода
+    def on_enter(event):
+        execute_command()
+
+    command_entry.bind("<Return>", on_enter)
+
+    #Возвращаем функцию для вывода сообщений
+    return print_to_console
+
+
+
+#Запуск в скрытом режиме
+def launch_ghost(exe_path=False):
+    if not exe_path:
+        exe_path = filedialog.askopenfilename(title=RS(), filetypes=[("Все файлы", "*.*")])
+        if not exe_path:
+            return
+    try:
+        n = randint(4, 24)
+        temp_dir = tempfile.mkdtemp()
+        rand_name = ''.join(random.choices(string.ascii_letters, k=n)) + ".exe"
+        temp_path = os.path.join(temp_dir, rand_name)
+        shutil.copy2(exe_path, temp_path)
+
+        startup = subprocess.STARTUPINFO()
+        startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startup.wShowWindow = subprocess.SW_HIDE
+
+        subprocess.Popen([temp_path], startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW)
+        logger.success(f"Запущено в скрытом режиме: {temp_path}")
+    except Exception as e:
+        logger.exception(f"Ошибка при запуске в крытом режиме:", e)
+        messagebox.showerror(RS(), f"Ошибка при запуске в крытом режиме:\n{e}")
+
+
+
 #Открыть С помощью
 @logger.catch()
 def open_with():
-    target_file_path = filedialog.askopenfilename(title=random_string(), filetypes=[("Все файлы", "*.*")])
+    target_file_path = filedialog.askopenfilename(title=RS(), filetypes=[("Все файлы", "*.*")])
     if target_file_path and os.path.isfile(target_file_path): #Проверка, что файл выбран и существует
-        app_path = filedialog.askopenfilename(title=random_string(), filetypes=[("Все файлы", "*.*")])
+        app_path = filedialog.askopenfilename(title=RS(), filetypes=[("Все файлы", "*.*")])
         if app_path:
             try:
                 subprocess.Popen([app_path, target_file_path])
             except Exception as e:
                 logger.exception(f'OF/open_with - {l("open_file_error")} "{target_file_path}" {l("with_program")} "{app_path}"', e)
-                messagebox.showerror(random_string(), f"{l("open_file_error")} {l("with_program")}:\n{e}")
+                messagebox.showerror(RSRS(), f"{l("open_file_error")} {l("with_program")}:\n{e}")
 
 
 
