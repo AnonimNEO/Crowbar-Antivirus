@@ -8,25 +8,25 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-users_manager_version = "0.3.3 Beta"
+#Интерфейс
+from tkinter import ttk, messagebox, Menu, simpledialog
+import tkinter as tk
+#Работа с пользователями
+import subprocess
+import os
+import threading
+#Логирование
+from loguru import logger
+
+from config import current_localization
+from languages import l
+from OF import pac, apply_global_theme, create_menubar
+from RS import RS
+from config import theme, default_theme
+
+users_manager_version = "0.3.6 Beta"
 
 class UserManager:
-    #Интерфейс
-    from tkinter import ttk, messagebox, Menu, simpledialog
-    import tkinter as tk
-    #Работа с пользователями
-    import subprocess
-    import os
-    import threading
-    #Логирование
-    from loguru import logger
-
-    from config import current_localization
-    from languages import l
-    from OF import pac, apply_global_theme
-    from RS import random_string
-    from config import *
-
     def run_net_command(self, args):
         try:
             subprocess.run(["net"] + args, capture_output=True, text=True, check=True, creationflags=subprocess.CREATE_NO_WINDOW)
@@ -40,7 +40,7 @@ class UserManager:
 
     def __init__(self, UM_GUI):
         self.UM_GUI = UM_GUI
-        UM_GUI.title(random_string())
+        UM_GUI.title(RS())
         UM_GUI.geometry("400x350")
 
         self.users = [] 
@@ -98,7 +98,7 @@ class UserManager:
 
         except Exception as e:
             logger.exception(f"UM - {l("get_user_list_error")}")
-            messagebox.showerror(random_string(), f"{l("get_user_list_error")}:\n{e}")
+            messagebox.showerror(RS(), f"{l("get_user_list_error")}:\n{e}")
 
 
 
@@ -112,7 +112,7 @@ class UserManager:
 
     def create_user(self):
         create_window = tk.Toplevel(self.UM_GUI)
-        create_window.title(random_string())
+        create_window.title(RS())
         create_window.geometry("150x150")
 
         tk.Label(create_window, text=l("user_name")).pack(pady=2)
@@ -128,7 +128,7 @@ class UserManager:
             password = password_entry.get().strip()
 
             if not username or not password:
-                messagebox.showwarning(random_string(), l("enter_all_data"))
+                messagebox.showwarning(RS(), l("enter_all_data"))
                 return
 
             try:
@@ -139,7 +139,7 @@ class UserManager:
             except Exception as e:
                 comment = f"UM - {l("create_user_error")} {username}"
                 logger.exception(comment)
-                messagebox.showerror(random_string(), comment)
+                messagebox.showerror(RS(), comment)
 
         create_button = tk.Button(create_window, text=l("create_user"), command=confirm_creation)
         create_button.pack(pady=10)
@@ -149,13 +149,13 @@ class UserManager:
     def delete_users(self):
         selected_items = self.tree.selection()
         if not selected_items:
-            messagebox.showwarning(random_string(), l("select_user"))
+            messagebox.showwarning(RS(), l("select_user"))
             return
 
         for item in selected_items:
             username = self.tree.item(item, "values")[0]
             if username.lower() == self.current_username.lower():
-                messagebox.showwarning(random_string(), f"{l("cant_delete_self")} ({username})!\n{l("what_did_you")}!")
+                messagebox.showwarning(RS(), f"{l("cant_delete_self")} ({username})!\n{l("what_did_you")}!")
                 continue
 
             if self.run_net_command(["user", username, "/delete"]):
@@ -163,7 +163,7 @@ class UserManager:
             else:
                 comment = f"{l("delete_user_error")} {username}."
                 logger.error(f"UM - {comment}")
-                messagebox.showerror(random_string(), comment)
+                messagebox.showerror(RS(), comment)
 
         self.load_users()
 
@@ -172,12 +172,12 @@ class UserManager:
     def reset_password(self):
         selected_items = self.tree.selection()
         if not selected_items:
-            messagebox.showwarning(random_string(), l("select_user"))
+            messagebox.showwarning(RS(), l("select_user"))
             return
 
         #Диалог для ввода нового пароля
         password_dialog = tk.Toplevel(self.UM_GUI)
-        password_dialog.title(random_string())
+        password_dialog.title(RS())
         password_dialog.geometry("250x120")
         password_dialog.transient(self.UM_GUI)
         password_dialog.grab_set()
@@ -190,7 +190,7 @@ class UserManager:
             new_password = password_entry.get().strip()
             
             if not new_password:
-                messagebox.showwarning(random_string(), f"{l("password")} {l("not_empty")}")
+                messagebox.showwarning(RS(), f"{l("password")} {l("not_empty")}")
                 return
 
             password_dialog.destroy()
@@ -217,46 +217,27 @@ class UserManager:
                 logger.info(f"UM - {l("password_for_user")} {username} {l("reset2")}.")
             else:
                 logger.error(f"UM - {comment}")
-                messagebox.showerror(random_string(), comment)
+                messagebox.showerror(RS(), comment)
         except Exception as e:
             comment = f"{l("change_password_error")} {username}"
             logger.exception(f"UM - {comment}")
-            messagebox.showerror(random_string(), comment)
+            messagebox.showerror(RS(), comment)
 
 
 
-def UM(current_theme):
+def UM(current_theme=False, debug_mode=False):
     try:
         UM_GUI = tk.Tk()
-        menubar = Menu(UM_GUI)
 
-        UM_GUI.attributes("-topmost", True) 
-
-        higher = tk.BooleanVar(value=True)
-
-        def toggle_topmost(GUI):
-            new_state = not higher.get()
-            higher.set(new_state)
-            GUI.attributes("-topmost", new_state)
-
-        def update_topmost_label(menubar, GUI):
-            status = l("on2") if higher.get() else l("off2")
-            #Индекс command в menubar
-            menubar.entryconfig(1, label=f"{l("topmost")}: {status}")
-            GUI.after(200, lambda: update_topmost_label(menubar, GUI))
-
-        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(UM_GUI))
-        update_topmost_label(menubar, UM_GUI)
-
-        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
-
-        UM_GUI.config(menu=menubar)
+        create_menubar(UM_GUI, False, None, debug_mode=debug_mode)
 
         apply_global_theme(UM_GUI, current_theme)
+
         UserManager(UM_GUI)
         UM_GUI.mainloop()
     except Exception as e:
         logger.exception(l("um_critical_error"))
+
 if __name__ == "__main__":
     current_theme = theme[default_theme]
     UM(current_theme)

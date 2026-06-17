@@ -8,9 +8,9 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-scarecrow_protection_version = "0.3.10 Beta"
+scarecrow_protection_version = "0.3.13 Beta"
 
-def SP(run_in_recovery, current_disc_r, current_theme):
+def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_mode=False):
     #Интерфейс
     from tkinter import ttk, messagebox, Menu
     import tkinter as tk
@@ -22,8 +22,8 @@ def SP(run_in_recovery, current_disc_r, current_theme):
     import shutil
     import os
 
-    from RS import random_string
-    from OF import pac, apply_global_theme, get_user_name
+    from RS import RS
+    from OF import pac, apply_global_theme, get_user_name, create_menubar
     from languages import l
     from config import theme, default_theme, program_authentication_clyth, current_localization
 
@@ -247,7 +247,7 @@ def SP(run_in_recovery, current_disc_r, current_theme):
         class SPI:
             def __init__(self, master):
                 self.master = master
-                master.title(random_string())
+                master.title(RS())
                 master.geometry("300x215")
                 master.resizable(True, True)
 
@@ -388,12 +388,12 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                                 for value_name, value_data in key_values.items():
                                     self.create_registry_key(key_path, value_name, value_data)
                         logger.info(f"SP - {l("simulation_for")} {pr<ogram} {l("completed")}")
-                messagebox.showinfo(random_string(), l("simulation_completed"))
+                messagebox.showinfo(RS(), l("simulation_completed"))
 
 
 
             def delete_simulation(self):
-                if messagebox.askyesno(random_string(), l("sp_confirmation")):
+                if messagebox.askyesno(RS(), l("sp_confirmation")):
                     for program, info in PROGRAM_INFO.items():
                         if self.checkbox_vars[program].get():
                             logger.info(f"SP - {l("delete_simulation")} {program}")
@@ -408,13 +408,11 @@ def SP(run_in_recovery, current_disc_r, current_theme):
                                     for value_name, _ in key_values.items():
                                         self.delete_registry_key(key_path, value_name)
                             logger.info(f"SP - {l("delete_simulation_for")} {program} {l("completed")}")
-                    messagebox.showinfo(random_string(), l("delete_completed"))
+                    messagebox.showinfo(RS(), l("delete_completed"))
 
         def restart_sp(user_theme):
             global current_theme
             current_theme = theme[user_theme]
-            #SP_GUI.destroy()
-            #SP(run_in_recovery, current_disc_r, current_theme)
             apply_global_theme(SP_GUI, current_theme)
 
         SP_GUI = tk.Tk()
@@ -422,48 +420,13 @@ def SP(run_in_recovery, current_disc_r, current_theme):
         #GUI_SP = SP(SP_GUI)
         SPI(SP_GUI)
 
-        #Меню
-        menubar = Menu(SP_GUI)
-        theme_menu = Menu(menubar, tearoff=0)
-        theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_sp("dark"))
-        theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_sp("white"))
-        theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_sp("red"))
-        theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_sp("black"))
-        theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_sp("gray"))
-        theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_sp("orange"))
-
-        #Пункт "Темы"
-        menubar.add_cascade(label=l("themes"), menu=theme_menu)
-
-        SP_GUI.attributes("-topmost", True)
-
-        if run_in_recovery:
-            higher = tk.BooleanVar(value=False)
-        else:
-            higher = tk.BooleanVar(value=True)
-
-        def toggle_topmost(GUI):
-            new_state = not higher.get()
-            higher.set(new_state)
-            GUI.attributes("-topmost", new_state)
-
-        def update_topmost_label(menubar, GUI):
-            status = l("on2") if higher.get() else l("off2")
-            #Индекс command в menubar
-            menubar.entryconfig(2, label=f"{l("topmost")}: {status}")
-            GUI.after(200, lambda: update_topmost_label(menubar, GUI))
-
-        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(SP_GUI))
-        update_topmost_label(menubar, SP_GUI)
-
-        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
-
-        SP_GUI.config(menu=menubar)
+        create_menubar(SP_GUI, run_in_recovery, restart_sp, debug_mode=debug_mode)
 
         SP_GUI.mainloop()
     except Exception as e:
         logger.exception(l("sp_critical_error"))
 
 if __name__ == "__main__":
+    from config import theme, default_theme
     current_theme = theme[default_theme]
     SP(False, "C:\\", current_theme)

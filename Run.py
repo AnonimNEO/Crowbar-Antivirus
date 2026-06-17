@@ -8,30 +8,30 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-run_version = "1.1.2 Beta"
+#Логирование ошибок
+from loguru import logger
+#Интерфейс
+import tkinter as tk
+from tkinter import ttk, Menu
+#Работа с процессами и файлами
+import subprocess
+import os
+import re
+
+from RS import RS
+from OF import pac, apply_global_theme, create_menubar
+from config import theme, default_theme, program_authentication_clyth, current_localization
+from languages import l
+
+run_version = "1.1.4 Beta"
 run_width_window = 400
 run_height_window = 200
 run_size_window = f"{run_width_window}x{run_height_window}"
 
 class Run_As_Admin:
-    #Логирование ошибок
-    from loguru import logger
-    #Интерфейс
-    import tkinter as tk
-    from tkinter import ttk, Menu
-    #Работа с процессами и файлами
-    import subprocess
-    import os
-    import re
-
-    from RS import random_string
-    from OF import pac, apply_global_theme
-    from config import theme, default_theme, program_authentication_clyth, current_localization
-    from languages import l
-
     def __init__(self, RUN_GUI):
         self.RUN_GUI = RUN_GUI
-        self.RUN_GUI.title(random_string())
+        self.RUN_GUI.title(RS())
         self.RUN_GUI.geometry(run_size_window)
         self.RUN_GUI.minsize(run_width_window, run_height_window)
 
@@ -273,7 +273,7 @@ class Run_As_Admin:
         self.log_text.see(tk.END)
 
 
-def Run(current_theme):
+def Run(current_theme="dark", debug_mode=False):
     RUN_GUI = tk.Tk()
     apply_global_theme(RUN_GUI, current_theme)
     Run_As_Admin(RUN_GUI)
@@ -283,43 +283,7 @@ def Run(current_theme):
         current_theme = theme[user_theme]
         apply_global_theme(RUN_GUI, current_theme)
 
-    menubar = tk.Menu(RUN_GUI)
-
-    #Меню
-    menubar = Menu(RUN_GUI)
-    theme_menu = Menu(menubar, tearoff=0)
-    theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_run("dark"))
-    theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_run("white"))
-    theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_run("red"))
-    theme_menu.add_checkbutton(label=l("green"), command=lambda: restart_run("lime"))
-    theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_run("black"))
-    theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_run("gray"))
-    theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_run("orange"))
-
-    #Пункт "Темы"
-    menubar.add_cascade(label=l("themes"), menu=theme_menu)
-
-    RUN_GUI.attributes("-topmost", True) 
-
-    higher = tk.BooleanVar(value=True)
-
-    def toggle_topmost(GUI):
-        new_state = not higher.get()
-        higher.set(new_state)
-        GUI.attributes("-topmost", new_state)
-
-    def update_topmost_label(menubar, GUI):
-        status = l("on2") if higher.get() else l("off2")
-        #Индекс command в menubar
-        menubar.entryconfig(2, label=f"{l("topmost")}: {status}")
-        GUI.after(200, lambda: update_topmost_label(menubar, GUI))
-
-    menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(RUN_GUI))
-    update_topmost_label(menubar, RUN_GUI)
-
-    menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
-
-    RUN_GUI.config(menu=menubar)
+    create_menubar(RUN_GUI, False, restart_run, debug_mode=debug_mode)
 
     RUN_GUI.mainloop()
 

@@ -23,34 +23,39 @@ import os
 #Импорт Компонентов
 from config import *
 from languages import l
-from RS import random_string
+from RS import RS
 
 global about_program_version
-about_program_version = "0.3.2 Beta"
+about_program_version = "0.3.4 Beta"
 image_references = {}
+er = l("error")
 
-def AP(autorun_master_version="error",
-       clear_cache_version="error",
-       crowbar_menu_version="error",
-       crowbar_console_version="error",
-       exit_version="error",
-       edit_criticality_version="error",
-       file_editor_version="error",
-       file_manager_version="error",
-       file_replacer_version="error",
-       get_full_access_version="error",
-       on_board_pc_version="error",
-       other_function_version="error",
-       process_manager_version="error",
-       restart_version="error",
-       real_time_protect_version="error",
-       random_string_version="error",
-       run_version="error",
-       settings_and_update_version="error",
-       scarecrow_protection_version="error",
-       trey_version="error",
-       unlock_all_version="error",
-       users_manager_version="error"):
+def AP(aes_version=er,
+       autorun_master_version=er,
+       crowbar_antivirus_scripts_handler_version=er,
+       clear_cache_version=er,
+       crowbar_menu_version=er,
+       crowbar_console_version=er,
+       exit_version=er,
+       edit_criticality_version=er,
+       file_editor_version=er,
+       file_manager_version=er,
+       file_replacer_version=er,
+       get_full_access_version=er,
+       on_board_pc_version=er,
+       other_function_version=er,
+       process_manager_version=er,
+       restart_version=er,
+       real_time_protect_version=er,
+       registry_monitor=er,
+       random_string_version=er,
+       run_version=er,
+       settings_and_update_version=er,
+       software_installation_manager=er,
+       scarecrow_protection_version=er,
+       trey_version=er,
+       unlock_all_version=er,
+       users_manager_version=er):
     try:
         #Загрузка изображений
         def load_images(master):
@@ -113,25 +118,31 @@ def AP(autorun_master_version="error",
                 f"{l("FM")}: {file_manager_version}\n"
                 f"{l("UA")}: {unlock_all_version}\n"
                 f"{l("FE")}: {file_editor_version}\n"
+                f"{l("RLP")}: {real_time_protect_version}\n"
+                f"{l("SIM")}: {software_installation_manager}\n"
+                f"{l("RM")}: {real_time_protect_version}\n"
                 f"---{l("mini_component")}---\n"
                 f"{l("CM")}: {crowbar_menu_version}\n"
+                f"{l("UM")}: {users_manager_version}\n"
+                f"{l("FR")}: {file_replacer_version}\n"
                 f"{l("SP")}: {scarecrow_protection_version}\n"
                 f"{l("CC")}: {clear_cache_version}\n"
-                f"{l("UM")}: {users_manager_version}\n"
                 f"{l("R")}: {restart_version}\n"
                 f"{l("Run")}: {run_version}\n"
                 f"{l("OBPC")}: {on_board_pc_version}\n"
                 f"---{l("system_component")}---\n"
-                f'{l("CC22")}: 2.2\n'
+                f"{l("encryption")}: AES\n"
+                f"{l("CASH")}: {crowbar_antivirus_scripts_handler_version}\n"
                 f"{l("EC")}: {edit_criticality_version}\n"
                 f"{l("GFA")}: {get_full_access_version}\n"
                 f"{l("OF")}: {other_function_version}\n"
+                f"{l("Console")}: {crowbar_console_version}\n"
                 f"{l("RS")}: {random_string_version}\n"
-                f"{l("E")}: {exit_version}\n"
                 f"{l("AP")}: {about_program_version}\n"
                 f"{l("SAU")}: {settings_and_update_version}"
+                f"{l("E")}: {exit_version}\n"
             )
-            messagebox.showinfo(random_string(), version_component_text)
+            messagebox.showinfo(RS(), version_component_text)
 
 
 
@@ -153,7 +164,7 @@ def AP(autorun_master_version="error",
                 webbrowser.open_new("https://steamcommunity.com/tradeoffer/new/?partner=1842324943&token=xPAad4EP")
 
             donate_window = tk.Tk()
-            donate_window.title(random_string())
+            donate_window.title(RS())
             donate_window.configure(bg="black")
             donate_window.resizable(False, False)
 
@@ -178,7 +189,7 @@ def AP(autorun_master_version="error",
             donate_window.mainloop()
 
         about_window = tk.Tk()
-        about_window.title(random_string())
+        about_window.title(RS())
         about_window.configure(bg="black")
 
         #Текст

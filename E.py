@@ -17,11 +17,11 @@ from loguru import logger
 import random
 import os
 
-from RS import random_string
+from RS import RS
 from config import program_authentication_clyth, current_localization
 from languages import l
 
-exit_version = "1.1.2 Beta"
+exit_version = "1.1.3 Beta"
 dyrachok_path = r"C:\ProgramData\dyrachok.txt"
 
 @logger.catch
@@ -31,7 +31,7 @@ def check_access_file():
             content = f.read()
         if "debil" in content:
             logger.critical(f"E - {l("dyrachok_test_log_text")}.")
-            messagebox.showwarning(random_string(), l("dyrachok_test_text"))
+            messagebox.showwarning(RS(), l("dyrachok_test_text"))
             return False
         else:
             #logger.success("E - Проверка на дурочка прошла успешно.")
@@ -43,15 +43,15 @@ def check_access_file():
 
 @logger.catch
 def tiktok_question():
-    if messagebox.askyesno(random_string(), l("watch_tiktok?")):
+    if messagebox.askyesno(RS(), l("watch_tiktok?")):
         try:
             with open(dyrachok_path, "w") as f:
                 f.write("debil")
-            messagebox.showinfo(random_string(), l("dyrachok_test_text"))
+            messagebox.showinfo(RS(), l("dyrachok_test_text"))
         except Exception as e:
             comment = f"E - {l("exit_error")}"
             logger.exception(comment)
-            messagebox.showerror(random_string(), f"{comment}\n{e}")
+            messagebox.showerror(RS(), f"{comment}\n{e}")
             return False
     else:
         logger.info(l("exit_program"))
@@ -60,13 +60,13 @@ def tiktok_question():
 
 
 def bad_capcha():
-    messagebox.showerror(random_string(), l("bad_capcha"))
+    messagebox.showerror(RS(), l("bad_capcha"))
 
 
 
 def math_window():
     n = random.randint(256, 1024)
-    number_input = tk.simpledialog.askinteger(random_string(), f"{l("enter_result_example")}: √({n} * {n})")
+    number_input = tk.simpledialog.askinteger(RS(), f"{l("enter_result_example")}: √({n} * {n})")
 
     if number_input == n:
         #logger.info("E - ввод примера верен.")
@@ -79,7 +79,7 @@ def math_window():
 
 def captcha_window():
     n = random.randint(256, 1024)
-    captcha_input = tk.simpledialog.askinteger(random_string(), f"{l("enter_number")}: {n}")
+    captcha_input = tk.simpledialog.askinteger(RS(), f"{l("enter_number")}: {n}")
 
     if captcha_input == n:
         #logger.info("E - ввод числа верен.")
@@ -93,10 +93,10 @@ def captcha_window():
 def E():
     try:
         if check_access_file():
-            if messagebox.askyesno(random_string(), f"{l("pac")} - {program_authentication_clyth}\n\n{l("want_exit?")}"):
+            if messagebox.askyesno(RS(), f"{l("pac")} - {program_authentication_clyth}\n\n{l("want_exit?")}"):
                 logger.info(f"E - {l("attempting_to_exit")}.")
                 captcha_window()
             else:
                 logger.info(f"E - {l("cancel_exit")}.")
-    except Exception as e:
+    except:
         logger.exception(f"{e_critical_error}")

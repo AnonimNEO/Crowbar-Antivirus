@@ -10,7 +10,7 @@
 
 #Интерфейс
 from tkinter import messagebox
-from RS import random_string
+from RS import RS
 #Работа с реестром и списками
 from typing import Tuple, Any
 import winreg
@@ -23,7 +23,7 @@ from OF import get_offline_reg_path, loaded_hive_names
 from config import current_localization
 from languages import l
 
-unlock_all_version = "1.2.2 Beta"
+unlock_all_version = "1.2.4 Beta"
 
 #Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
@@ -274,7 +274,7 @@ def process_hosts_with_exclusions(exclude_hosts=None):
 
 
 #Разблокировка всего
-def UA(run_in_recovery):
+def UA(run_in_recovery=False, debug_mode=False):
     try:
         #system_hive = loaded_hive_names.get("SYSTEM", "Offline_SYSTEM")
         software_hive = loaded_hive_names.get("SOFTWARE", "Offline_SOFTWARE")
@@ -305,7 +305,7 @@ def UA(run_in_recovery):
         system_restore_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, run_in_recovery)
 
         #Восстановление шрифтов
-        font_restore_success = restore_fonts(ua_globals, run_in_recovery)
+        font_restore_success = restore_fonts(ua_globals, run_in_recovery, debug_mode)
 
         #файл hosts
         host_restore_success = process_hosts_with_exclusions()
@@ -322,10 +322,10 @@ def UA(run_in_recovery):
                 ua_text += f"{l("blocks")} {restore_text[i]}: {l("unlock_error")}\n"
             i += 1
 
-        messagebox.showinfo(random_string(), f"{l("au_result")}:\n{ua_text}")
+        messagebox.showinfo(RS(), f"{l("au_result")}:\n{ua_text}")
     except Exception as e:
         logger.exception(l("ua_critical_error"))
-        messagebox.showerror(random_string(), f"{l("ua_critical_error")}\n{e}")
+        messagebox.showerror(RS(), f"{l("ua_critical_error")}\n{e}")
 
     logger.info(f"UA - {l("component_work_complete")}.")
 
@@ -408,7 +408,7 @@ def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
             #Если проблемы обнаружены, запускаем восстановление
             if needs_restore:
                 logger.warning(f"UA - {l("font_problem_detect")}...")
-                restore_fonts(ua_globals, run_in_recovery)
+                restore_fonts(ua_globals, run_in_recovery, debug_mode)
                 return True
             else:
                 if debug_mode:

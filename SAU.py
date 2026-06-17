@@ -35,9 +35,9 @@ from languages import l
 #Запуск команд
 from OF import run_command, apply_global_theme
 #Случайные заголовки
-from RS import random_string
+from RS import RS
 
-settings_and_update_version = "1.2.2 Beta"
+settings_and_update_version = "1.2.3 Beta"
 
 def compiling_crowbar():
     global COMPILING_COMMAND
@@ -80,7 +80,7 @@ def save_settings(settings_data, config_comments=None):
         return True
     except Exception as e:
         logger.exception(f"SAU - {l("settings_save_error")}")
-        messagebox.showerror(random_string(), l("settings_save_error"))
+        messagebox.showerror(RS(), l("settings_save_error"))
         return False
 
 
@@ -97,14 +97,14 @@ def backup_settings(export=False):
         logger.info(f"SAU - {l("settings_backup_created_ob_path")}: {backup_filepath}")
 
         if export:
-            messagebox.showinfo(random_string(), f"{l("settings_export_success")} {backup_filepath}")
+            messagebox.showinfo(RS(), f"{l("settings_export_success")} {backup_filepath}")
 
         return backup_filepath
     except Exception as e:
         logger.exception(f"SAU - {l("settings_backup_created_error")}")
-        messagebox.showerror(random_string(), l("settings_backup_created_error"))
+        messagebox.showerror(RS(), l("settings_backup_created_error"))
         if export:
-            messagebox.showerror(random_string(), f"{l("settings_export_error")}:\n{e}")
+            messagebox.showerror(RS(), f"{l("settings_export_error")}:\n{e}")
         return 0
 
 
@@ -115,7 +115,7 @@ def extract_archive(ARCHIVE_PATH):
         if not os.path.exists(ARCHIVE_PATH):
             comment = f"SAU - {l("archive")} {ARCHIVE_PATH} {l("not_found")}.\n{l("not_compilation")}."
             logger.error(comment)
-            messagebox.showerror(random_string(), comment)
+            messagebox.showerror(RS(), comment)
             return False
 
         with zipfile.ZipFile(ARCHIVE_PATH, "r") as zip_ref:
@@ -124,11 +124,11 @@ def extract_archive(ARCHIVE_PATH):
         return True
     except zipfile.BadZipFile:
         logger.error(f"SAU - {l("bad_archive")}")
-        messagebox.showerror(random_string(), l("bad_archive"))
+        messagebox.showerror(RS(), l("bad_archive"))
         return False
     except Exception as e:
         logger.exception(f"SAU - {l("unpacked_archive_error")}")
-        messagebox.showerror(random_string(), l("unpacked_archive_error"))
+        messagebox.showerror(RS(), l("unpacked_archive_error"))
         return False
 
 
@@ -150,7 +150,7 @@ def move_all_files(src_folder, dest_folder):
 
 
 def copy_files():
-    new_image_path = simpledialog.askstring(title=random_string(), prompt=l("enter_path_to_image"))
+    new_image_path = simpledialog.askstring(title=RS(), prompt=l("enter_path_to_image"))
 
     copy = 1
     if not new_image_path or new_image_path == None:
@@ -162,17 +162,17 @@ def copy_files():
     except PermissionError:
         comment = f"{l("permission_error")} {l("for_copy_image")} - {new_image_path}"
         logger.warning(f"SAU - {comment}", e)
-        messagebox.warning(random_string(), f"{comment}\n{e}")
+        messagebox.warning(RS(), f"{comment}\n{e}")
     except FileNotFoundError:
-        messagebox.warning(random_string(), f"{l("file_not_found")} {l("for_copy_file")}")
+        messagebox.warning(RS(), f"{l("file_not_found")} {l("for_copy_file")}")
     except Exception as e:
         comment = f"SAU - {l("copy_error")} {l("copy_file_error")}"
         logger.exception(comment)
-        messagebox.error(random_string(), comment)
+        messagebox.error(RS(), comment)
         return False
 
     global path_to_copy
-    path_to_copy = simpledialog.askstring(title=random_string(), prompt=l("enter_exe_name"))
+    path_to_copy = simpledialog.askstring(title=RS(), prompt=l("enter_exe_name"))
 
     if not path_to_copy or path_to_copy == None:
         return False
@@ -182,16 +182,16 @@ def copy_files():
     except PermissionError:
         comment = f"SAU - {l("permission_error")} {l("file_not_found")} {l("for_copy")} {PROGRAM_NAME}.exe"
         logger.error(comment, e)
-        messagebox.showwarning(random_string(), comment)
+        messagebox.showwarning(RS(), comment)
         return False
     except FileNotFoundError:
         comment = f"SAU - {l("file_not_found")} {PROGRAM_NAME}.exe"
         logger.error(comment, e)
-        messagebox.showwarning(random_string(), comment)
+        messagebox.showwarning(RS(), comment)
         return False
     except Exception as e:
         logger.exception(f"SAU - {l("copy_error")}")
-        messagebox.showerror(random_string(), f"{l("copy_error")} {PROGRAM_NAME}.exe\n{l("copy_exe_error")}.")
+        messagebox.showerror(RS(), f"{l("copy_error")} {PROGRAM_NAME}.exe\n{l("copy_exe_error")}.")
         return False
 
     return True
@@ -267,11 +267,11 @@ def preparing_for_recompilation(settings_data, config_comments):
     if not copy_files():
         return False
 
-    create_lnk(path_to_copy, random_string())
+    create_lnk(path_to_copy, RS())
 
-    if messagebox.askyesno(random_string(), l("add_program_to_autorun")):
+    if messagebox.askyesno(RS(), l("add_program_to_autorun")):
         if not add_to_autorun(path_to_copy):
-            messagebox.showerror(random_string(), f"{l("add_program_to_autorun_error")}\n{e}")
+            messagebox.showerror(RS(), f"{l("add_program_to_autorun_error")}\n{e}")
 
     return True
 
@@ -425,7 +425,7 @@ def read_config(user_config=False):
     current_comment = ""
     try:
         if user_config:
-            config_path = filedialog.askopenfilename(title=random_string(), filetypes=[("Python файлы", "*.py*")])
+            config_path = filedialog.askopenfilename(title=RS(), filetypes=[("Python файлы", "*.py*")])
         else:
             #Пытаемся открыть файл config.py, находящийся в том же каталоге
             config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.py")
@@ -466,7 +466,7 @@ def crowbar_settings(current_theme):
     config_comments = read_config()
 
     SAU_GUI = tk.Tk()
-    SAU_GUI.title(random_string())
+    SAU_GUI.title(RS())
     SAU_GUI.geometry("435x500")
 
     SAU_GUI.focus_set()
@@ -588,7 +588,7 @@ def crowbar_settings(current_theme):
             return True
         except Exception as e:
             logger.exception(f"SAU - {l("delete_error")} {path}")
-            messagebox.showerror(random_string(), f"{l("delete_error")} {path}:\n{e}")
+            messagebox.showerror(RS(), f"{l("delete_error")} {path}:\n{e}")
 
 
 
@@ -646,10 +646,10 @@ def crowbar_settings(current_theme):
                 valid = False
 
         if not valid:
-            messagebox.showerror(random_string(), l("fix_problem_in_fields"))
+            messagebox.showerror(RS(), l("fix_problem_in_fields"))
             return
 
-        if not messagebox.askyesno(random_string(), l("recompilation_required_continue")):
+        if not messagebox.askyesno(RS(), l("recompilation_required_continue")):
             return
 
         #Блокируем интерфейс
@@ -688,20 +688,20 @@ def crowbar_settings(current_theme):
 
                 def finalize():
                     if copy_files():
-                        create_lnk(path_to_copy, random_string())
+                        create_lnk(path_to_copy, RS())
                         progress_bar.config(value=100)
                         compilation_label.config(text=l("adding_to_autorun"))
-                        if messagebox.askyesno(random_string(), l("add_program_to_autorun")):
+                        if messagebox.askyesno(RS(), l("add_program_to_autorun")):
                             add_to_autorun(path_to_copy)
                         comment = f"{l("success")} {l("completed")}"
                         compilation_label.config(text=comment)
-                        messagebox.showinfo(random_string(), comment)
+                        messagebox.showinfo(RS(), comment)
                     set_ui_state("normal")
 
                 SAU_GUI.after(0, finalize)
 
             except Exception as e:
-                messagebox.showerror(random_string(), f"{l("error")} {l("during_recompilation")}:\n{e}")
+                messagebox.showerror(RS(), f"{l("error")} {l("during_recompilation")}:\n{e}")
                 compilation_label.config(text=f"{l("error")} {l("during_recompilation")}")
                 progress_bar.config(value=0)
                 set_ui_state("normal")
@@ -710,7 +710,7 @@ def crowbar_settings(current_theme):
         threading.Thread(target=run_compilation, daemon=True).start()
 
     def delete_cache():
-        if not messagebox.askyesno(random_string(), l("delete_compiling_cache")):
+        if not messagebox.askyesno(RS(), l("delete_compiling_cache")):
             return
 
         global config_log_path
@@ -745,10 +745,10 @@ def crowbar_settings(current_theme):
 
             comment = f"{l("clean_completed_deleted_objects")}: {deleted_count}"
             logger.info(f"SAU - {comment}")
-            messagebox.showinfo(random_string(), comment)
+            messagebox.showinfo(RS(), comment)
         except Exception as e:
             logger.exception(f"SAU - {l("clean_cache_error")}")
-            messagebox.showerror(random_string(), l("clean_cache_error"))
+            messagebox.showerror(RS(), l("clean_cache_error"))
 
     status_frame = ttk.Frame(frame)
     status_frame.pack(fill="x", side=tk.BOTTOM, pady=5)
@@ -779,7 +779,7 @@ def crowbar_settings(current_theme):
             if os.path.exists(config_log_path):
                 os.startfile(config_log_path)
             else:
-                messagebox.showwarning(random_string(), f"{l("not_found")} {l("log")}")
+                messagebox.showwarning(RS(), f"{l("not_found")} {l("log")}")
         except Exception as e:
             logger.exception(f"{l("open_error")} {l("log")}")
 
@@ -817,15 +817,15 @@ def crowbar_settings(current_theme):
     SAU_GUI.mainloop()
 
 def SAU(current_theme):
-    if messagebox.askyesno(random_string(), l("sau_start_text")):
+    if messagebox.askyesno(RS(), l("sau_start_text")):
         global PROGRAM_NAME, ARCHIVE_PASSWORD
         SETTINGS_BACKUP_PREFIX = "settings_backup"
         #ARCHIVE_PATH = "crowbar_code.zip"
         ARCHIVE_PASSWORD = b"0000"
-        PROGRAM_NAME = simpledialog.askstring(title=random_string(), prompt=l("enter_program_name"))
+        PROGRAM_NAME = simpledialog.askstring(title=RS(), prompt=l("enter_program_name"))
         if not os.path.isfile("icon\\T_icon.ico"):
-            messagebox.showinfo(random_string(), l("icon_not_found"))
-            ICON_PATH = filedialog.askopenfilename(title=random_string(), filetypes=[("Иконка программы", "*.ico*")])
+            messagebox.showinfo(RS(), l("icon_not_found"))
+            ICON_PATH = filedialog.askopenfilename(title=RS(), filetypes=[("Иконка программы", "*.ico*")])
             if ICON_PATH:
                 COMPILING_COMMAND = f"python -m nuitka --follow-imports --standalone --windows-console-mode=disable --onefile --enable-plugin=tk-inter --windows-icon-from-ico={ICON_PATH} --lto=no --mingw64 {PROGRAM_NAME}.py"
             else:
@@ -834,7 +834,7 @@ def SAU(current_theme):
             COMPILING_COMMAND = f"python -m nuitka --follow-imports --standalone --windows-console-mode=disable --onefile --enable-plugin=tk-inter --windows-icon-from-ico=icon\\T_icon.ico --lto=no --mingw64 {PROGRAM_NAME}.py"
 
         global ARCHIVE_PATH
-        ARCHIVE_PATH = filedialog.askopenfilename(title=random_string(), filetypes=[("Zip Архивы", "*.zip*")])
+        ARCHIVE_PATH = filedialog.askopenfilename(title=RS(), filetypes=[("Zip Архивы", "*.zip*")])
         extract_archive(ARCHIVE_PATH)
         try:
             crowbar_settings(current_theme)
@@ -844,7 +844,7 @@ def SAU(current_theme):
         return
 
 if __name__ == "__main__":
-    config_log_path = simpledialog.askstring(title=random_string(), prompt=l("enter_log_name"))
+    config_log_path = simpledialog.askstring(title=RS(), prompt=l("enter_log_name"))
     if config_log_path:
         logger.add(config_log_path, format="{time} {level} {message}", rotation="10 MB", compression="zip")
     current_theme = theme[default_theme]

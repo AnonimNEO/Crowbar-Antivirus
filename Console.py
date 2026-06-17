@@ -8,36 +8,37 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-crowbar_console_version = "0.1.3 Pre-Alpha"
+import tkinter as tk
+from tkinter import scrolledtext, messagebox
+from io import StringIO
+from loguru import logger
+import threading
+import random
+import sys
+
+from config import program_authentication_clyth, current_localization
+from OF import create_menubar
+from languages import l
+from RS import RS
+import config
+
+crowbar_console_version = "0.1.5 Pre-Alpha"
 
 class CrowbarConsole:
-    import tkinter as tk
-    from tkinter import scrolledtext, messagebox
-    from io import StringIO
-    from loguru import logger
-    import threading
-    import random
-    import sys
-
-    from config import program_authentication_clyth, current_localization
-    from languages import l
-    from RS import random_string
-    import config
-
-    def __init__(self, globals_dict=None):
+    def __init__(self, globals_dict=None, debug_mode=False):
         self.globals_dict = globals_dict if globals_dict else {}
-        self.window = None
+        self.CC_GUI = None
         self.output_text = None
         self.input_entry = None
 
     def create_console(self):
-        self.window = tk.Tk()
-        self.window.title(random_string())
-        self.window.geometry("650x400")
+        self.CC_GUI = tk.Tk()
+        self.CC_GUI.title(RS())
+        self.CC_GUI.geometry("650x400")
 
         #Вывод консоли
         self.output_text = scrolledtext.ScrolledText(
-            self.window,
+            self.CC_GUI,
             wrap=tk.WORD,
             bg="#1e1e1e",
             fg="#00ff00",
@@ -52,7 +53,7 @@ class CrowbarConsole:
         self.output_text.config(state=tk.DISABLED)
 
         #Поле ввода
-        input_frame = tk.Frame(self.window)
+        input_frame = tk.Frame(self.CC_GUI)
         input_frame.pack(fill=tk.X, padx=5, pady=5)
 
         tk.Label(input_frame, text=">>>", fg="#00ff00", bg="black").pack(side=tk.LEFT, padx=5)
@@ -68,7 +69,9 @@ class CrowbarConsole:
         self.input_entry.bind("<Return>", self.execute_command)
         self.input_entry.focus()
 
-        self.window.mainloop()
+        create_menubar(self.CC_GUI, False, None, debug_mode=debug_mode)
+
+        self.CC_GUI.mainloop()
 
     def execute_command(self, event=None):
         command = self.input_entry.get()
@@ -130,14 +133,14 @@ class CrowbarConsole:
         self.output_text.see(tk.END)
         self.output_text.config(state=tk.DISABLED)
 
-def open_console(globals_dict=None):
+def open_console(globals_dict=None, debug_mode=False):
     n = random.randint(128, 2048)
-    captcha_input = tk.simpledialog.askinteger(random_string(), f"{l("enter_number")}: {n}")
+    captcha_input = tk.simpledialog.askinteger(RS(), f"{l("enter_number")}: {n}")
 
     if captcha_input == n:
         pass
     else:
-        messagebox.showerror(random_string(), l("bad_password_for_console"))
+        messagebox.showerror(RS(), l("bad_password_for_console"))
         return
-    console = CrowbarConsole(globals_dict)
+    console = CrowbarConsole(globals_dict, debug_mode=debug_mode)
     console.create_console()

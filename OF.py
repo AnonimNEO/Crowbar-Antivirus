@@ -9,7 +9,10 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Интерфейс
-from tkinter import ttk, messagebox, filedialog, simpledialog
+from tkinter import ttk, messagebox, filedialog, simpledialog, Menu
+import tkinter as tk
+from tkinter.messagebox import askyesno
+
 #Логирование Ошибок
 from loguru import logger
 #Работа с процессами
@@ -23,6 +26,9 @@ import winreg
 import sys
 import os
 from io import BytesIO
+from time import time
+from collections import deque
+
 
 #from OBPC import OBPC
 from RS import RS
@@ -30,7 +36,7 @@ from languages import l
 from config import *
 
 global load_bush
-other_function_version = "0.12.1 Beta"
+other_function_version = "0.13.6 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -82,7 +88,7 @@ def run_component(func, *args):
         thread = threading.Thread(target=func, args=args, daemon=True)
         thread.start()
         logger.info(f"OF/run_component - {l("start_thread")} {func.__name__}")
-    except Exception as e:
+    except:
         logger.exception(f"OF/run_component - {l("start_thread_error")} {func.__name__}")
 
 
@@ -94,7 +100,7 @@ def run_component_process(func, *args):
         process.daemon = True
         process.start()
         logger.info(f"OF/run_component - {l("start_process")} {func.__name__}")
-    except Exception as e:
+    except:
         logger.exception(f"OF/run_component - {l("start_process_error")} {func.__name__}")
 
 
@@ -208,15 +214,15 @@ def apply_global_theme(window, current_theme):
 
 
 
-#Защищает окно tkinter от подозрительно частого или резкого перемещения
-def protect_window_from_moving(GUI, debug_mode=False):
-    #параметры
+#Защищаем окно от подозрительно частого или резкого перемещения
+def protect_window_from_moving(GUI, enable=True, debug_mode=False):
+    #Параметры
     MAX_MOVES_PER_SECOND = 15 #Максимум перемещений в секунду
     MAX_PIXEL_JUMP = 250 #Максимальный скачок в пикселях
     DETECTION_WINDOW = 1.5 #Временное окно для анализа (секунды)
     LOCK_DURATION = 0.6 #Блокировка на n секунд после обнаружения
 
-    #состояние
+    #Состояние
     state = {
         "last_x": GUI.winfo_x(),
         "last_y": GUI.winfo_y(),
@@ -227,9 +233,14 @@ def protect_window_from_moving(GUI, debug_mode=False):
         "is_locked": False,
         "lock_time": 0,
         "attack_count": 0,
+        "is_protected": enable,
     }
 
     def on_window_move(event):
+        #Если защита отключена - ничего не делаем
+        if not state["is_protected"]:
+            return
+
         current_time = time()
         current_x = GUI.winfo_x()
         current_y = GUI.winfo_y()
@@ -263,12 +274,12 @@ def protect_window_from_moving(GUI, debug_mode=False):
         #Слишком много перемещений в секунду
         if len(state["move_timestamps"]) > MAX_MOVES_PER_SECOND:
             is_attack = True
-            attack_reason = f"Слишком частые движения ({len(state["move_timestamps"])} за {DETECTION_WINDOW}с)"
+            attack_reason = f"{l("excessive_movements")} ({len(state["move_timestamps"])} {l("for2")} {DETECTION_WINDOW} {l("second")})"
 
         #Резкий скачок позиции
         if max_jump > MAX_PIXEL_JUMP and (current_time - state["last_time"]) < 0.05:
             is_attack = True
-            attack_reason = f"Резкий скачок: {max_jump}px за {(current_time - state['last_time'])*1000:.1f}мс"
+            attack_reason = f"{l("sharp_jump")}: {max_jump}px {l("for2")} {(current_time - state["last_time"])*1000:.1f} {l("milliseconds")}"
 
         if is_attack:
             state["is_locked"] = True
@@ -279,21 +290,108 @@ def protect_window_from_moving(GUI, debug_mode=False):
             GUI.geometry(f"+{state["safe_x"]}+{state["safe_y"]}")
 
             if debug_mode:
-                logger.debug(f"PWFM - Атака #{state["attack_count"]}: {attack_reason}")
-                logger.debug(f"PWFM - Окно заблокировано на {LOCK_DURATION} сек")
+                logger.debug(f"protect_window_from_moving - {l("attack")} #{state["attack_count"]}: {attack_reason}")
+                logger.debug(f"protect_window_from_moving - {l("window_block")} {LOCK_DURATION} {l("second")}")
+
+        #Обновляем безопасную позицию при нормальном движении
+        #state["last_x"] = current_x
+        #state["last_y"] = current_y
+        #state["last_time"] = current_time
+        #state["safe_x"] = current_x
+        #state["safe_y"] = current_y
 
     #Привязываем событие к окну
     GUI.bind("<Configure>", on_window_move)
 
-    #Возвращаем функцию для отключения защиты
+    #Вкл/Выкл защиты
+    def toggle_protection(new_state):
+        state["is_protected"] = new_state
+        if new_state:
+            logger.success(f"OF/protect_window_from_moving - {l("protect_window_on")}")
+        else:
+            logger.info(f"OF/protect_window_from_moving - {l("protect_window_off")}")
+
     def get_status():
         return {
             "attacks_detected": state["attack_count"],
             "is_locked": state["is_locked"],
+            "is_protected": state["is_protected"],
             "safe_position": (state["safe_x"], state["safe_y"])
         }
 
-    logger.success("PWFM - Защита от перемещения окна активирована")
+    if enable:
+        logger.success(f"OF/protect_window_from_moving - {l("protect_window_on")}")
+
+    #Возвращаем функции управления
+    return toggle_protection, get_status
+
+
+
+#Создаём пункты в панели
+def create_menubar(GUI, run_in_recovery, restart_theme_func, component=None, component_func=None, component_func2=None, elements=None, debug_mode=False):
+    menubar = Menu(GUI)
+
+    if component == "FM":
+        custom = 0
+        menubar.add_command(label=l("search"), command=component_func)
+    elif component == "ARM":
+        pass
+        custom = 0
+    elif component == "PM":
+        #Создаем выпадающее меню "Действия"
+        actions_menu = tk.Menu(menubar, tearoff=0)
+        actions_menu.add_command(label=l("search"), accelerator="Ctrl+F", command=lambda: component_func(elements))
+        actions_menu.add_command(label=l("cancel_search"), accelerator="Esc", command=lambda: component_func2(elements))
+        menubar.add_cascade(label=l("actions"), menu=actions_menu)
+        custom = 0
+    else:
+        custom = 0
+
+    #Меню тем
+    theme_menu = Menu(menubar, tearoff=0)
+    themes = [("dark", "dark"), ("white", "white"), ("red", "red"), ("green", "lime"), ("contrast", "black"), ("gray", "gray"), ("orange", "orange")]
+    for label, theme_name in themes:
+        theme_menu.add_checkbutton(label=l(label), command=lambda t=theme_name: restart_theme_func(t))
+    menubar.add_cascade(label=l("themes"), menu=theme_menu)
+
+    #Переменные состояния
+    higher = tk.BooleanVar(value=not run_in_recovery)
+    protect = tk.BooleanVar(value=not run_in_recovery)
+
+    #Сохраняем индексы с учётом смещения
+    topmost_index = (menubar.index("end") + 1 if menubar.index("end") else 1) + custom
+    menubar.add_command(label=f"{l("topmost")}: {l("on2")}")
+
+    protect_index = (menubar.index("end") + 1) + custom
+    menubar.add_command(label=f"Защита окна: {l("on2")}")
+
+    pac_index = (menubar.index("end") + 1) + custom
+    menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}")
+
+    #Функции переключения
+    def toggle_topmost():
+        higher.set(not higher.get())
+        GUI.attributes("-topmost", higher.get())
+        status = l("on2") if higher.get() else l("off2")
+        menubar.entryconfig(topmost_index, label=f"{l('topmost')}: {status}")
+
+    def toggle_protect():
+        protect.set(not protect.get())
+        protect_window_from_moving(GUI, protect.get(), debug_mode)
+        status = l("on2") if protect.get() else l("off2")
+        menubar.entryconfig(protect_index, label=f"Защита окна: {status}")
+
+    #Присваиваем команды
+    menubar.entryconfig(topmost_index, command=toggle_topmost)
+    menubar.entryconfig(protect_index, command=toggle_protect)
+    menubar.entryconfig(pac_index, command=pac)
+
+    GUI.config(menu=menubar)
+
+    #Активируем защиту в обычной среде
+    if not run_in_recovery:
+        GUI.attributes("-topmost", True)
+        GUI.after(100, lambda: protect_window_from_moving(GUI, True, debug_mode))
 
 
 
@@ -352,7 +450,7 @@ def get_current_disc(run_in_recovery=False):
             if "fixed" in p.opts and os.path.exists(os.path.join(p.mountpoint, "Windows")):
                 return p.mountpoint, True
         return "C:\\", False
-    except Exception as e:
+    except:
         logger.exception(f"OF\\get_current_disc - {l("unknown_error")}")
         return "X:\\", False
 
@@ -396,7 +494,7 @@ def load_bush(current_disc, user=False):
             active_loaded_hives.append(name)
             logger.info(f"OF/load_bush - {l("bush")} {name} {l("success_load")} {path}")
             success_count += 1
-        except Exception as e:
+        except:
             logger.exception(f"OF/load_bush - {l("load_bush_error")} {path}\\{name}")
 
     #Возвращаем True, если загрузили хотя бы один куст
@@ -414,7 +512,7 @@ def unload_bush():
             winreg.unloadkey(winreg.HKEY_LOCAL_MACHINE, name)
             active_loaded_hives.remove(name)
             logger.success(f"OF/unload_bush - {l("bush")} {name} {l("success_unload")}.")
-        except Exception as e:
+        except:
             logger.exception(f"OF/unload_bush - {l("unload_bush_error")} {name}")
 
 
@@ -425,7 +523,7 @@ def get_user_name():
     try:
         user_name = os.getlogin()
         return user_name
-    except Exception as e:
+    except:
         logger.exception(f"OF/get_user_name - {l("get_user_name_error")}!")
         return default_user_name
 
@@ -504,7 +602,7 @@ def decoy_mode(cycle=False, debug=True):
                             file.write(RS("data"))
                         if debug:
                             logger.debug(f"create - {f}")
-                    except Exception as e:
+                    except:
                         logger.exception(f"Не удалось создать файл {file_path}")
 
             #Пинги
@@ -523,7 +621,7 @@ def decoy_mode(cycle=False, debug=True):
                     try:
                         key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_name)
                         if debug:
-                            logger.debug(f"create registry key - {key_name}")
+                            logger.debug(f"{l("create_reg_key")} - {key_name}")
 
                         #Создаём параметры с информацией о "сборе данных"
                         params = {
@@ -547,10 +645,10 @@ def decoy_mode(cycle=False, debug=True):
 
                         winreg.CloseKey(key)
 
-                    except Exception as e:
+                    except:
                         logger.exception(f"{l("create_key_error")} {key_name}")
 
-            except Exception as e:
+            except:
                 logger.exception()
 
             for cmd in fake_cmds:
@@ -561,9 +659,9 @@ def decoy_mode(cycle=False, debug=True):
                 try:
                     winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_name)
                     if debug:
-                        logger.debug(f"remove registry key - {key_name}")
-                except Exception as e:
-                    logger.exception(f"Не удалось удалить ключ реестра {key_name}")
+                        logger.debug(f"{l("reg_key_delete")} - {key_name}")
+                except:
+                    logger.exception(f"{l("reg_key_delete_error")} - {key_name}")
 
             for cmd in fake_cmds:
                 subprocess.Popen(cmd, stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
@@ -574,29 +672,25 @@ def decoy_mode(cycle=False, debug=True):
                     if os.path.exists(f):
                         os.remove(f)
                         if debug:
-                            logger.debug(f"remove - {f}")
-                except Exception as e:
-                    logger.exception(f"Не удалось удалить файл {f}")
+                            logger.debug(f"{l("file_delete")} - {f}")
+                except:
+                    logger.exception(f"{l("file_delete_error")} {f}")
 
             for d in fake_dirs:
                 try:
                     if os.path.exists(d):
                         if debug:
-                            logger.debug(f"remove dir - {d}")
+                            logger.debug(f"{l("dir_delete")} dir - {d}")
                         os.rmdir(d)
-                except Exception as e:
-                    logger.exception(f"Не удалось удалить папку {d}")
+                except:
+                    logger.exception(f"{l("delete_dir_error")} {d}")
 
             if not cycle:
                 c = 0
         except Exception as e:
-            logger.exception(f"Ошибка при создании фейковой активности!:")
+            logger.exception(f"OF/decoy_mode - {l("decoy_mode_error")}!:")
             if not cycle:
-                try:
-                    from tkinter import messagebox
-                    messagebox.showerror(RS(), f"Ошибка при создании фейковой активности!:\n{e}")
-                except:
-                    pass
+                messagebox.showerror(RS(), f"{l("decoy_mode_error")}!:\n{e}")
 
 
 
@@ -633,7 +727,8 @@ def CMD():
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
             output = result.stdout if result.stdout else result.stderr
             print_to_console(output.strip())
-        except Exception as e:
+        except:
+            logger.exception(f"OF/CMD - {l("error")}")
             print_to_console(f"{l("error")}:\n{e}")
 
     execute_button = tk.Button(input_frame, text=l("execute"), command=execute_command)
@@ -670,8 +765,8 @@ def launch_ghost(exe_path=False):
         subprocess.Popen([temp_path], startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW)
         logger.success(f"Запущено в скрытом режиме: {temp_path}")
     except Exception as e:
-        logger.exception(f"Ошибка при запуске в крытом режиме:", e)
-        messagebox.showerror(RS(), f"Ошибка при запуске в крытом режиме:\n{e}")
+        logger.exception(f"OF/launch_ghost - Ошибка при запуске в крытом режиме:", e)
+        messagebox.showerror(RS(), f"Ошибка при запуске в cкрытом режиме:\n{e}")
 
 
 
@@ -690,13 +785,21 @@ def open_with():
 
 
 
+def enable_debug_mode():
+    if askyesno(RS, l("enable_debug_mode_text")):
+        logger.warning(f"OF/enable_debug_mode - {l("debug_mode_on")}.")
+        return True
+    return False
+
+
+
 @logger.catch()
 def reg_file(reg_file, reg_code):
     with open(reg_file, "w") as reg:
         reg.write(reg_code)
     try:
         os.startfile(reg_file)
-    except Exception as e:
+    except:
         logger.exception(f"OF/reg_file - {l("start_error")} {reg_file}")
 
 
@@ -707,5 +810,5 @@ def run_command(command):
         #Запускает команду и ждём её завершения
         process = subprocess.run(command, shell=True)
         return process.returncode
-    except Exception as e:
+    except:
         logger.exception(f"OF/run_command - {l("start_command_error")} - {command}")

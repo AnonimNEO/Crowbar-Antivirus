@@ -20,11 +20,11 @@ import os
 
 from languages import l
 from OF import get_user_name, get_current_disc
-from RS import random_string
+from RS import RS
 from config import *
 
 global log_path, clear_temp_log
-clear_cache_version = "0.7.2 Beta"
+clear_cache_version = "0.7.3 Beta"
 
 @logger.catch
 def CC(run_in_recovery):
@@ -52,7 +52,7 @@ def CC(run_in_recovery):
                 elif os.path.isdir(item_path):
                     shutil.rmtree(item_path)
                     files_deleted.append(item)
-            except Exception as e:
+            except:
                 files_not_deleted.append(item)
                 logger.exception(f"CC - {l("file_delete_error")} {l("from")} %Temp% - {item}")
 
@@ -71,7 +71,7 @@ def CC(run_in_recovery):
 
         cc_log_text = f"CC - {l("cc_log_dir")} - {log_path}\\{log_filename}"
         logger.info(cc_log_text)
-        messagebox.showinfo(random_string(), cc_log_text)
+        messagebox.showinfo(RS(), cc_log_text)
 
-    except Exception as e:
+    except:
         logger.exception(l("cc_critical_error"))

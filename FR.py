@@ -8,9 +8,9 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-file_replacer_version = "0.4.2 Beta"
+file_replacer_version = "0.4.5 Beta"
 
-def FR(run_in_recovery, current_theme):
+def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
     #Интерфейс
     from tkinter import filedialog, messagebox, ttk, Menu
     import tkinter as tk
@@ -22,18 +22,18 @@ def FR(run_in_recovery, current_theme):
     import os
 
     from GFA import GFA
-    from RS import random_string
-    from OF import pac, apply_global_theme, get_current_disc
+    from RS import RS
+    from OF import pac, apply_global_theme, get_current_disc, create_menubar
     from languages import l
     from config import theme, default_theme, program_authentication_clyth, current_localization
 
     def browse_source(source_var):
-        path = filedialog.askopenfilename(title=random_string())
+        path = filedialog.askopenfilename(title=RS())
         if path:
             source_var.set(path)
 
     def browse_target(target_var):
-        path = filedialog.askopenfilename(title=random_string())
+        path = filedialog.askopenfilename(title=RS())
         if path:
             target_var.set(path)
 
@@ -63,7 +63,7 @@ def FR(run_in_recovery, current_theme):
             final_tgt = raw_target
 
         if not final_src or not os.path.exists(final_src):
-            messagebox.showerror(random_string(), f"{l("file")} {l("not_found")}")
+            messagebox.showerror(RS(), f"{l("file")} {l("not_found")}")
             return
 
         try:
@@ -84,11 +84,11 @@ def FR(run_in_recovery, current_theme):
             #Копируем новый файл
             shutil.copy2(final_src, final_tgt)
             logger.success(f"FR - {l("success")} {l("replaced")}: {final_tgt}")
-            messagebox.showinfo(random_string(), f"{l("file")} {l("replaced")} {l("on_disc")} {current_disc}")
+            messagebox.showinfo(RS(), f"{l("file")} {l("replaced")} {l("on_disc")} {current_disc}")
 
         except Exception as e:
             logger.exception(f"FR - {l("error")}")
-            messagebox.showerror(random_string(), f"{l("replace_file_not_found")}:\n{e}")
+            messagebox.showerror(RS(), f"{l("replace_file_not_found")}:\n{e}")
 
     def restore_file(target_var):
         final_tgt = target_var.get()
@@ -97,33 +97,31 @@ def FR(run_in_recovery, current_theme):
             current_disc = "C:\\"
         final_tgt = final_tgt.replace("C:", f"{current_disc}")
         if not final_tgt:
-            messagebox.showwarning(random_string(), l("select_file"))
+            messagebox.showwarning(RS(), l("select_file"))
             return
 
         backup_path = final_tgt + ".backup"
         if not os.path.exists(backup_path):
-            messagebox.showwarning(random_string(), f"{l("backup")} {l("not_found")} {l("on_dir")}:\n{backup_path}")
+            messagebox.showwarning(RS(), f"{l("backup")} {l("not_found")} {l("on_dir")}:\n{backup_path}")
             return
 
-        if messagebox.askyesno(random_string(), f"{l("restore")} {os.path.basename(final_tgt)} {l("from_backup")}?"):
+        if messagebox.askyesno(RS(), f"{l("restore")} {os.path.basename(final_tgt)} {l("from_backup")}?"):
             try:
                 #Возвращаем бэкап на место основного файла
                 shutil.move(backup_path, final_tgt)
                 logger.success(f"FR - {l("restore_from_backup")}: {final_tgt}")
-                messagebox.showinfo(random_string(), f"{l("file")} {l("success")} {l("restored")}.")
+                messagebox.showinfo(RS(), f"{l("file")} {l("success")} {l("restored")}.")
             except Exception as e:
                 logger.exception(f"FR - {l("error")} {l("when_restoring_a_file")}")
-                messagebox.showerror(random_string(), str(e))
+                messagebox.showerror(RS(), str(e))
 
     def restart_fr(user_theme):
         global current_theme
         current_theme = theme[user_theme]
-        #FR_GUI.destroy()
-        #FR(current_theme)
         apply_global_theme(FR_GUI, current_theme)
 
     FR_GUI = tk.Tk()
-    FR_GUI.title(random_string())
+    FR_GUI.title(RS())
     FR_GUI.geometry("400x235")
 
     apply_global_theme(FR_GUI, current_theme)
@@ -169,43 +167,11 @@ def FR(run_in_recovery, current_theme):
               command=lambda: restore_file(target_path), 
               width=15).pack(side="left", padx=10)
 
-    #Меню
-    menubar = Menu(FR_GUI)
-    theme_menu = Menu(menubar, tearoff=0)
-    theme_menu.add_checkbutton(label=l("dark"), command=lambda: restart_fr("dark"))
-    theme_menu.add_checkbutton(label=l("white"), command=lambda: restart_fr("white"))
-    theme_menu.add_checkbutton(label=l("red"), command=lambda: restart_fr("red"))
-    theme_menu.add_checkbutton(label=l("contrast"), command=lambda: restart_fr("black"))
-    theme_menu.add_checkbutton(label=l("gray"), command=lambda: restart_fr("gray"))
-    theme_menu.add_checkbutton(label=l("orange"), command=lambda: restart_fr("orange"))
-
-    #Пункт "Темы"
-    menubar.add_cascade(label=l("themes"), menu=theme_menu)
-
-    FR_GUI.attributes("-topmost", True) 
-
-    higher = tk.BooleanVar(value=True)
-
-    def toggle_topmost(GUI):
-        new_state = not higher.get()
-        higher.set(new_state)
-        GUI.attributes("-topmost", new_state)
-
-    def update_topmost_label(menubar, GUI):
-        status = l("on2") if higher.get() else l("off2")
-        #Индекс command в menubar
-        menubar.entryconfig(2, label=f"{l("topmost")}: {status}")
-        GUI.after(200, lambda: update_topmost_label(menubar, GUI))
-
-    menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda: toggle_topmost(FR_GUI))
-    update_topmost_label(menubar, FR_GUI)
-
-    menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
-
-    FR_GUI.config(menu=menubar)
+    create_menubar(FR_GUI, run_in_recovery, restart_fr, debug_mode=debug_mode)
 
     FR_GUI.mainloop()
 
 if __name__ == "__main__":
+    from config import theme, default_theme
     current_theme = theme[default_theme]
     FR(False, current_theme)

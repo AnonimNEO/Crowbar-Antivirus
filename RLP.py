@@ -9,7 +9,7 @@
 #Coded by @AnonimNEO (Telegram)
 
 from tkinter import messagebox
-from RS import random_string
+from RS import RS
 from loguru import logger
 import psutil
 
@@ -17,7 +17,7 @@ import psutil
 def get_process_critical_status(a=None,b=None,c=None):
     pass
 
-real_time_protect_version = "0.1.0 Pre-Alpha"
+real_time_protect_version = "0.1.2 Pre-Alpha"
 
 #Действие с процессами
 def action_process(action, process_ids):
@@ -89,7 +89,7 @@ def get_process_list(list_type, run_in_recovery):
         return [p for p in all_processes if p["Статус"] == "Заморожен"]
     return []
 
-def RLP(run_in_recovery,b=None,c=None):
+def RLP(run_in_recovery=False):
     SUSPEND_PROCESS = []
     system_name_process = (
         ("cmd.exe", r"C:\Windows\System32\cmd.exe"),
@@ -104,7 +104,7 @@ def RLP(run_in_recovery,b=None,c=None):
     system_exception = [r"C:\Users\Adminus\Desktop\calc.exe"]
 
     if run_in_recovery:
-        messagebox.showwarning(random_string(), "RealTimeProtect невозможно запустить в среде восстановления")
+        messagebox.showwarning(RS(), "RealTimeProtect невозможно запустить в среде восстановления")
 
     def warning_dialog(cause, p):
         if cause == "fake_system":

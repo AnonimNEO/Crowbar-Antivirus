@@ -1,6 +1,10 @@
 #Текущий язык (доступные языки: ru)
 current_localization = "ru"
 
+#Тестовый режим
+#global debug_mode
+#debug_mode = False
+
 #Общее количество строчек кода
 all_line = "~11000"
 
@@ -29,7 +33,7 @@ clear_temp_log = "Clear_Temp_log"
 T_log_txt = "Crawbar_log.txt"
 
 #Ключ Шифрования
-clyth = 13
+clyth = "13"
 
 #Ключ подтверждения подлиного окна
 program_authentication_clyth = "88005553535"

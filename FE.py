@@ -8,23 +8,23 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-file_editor_version = "0.3.2 Beta"
+import tkinter as tk
+from tkinter import filedialog, messagebox
+from loguru import logger
+import os
+
+from languages import l
+from config import program_authentication_clyth, current_localization, clyth
+from RS import RS
+from AES import AES
+from OF import pac, extract_filename_from_path
+
+file_editor_version = "0.3.6 Beta"
 
 class FileEditor:
-    import tkinter as tk
-    from tkinter import filedialog, messagebox
-    from loguru import logger
-    import os
-
-    from languages import l
-    from config import program_authentication_clyth, current_localization, clyth
-    from RS import random_string
-    #from CC22 import CC22
-    from OF import pac
-
     def __init__(self, FE_GUI):
         self.FE_GUI = FE_GUI
-        self.FE_GUI.title(random_string())
+        self.FE_GUI.title(RS())
         self.FE_GUI.geometry("650x400")
 
         self.current_file = None
@@ -44,6 +44,9 @@ class FileEditor:
         #Создаём меню
         self.create_menu()
 
+        #Создаём панель поиска
+        self.create_search_panel()
+
         #Создаём главный фрейм
         self.main_frame = tk.Frame(self.FE_GUI)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
@@ -53,9 +56,6 @@ class FileEditor:
 
         #Создаём строку состояния
         self.create_status_bar()
-
-        #Создаём панель поиска
-        self.create_search_panel()
 
         #Создаём контекстное меню
         self.create_context_menu()
@@ -173,16 +173,16 @@ class FileEditor:
 
 
     def bind_shortcuts(self):
-        self.FE_GUI.bind("<Control-o>", lambda e: self.open_file())
-        self.FE_GUI.bind("<Control-s>", lambda e: self.save_file())
+        self.FE_GUI.bind("<Control-O>", lambda e: self.open_file())
+        self.FE_GUI.bind("<Control-S>", lambda e: self.save_file())
         self.FE_GUI.bind("<Control-Shift-S>", lambda e: self.save_as_file())
-        self.FE_GUI.bind("<Control-z>", lambda e: self.text_widget.edit_undo())
-        self.FE_GUI.bind("<Control-y>", lambda e: self.text_widget.edit_redo())
-        self.FE_GUI.bind("<Control-x>", lambda e: self.cut_text())
-        self.FE_GUI.bind("<Control-c>", lambda e: self.copy_text())
-        self.FE_GUI.bind("<Control-v>", lambda e: self.paste_text())
-        self.FE_GUI.bind("<Control-a>", lambda e: self.select_all())
-        self.FE_GUI.bind("<Control-f>", lambda e: self.toggle_search_panel())
+        self.FE_GUI.bind("<Control-Z>", lambda e: self.text_widget.edit_undo())
+        self.FE_GUI.bind("<Control-Y>", lambda e: self.text_widget.edit_redo())
+        self.FE_GUI.bind("<Control-X>", lambda e: self.cut_text())
+        self.FE_GUI.bind("<Control-C>", lambda e: self.copy_text())
+        self.FE_GUI.bind("<Control-V>", lambda e: self.paste_text())
+        self.FE_GUI.bind("<Control-A>", lambda e: self.select_all())
+        self.FE_GUI.bind("<Control-F>", lambda e: self.toggle_search_panel())
 
 
 
@@ -266,7 +266,7 @@ class FileEditor:
 
     def open_file(self):
         file_path = filedialog.askopenfilename(
-            title=random_string(),
+            title=RS(),
             filetypes=[(l("text_file"), "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l("crowbar_scripts"), "*.cas"), (l("all_files"), "*.*")]
         )
         if file_path:
@@ -277,15 +277,15 @@ class FileEditor:
     def load_file(self, file_path):
         try:
             if not os.path.exists(file_path):
-                messagebox.showerror(random_string(), f"{l("file")} {l("not_found")}: {file_path}")
+                messagebox.showerror(RS(), f"{l("file")} {l("not_found")}: {file_path}")
                 return
 
             with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
 
-            #file_name = extract_filename_from_path(file_path)
-            #if file_name[-4:] == ".cas":
-            #    content = CC22(code, clyth, True)
+            file_name = extract_filename_from_path(file_path)
+            if file_name[-4:] == ".cas":
+                content = AES(content, clyth, True)
 
             self.text_widget.delete(1.0, tk.END)
             self.text_widget.insert(1.0, content)
@@ -295,7 +295,7 @@ class FileEditor:
             self.update_status_bar()
         except Exception as e:
             logger.exception(f"FE - {l("error")} {l("load_file")}")
-            messagebox.showerror(random_string(), str(e))
+            messagebox.showerror(RS(), str(e))
 
 
 
@@ -305,38 +305,39 @@ class FileEditor:
             return
         try:
             content = self.text_widget.get(1.0, tk.END)
-            #file_name = extract_filename_from_path(self.current_file)
-            #if file_name[-4:] == ".cas":
-            #    content = CC22(code, clyth)
+            file_name = extract_filename_from_path(self.current_file)
+            if file_name[-4:] == ".cas":
+                content = AES(content, clyth)
             with open(self.current_file, "w", encoding="utf-8") as file:
                 file.write(content)
             self.is_modified = False
             self.update_status_bar()
-            messagebox.showinfo(random_string(), f"{l("file")} {l("success_saved")}!")
+            messagebox.showinfo(RS(), f"{l("file")} {l("success_saved")}!")
         except Exception as e:
-            logger.exception(f"FE - {l("error")} {l("save_file")}: {current_file}")
-            messagebox.showerror(random_string(), str(e))
+            logger.exception(f"FE - {l("error")} {l("save_file")}: {self.current_file}")
+            messagebox.showerror(RS(), str(e))
 
 
 
     def save_as_file(self):
         file_path = filedialog.asksaveasfilename(
-            title=random_string(),
+            title=RS(),
             defaultextension=".txt",
-            filetypes=[(l("text_file"), "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l("all_files"), "*.*")]
+            filetypes=[(l("text_file"), "*.txt"), ("MarkDown", "*.md"), ("JSON", "*.json"), (l("crowbar_scripts"), "*.cas"), (l("all_files"), "*.*")]
         )
         if file_path:
             try:
                 content = self.text_widget.get(1.0, tk.END)
+                content = AES(content, clyth)
                 with open(file_path, "w", encoding="utf-8") as file:
                     file.write(content)
                 self.current_file = file_path
                 self.is_modified = False
                 self.update_status_bar()
-                messagebox.showinfo(random_string(), f"{l("file")} {l("success_saved")}!")
+                messagebox.showinfo(RS(), f"{l("file")} {l("success_saved")}!")
             except Exception as e:
                 logger.exception(f"FE - {l("error")} {l("save_file")}: {file_path}")
-                messagebox.showerror(random_string(), str(e))
+                messagebox.showerror(RS(), str(e))
 
 
 
@@ -374,7 +375,7 @@ class FileEditor:
 
     def on_closing(self):
         if self.is_modified:
-            response = messagebox.askyesnocancel(random_string(), l("save_changes?"))
+            response = messagebox.askyesnocancel(RS(), l("save_changes?"))
             if response is None: #Отмена
                 return
             elif response: #Да
@@ -385,8 +386,9 @@ class FileEditor:
 
     #Создаём панель поиска
     def create_search_panel(self):
-        self.search_active = False
+        self.search_active = True
         self.search_panel = tk.Frame(self.FE_GUI, bd=1, relief=tk.RAISED)
+        self.search_panel.pack(side=tk.TOP, fill=tk.X)
         #Текстовое поле поиска
         self.search_var = tk.StringVar()
         self.search_entry = tk.Entry(self.search_panel, textvariable=self.search_var)
@@ -422,12 +424,13 @@ class FileEditor:
             self.search_active = False
             self.clear_search_highlight()
         else:
-            self.search_panel.pack(side=tk.TOP, fill=tk.X)
+            self.search_panel.pack(side=tk.TOP, fill=tk.X, before=self.main_frame)
             self.search_active = True
             self.search_var.set('')
             self.matches_positions = []
             self.current_match_index = -1
             self.clear_search_highlight()
+
 
 
 
@@ -528,7 +531,7 @@ def FE(file_path=None):
         if file_path:
             editor.load_file(file_path)
         FE_GUI.mainloop()
-    except Exception as e:
+    except:
         logger.exception(l("fe_critical_error"))
 
 if __name__ == "__main__":

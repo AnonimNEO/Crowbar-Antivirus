@@ -19,7 +19,7 @@ from OF import Psutil
 from languages import l
 from config import current_localization
 
-edit_criticality_version = "0.4.3 Beta"
+edit_criticality_version = "0.4.4 Beta"
 
 #Загрузка необходимых библиотек windows
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -63,7 +63,7 @@ def get_process_name(process_id):
 
 
 #Получаем текущий статус критичности процесса
-def get_process_critical_status(process_id):
+def get_process_critical_status(process_id, debug_mode=False):
     process_handle = None
     try:
         define_functions()
@@ -73,7 +73,8 @@ def get_process_critical_status(process_id):
 
         if not process_handle:
             error_code = ctypes.get_last_error()
-            logger.error(f"EC - {l("open_process_error")} (pid: {process_id}). {l("error_code")}: {error_code}")
+            if debug_mode:
+                logger.error(f"EC - {l("open_process_error")} (pid: {process_id}). {l("error_code")}: {error_code}")
             return None
 
         #Переменная для хранения результата
@@ -85,13 +86,14 @@ def get_process_critical_status(process_id):
 
         if result == STATUS_SUCCESS:
             is_critical = bool(critical_value.value)
-            logger.info(f"EC - {l("process")} (pid: {process_id}) {l("criticality_status")}: {is_critical}")
+            if debug_mode:
+                logger.info(f"EC - {l("process")} (pid: {process_id}) {l("criticality_status")}: {is_critical}")
             return is_critical
         else:
             logger.error(f"EC - {l("query_critical_error")}. {l("error_code")}: {hex(result)}")
             return None
 
-    except Exception as e:
+    except:
         logger.exception(f"EC - {l("get_critical_unknown_error")}")
         return None
     finally:
@@ -128,7 +130,7 @@ def set_process_critical(process_id, critical):
             logger.error(f"EC - {l("edit_critical_error")}. {l("error_code")}: {hex(result)}")
             return False
 
-    except Exception as e:
+    except:
         logger.exception(f"EC - {l("edit_critical_unknown_error")}")
         return False
     finally:
@@ -137,7 +139,7 @@ def set_process_critical(process_id, critical):
 
 
 
-def EC(process_id, critical=None, debug_mode=True):
+def EC(process_id, critical=None, debug_mode=False):
     try:
         process_name = get_process_name(process_id)
 
@@ -166,6 +168,6 @@ def EC(process_id, critical=None, debug_mode=True):
             logger.error(f"EC - {l("criticality_status")} {process_name} (pid: {process_id}) {l("no_changed")}")
             return False
 
-    except Exception as e:
+    except:
         logger.exception(f"{l("ec_critical_error")}")
         return None

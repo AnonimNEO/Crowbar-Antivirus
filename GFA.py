@@ -8,42 +8,19 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-get_full_access_version = "0.4.1 Alpha"
-l = localizations[current_localization]
+from tkinter import messagebox
+from loguru import logger
+import subprocess
+import os
 
-#Получаем полные права на файл, каталог или ключ реестра
-def GFA(path, run_in_recovery=False):
-    from tkinter import messagebox
-    from loguru import logger
-    import subprocess
-    import os
+#from RS import RS
+from languages import l
+from config import current_localization
 
-    from RS import random_string
-    from languages import localizations
-    from config import current_localization
-
-    #if run_in_recovery:
-    #    messagebox.showwarning(random_string(), "Невозможно получить права в среде восстановления.")
-    #    return False
-
-    try:
-        username = os.getenv("USERNAME")
-        domain = os.getenv("USERDOMAIN")
-        full_username = f"{domain}\\{username}"
-
-        if _is_registry_path(path):
-            return _grant_registry_access(path, full_username)
-        else:
-            return _grant_file_access(path, username)
-
-    except Exception as e:
-        logger.exception(f"GFA - {l("error")}")
-        return False
-
-
+get_full_access_version = "0.4.4 Alpha"
 
 #Проверяем, является ли путь ключом реестра
-def _is_registry_path(path):
+def is_registry_path(path):
     registry_prefixes = [
         "HKEY_LOCAL_MACHINE", "HKLM",
         "HKEY_CURRENT_USER", "HKCU",
@@ -56,9 +33,9 @@ def _is_registry_path(path):
 
 
 #Устанавливаем полные права на файл или каталог
-def _grant_file_access(path, username):
+def grant_file_access(path, username):
     if not os.path.exists(path):
-        logger.error(f"GFA - {l["not_dir"]}: {path}")
+        logger.error(f"GFA - {l("not_dir")}: {path}")
         return False
 
     try:
@@ -66,31 +43,31 @@ def _grant_file_access(path, username):
         result = subprocess.run(cmd, capture_output=True, text=True)
 
         if result.returncode == 0:
-            logger.success(f"GFA - {l["full_access_set"]}: {path}")
+            logger.success(f"GFA - {l("full_access_set")}: {path}")
             return True
         else:
-            logger.error(f"GFA - {l["error"]} icacls: {result.stderr}")
+            logger.error(f"GFA - {l("error")} icacls: {result.stderr}")
             return False
 
     except Exception as e:
-        logger.exception(f"GFA - {l["file_error"]}")
+        logger.exception(f"GFA - {l("file_error")}")
         return False
 
 
 
 #Устанавливаем полные права на ключ реестра
-def _grant_registry_access(path, full_username):
+def grant_registry_access(path, full_username):
     try:
         import win32security
         import ntsecuritycon as con
         import winreg
         import pywintypes
     except ImportError as e:
-        logger.critical(f"GFA - {l["import_error"]}!\n{e}")
+        logger.critical(f"GFA - {l("import_error")}!\n{e}")
         return False
 
     try:
-        registry_path = _normalize_registry_path(path)
+        registry_path = normalize_registry_path(path)
 
         #Разбираем путь на корневой ключ и под-путь
         parts = registry_path.split("\\", 1)
@@ -115,17 +92,17 @@ def _grant_registry_access(path, full_username):
         try:
             key = winreg.OpenKey(root_key, subkey_path, 0, winreg.KEY_ALL_ACCESS)
         except PermissionError:
-            logger.error(f"GFA - {l["permission_error"]} {l["to_access"]}: {registry_path}")
+            logger.error(f"GFA - {l("permission_error")} {l("to_access")}: {registry_path}")
             return False
         except FileNotFoundError:
-            logger.error(f"GFA - {l["key_not_found"]}: {registry_path}")
+            logger.error(f"GFA - {l("key_not_found")}: {registry_path}")
             return False
 
         #Получаем SID пользователя
         try:
             sid = win32security.LookupAccountName(None, full_username)[0]
         except Exception as e:
-            logger.exception(f"GFA - {l["get_sid_error"]} {full_username}")
+            logger.exception(f"GFA - {l("get_sid_error")} {full_username}")
             winreg.CloseKey(key)
             return False
 
@@ -137,7 +114,7 @@ def _grant_registry_access(path, full_username):
                 win32security.DACL_SECURITY_INFORMATION
             )
         except Exception as e:
-            logger.exception(f"GFA - {l["get_description_error"]}")
+            logger.exception(f"GFA - {l("get_description_error")}")
             winreg.CloseKey(key)
             return False
 
@@ -150,8 +127,7 @@ def _grant_registry_access(path, full_username):
         if dacl is None:
             dacl = win32security.ACL()
 
-        #Добавляем полные права (GENERIC_ALL) для пользователя
-        #Используем константы из ntsecuritycon
+        #Добавляем полные права (GENERIC_ALL) для пользователя, используем константы из ntsecuritycon
         try:
             dacl.AddAccessAllowedAceEx(
                 win32security.ACL_REVISION,
@@ -160,7 +136,7 @@ def _grant_registry_access(path, full_username):
                 sid
             )
         except Exception as e:
-            logger.exception(f"GFA - {l["ace_error"]}")
+            logger.exception(f"GFA - {l("ace_error")}")
             winreg.CloseKey(key)
             return False
 
@@ -177,21 +153,21 @@ def _grant_registry_access(path, full_username):
                 None
             )
         except Exception as e:
-            logger.exception(f"GFA - {l["set_access_error"]}")
+            logger.exception(f"GFA - {l("set_access_error")}")
             winreg.CloseKey(key)
             return False
 
-        logger.success(f"GFA - {l["success_set_full_access"]}: {registry_path}")
+        logger.success(f"GFA - {l("success_set_full_access")}: {registry_path}")
         winreg.CloseKey(key)
         return True
 
     except Exception as e:
-        logger.exception(f"GFA - {l["regedit_error"]}")
+        logger.exception(f"GFA - {l("regedit_error")}")
         return False
 
 
 
-def _normalize_registry_path(path):
+def normalize_registry_path(path):
     registry_map = {
         "HKLM": "HKEY_LOCAL_MACHINE",
         "HKCU": "HKEY_CURRENT_USER",
@@ -206,3 +182,25 @@ def _normalize_registry_path(path):
             break
 
     return path
+
+
+
+#Получаем полные права на файл, каталог или ключ реестра
+def GFA(path, run_in_recovery=False):
+    #if run_in_recovery:
+    #    messagebox.showwarning(RS(), "Невозможно получить права в среде восстановления.")
+    #    return False
+
+    try:
+        username = os.getenv("USERNAME")
+        domain = os.getenv("USERDOMAIN")
+        full_username = f"{domain}\\{username}"
+
+        if is_registry_path(path):
+            return grant_registry_access(path, full_username)
+        else:
+            return grant_file_access(path, username)
+
+    except Exception as e:
+        logger.exception(f"GFA - {l("error")}")
+        return False

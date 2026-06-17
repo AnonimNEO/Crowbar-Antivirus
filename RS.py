@@ -9,9 +9,63 @@
 #Coded by @AnonimNEO (Telegram)
 
 import random
+import string
 
-random_string_version = "0.1.3"
+random_string_version = "1.0.2"
 
-def random_string():
-    n = random.randint(4, 15)
-    return ''.join(random.choice("abcdefghijklmnopqrstuvwxyz") for i in range(n))
+def RS(type=None, dir=None, cycle=False):
+    if type == None:
+        #Случайное количество слов (от 2 до 6)
+        num_words = random.randint(2, 6)
+
+        words = []
+        for _ in range(num_words):
+            #Случайная длина слова (от 3 до 10 букв)
+            word_length = random.randint(3, 10)
+
+            #Случайный выбор типа форматирования слова
+            formatting = random.choice(["lower", "upper", "title", "mixed"])
+
+            #Генерируем случайное слово
+            word = "".join(random.choices(string.ascii_letters, k=word_length))
+
+            #Применяем форматирование
+            if formatting == "lower":
+                word = word.lower()
+            elif formatting == "upper":
+                word = word.upper()
+            elif formatting == "title":
+                word = word.capitalize()
+            else: #mixed
+                word = "".join(random.choice([c.upper(), c.lower()]) for c in word)
+
+            words.append(word)
+
+        #Случайное количество пробелов между словами (от 1 до 2)
+        title = ""
+        for i, word in enumerate(words):
+            title += word
+            if i < len(words) - 1:
+                #Добавляем случайное количество пробелов
+                num_spaces = random.randint(1, 2)
+                title += " " * num_spaces
+        return title
+    elif type == "ip":
+        return random.randint(1, 256)
+    elif type == "ping":
+        return random.randint(1, 9)
+    elif type == "cmd":
+        commands = ["dir", "echo virus", "ipconfig", "ping www.youtube.com", "systeminfo", r"set path=C:\virus.exe", "netstat", "whoami", "date /t", "time /t"]
+        n = random.randint(0, 9)
+        return commands[n]
+    elif type == "dir":
+        n = random.randint(4, 12)
+        return ''.join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789") for i in range(n))
+    elif type == "file":
+        n = random.randint(4, 10)
+        i = random.randint(0, 6)
+        file_extension = [".txt", ".exe", ".msi", ".dat", ".tmp", ".jpg", ".mkv"]
+        return fr"{dir}\{''.join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789") for i in range(n))}{file_extension[i]}"
+    elif type == "data":
+        n = random.randint(256, 2048)
+        return ''.join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789 !@#$%^&*()") for i in range(n))
