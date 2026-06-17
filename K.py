@@ -8,6 +8,8 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2025
 #Coded by @AnonimNEO (Telegram)
 
+#Что это за файл? Это тестовое собственное шифрование оно нигде не используется, так как оно не законченно.
+
 knot_version = "0.5.5 Beta"
 
 symbol_list = '`~!@#$%^&*()"№;:?-_+=[]{}|/\<>.,' + "'"
