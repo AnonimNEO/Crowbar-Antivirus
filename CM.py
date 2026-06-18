@@ -294,13 +294,19 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         header_labels.append(label_prot)
 
         if debug_mode:
-            from RLP import RLP
+            try:
+                from RLP import RLP
+            except:
+                logger.exception(f"CM - {import_error} RLP")
             rlp_btn = ttk.Button(tab_protect, text="Защита Нагрузки",
                           command=lambda:run_component(RLP, run_in_recovery))
             rlp_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
             regular_buttons.append(rlp_btn)
 
-            from SIM import SIM
+            try:
+                from SIM import SIM
+            except:
+                logger.exception(f"CM - {import_error} SIM")
             sim_btn = ttk.Button(tab_protect, text="Менеджер Установки",
                                  command=lambda: run_component(SIM, run_in_recovery, current_theme, debug_mode))
             sim_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)

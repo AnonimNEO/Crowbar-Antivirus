@@ -1,10 +1,6 @@
 #Текущий язык (доступные языки: ru)
 current_localization = "ru"
 
-#Тестовый режим
-#global debug_mode
-#debug_mode = False
-
 #Общее количество строчек кода
 all_line = "~11000"
 

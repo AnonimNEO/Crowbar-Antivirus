@@ -28,9 +28,9 @@ from languages import l
 from PM import action_process
 from RM import RegistryMonitor
 
-software_installation_manager = "0.1.7 Pre-Alpha"
+software_installation_manager = "0.1.9 Pre-Alpha"
 
-class SIM:
+class SoftwareInstallManager:
     def __init__(self, SIM_GUI):
         self.SIM_GUI = SIM_GUI
         self.SIM_GUI.title(RS())
@@ -161,9 +161,6 @@ class SIM:
 
     def create_monitoring_tab(self):
         try:
-            #Стилизация
-            apply_global_theme(self.SIM_GUI, current_theme)
-
             #Основной фрейм
             main_frame = ttk.Frame(self.monitoring_tab, style="TInstall.TFrame")
             main_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -489,10 +486,10 @@ class SIM:
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         self.status_bar.config(text=f"[{timestamp}] {message}")
 
-    #def _save_installation_logs(self):
-    #    if not self.in_memory_logs and not self.log_file_path:
-    #        messagebox.showwarning(RS(), "Нет данных для сохранения")
-    #        return
+    def _save_installation_logs(self):
+        if not self.in_memory_logs and not self.log_file_path:
+            messagebox.showwarning(RS(), "Нет данных для сохранения")
+            return
 
         save_path = filedialog.asksaveasfilename(title=RS(),defaultextension=".txt", filetypes=[("Текстовые файлы", "*.txt")])
         if save_path:
@@ -559,9 +556,11 @@ class SIM:
                 label.pack_forget()
 
 def SIM(run_in_recovery=False, current_theme=False, debug_mode=False):
+    print(run_in_recovery)
     if run_in_recovery:
-        if not askyesno(RS(), "Тесты данного Компонента в среде восстановления не проводились\nЗапустить его?"):
+        if not messagebox.askyesno(RS(), "Тесты данного Компонента в среде восстановления не проводились\nЗапустить его?"):
             return
     SIM_GUI = tk.Tk()
-    app = SIM(SIM_GUI)
+    apply_global_theme(SIM_GUI, current_theme)
+    app = SoftwareInstallManager(SIM_GUI)
     SIM_GUI.mainloop()

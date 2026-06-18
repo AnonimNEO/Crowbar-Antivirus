@@ -30,8 +30,7 @@ about_program_version = "0.3.4 Beta"
 image_references = {}
 er = l("error")
 
-def AP(aes_version=er,
-       autorun_master_version=er,
+def AP(autorun_master_version=er,
        crowbar_antivirus_scripts_handler_version=er,
        clear_cache_version=er,
        crowbar_menu_version=er,

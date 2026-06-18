@@ -153,6 +153,8 @@ not_sp = False
 not_ua = False
 not_um = False
 not_console = False
+not_rm = False
+not_sim = False
 
 #Импорт Компонентов
 #from OBPC import OBPC, on_board_pc_version
@@ -323,7 +325,7 @@ except:
     logger.exception(f"T - {l("component_import_error")} UserManager")
 
 try:
-    from SIM import software_installation_manager
+    from SIM import SIM, software_installation_manager
 except:
     nor_sim = True
     logger.exception(f"T - {l("component_import_error")} SoftwareInstallationManager")
@@ -343,7 +345,7 @@ except:
 
 #Импорт движка скриптов
 try:
-    from CASH import CASH
+    from CASH import CASH, crowbar_antivirus_scripts_handler_version
 except:
     not_cash = True
     logger.exception(f"T - {l("component_import_error")} CASH")
@@ -428,17 +430,15 @@ try:
 except:
     logger.exception(f"T - {l("checking_damage_error")}")
 
-#Глобальные Переменные
-#global T_log_txt, start_interface, run_in_recovery, current_theme
 global debug_mode
 font_trey = "Default"
-trey_version = "2.4.11 Beta build 2"
+trey_version = "2.4.13 Beta"
 on_board_pc_version = l("not_stable")
-debug_mode = False
+debug_mode = True
 
 def Crowbar():
-    #global start_lp, start_interface, current_theme, run_in_recovery, current_disc, debug_mode
-    #from config import debug_mode
+    if debug_mode:
+        messagebox.showwarning(RS(), l("warning_debug_mode_on"))
     if not os.path.exists(log_path):
         os.makedirs(log_path)
     logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="100 KB", compression="zip")
@@ -545,6 +545,7 @@ def Crowbar():
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE), "FE"),
                     create_menu_item(not_sp, l("SP"), lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode), "SP"),
                     create_menu_item(not_cc, l("CC"), lambda: run_component(CC, run_in_recovery), "CC"),
+                    create_menu_item(not_sim, l("SIM"), lambda: run_component(SIM, run_in_recovery, current_theme, debug_mode), "SIM"),
                     create_menu_item(not_of, "CMD", lambda: run_component(CMD), "OF"),
                     create_menu_item(not_of, l("open_with"), open_with, "OF"),
                     create_menu_item(not_of, l("enable_debug_mode"), t_enable_debug_mode, "OF"),
@@ -560,7 +561,6 @@ def Crowbar():
                     create_menu_item(not_ua, l("UA"), lambda: UA(run_in_recovery, debug_mode), "UA"),
                     create_menu_item(not_run, l("Run"), lambda: run_component_process(Run, current_theme), "Run"),
                     create_menu_item(not_ap, l("AP"), lambda: run_component(AP,
-                        aes_version,
                         autorun_master_version,
                         crowbar_antivirus_scripts_handler_version,
                         clear_cache_version,

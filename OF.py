@@ -9,10 +9,9 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Интерфейс
-from tkinter import ttk, messagebox, filedialog, simpledialog, Menu
+from tkinter import ttk, messagebox, filedialog, simpledialog, Menu, scrolledtext
 import tkinter as tk
 from tkinter.messagebox import askyesno
-
 #Логирование Ошибок
 from loguru import logger
 #Работа с процессами
@@ -36,7 +35,7 @@ from languages import l
 from config import *
 
 global load_bush
-other_function_version = "0.13.6 Beta"
+other_function_version = "0.13.7 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -696,9 +695,12 @@ def decoy_mode(cycle=False, debug=True):
 
 #CMD
 def CMD():
-    cmd = tk.Toplevel()
+    cmd = tk.Tk()
     cmd.title(RS())
     cmd.geometry("700x450")
+    from config import theme, default_theme
+    current_theme = theme[default_theme]
+    apply_global_theme(cmd, current_theme)
 
     #Создаем виджет для вывода
     console_text = scrolledtext.ScrolledText(cmd, wrap=tk.WORD, font=("Default", 10))
@@ -724,10 +726,10 @@ def CMD():
 
         #Обработка команд
         try:
-            result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding="cp866")
             output = result.stdout if result.stdout else result.stderr
             print_to_console(output.strip())
-        except:
+        except Exception as e:
             logger.exception(f"OF/CMD - {l("error")}")
             print_to_console(f"{l("error")}:\n{e}")
 

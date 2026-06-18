@@ -98,6 +98,7 @@ def E():
         root.title(RS())
         from config import theme
         current_theme = theme["dark"]
+        from OF import apply_global_theme
         apply_global_theme(root, current_theme)
         root.withdraw()
         if check_access_file():
