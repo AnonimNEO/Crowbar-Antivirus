@@ -52,7 +52,7 @@ except Exception as e:
         pass
 
 try:
-    from OF import pac, run_component, run_component_process, open_with, get_current_disc, apply_global_theme, protect_window_from_moving, create_menubar
+    from OF import pac, run_component, run_component_process, open_with, get_current_disc, apply_global_theme, protect_window_from_moving, create_menubar, CMD
 except Exception as e:
     def pac():
         pass
@@ -67,6 +67,8 @@ except Exception as e:
     def protect_window_from_moving(a=None, b=None):
         pass
     def create_menubar(a=None, b=None, c=None, d=None, e=None):
+        pass
+    def CMD():
         pass
 
 try:
@@ -114,8 +116,7 @@ except Exception as e:
 from config import program_authentication_clyth
 from languages import l
 
-#global run_in_recovery, current_theme, crowbar_menu_version
-crowbar_menu_version = "2.3.8 Beta"
+crowbar_menu_version = "2.3.9 Beta"
 
 @logger.catch
 def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
@@ -193,7 +194,6 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         CM_GUI = tk.Tk()
         CM_GUI.geometry("750x350")
         CM_GUI.minsize(750, 300)
-        #CM_GUI.resizable(True, True)
         CM_GUI.title(RS())
 
         CM_GUI.lift()
@@ -268,8 +268,13 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
         run_btn = ttk.Button(tab_utilities, text=l("Run"),
                      command=lambda:run_component_process(Run, current_theme, debug_mode))
-        run_btn.grid(row=2, column=0, columnspan=2, sticky="nsew", padx=5, pady=5)
+        run_btn.grid(row=2, column=0, columnspan=1, sticky="nsew", padx=5, pady=5)
         small_buttons.append(run_btn)
+
+        cmd_btn = ttk.Button(tab_utilities, text="CMD",
+                     command=lambda:run_component(CMD))
+        cmd_btn.grid(row=2, column=1, columnspan=1, sticky="nsew", padx=5, pady=5)
+        small_buttons.append(cmd_btn)
 
         r_btn = ttk.Button(tab_utilities, text=l("R"),
                      command=R)

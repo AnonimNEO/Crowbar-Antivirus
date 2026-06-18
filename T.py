@@ -254,7 +254,7 @@ except:
     logger.exception(f"T - {l("component_import_error")} RandomString")
 
 try:
-    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, other_function_version
+    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, other_function_version, CMD, decoy_mode, extract_filename_from_path, launch_ghost
 except:
     not_of = True
     def restart_ca():
@@ -266,6 +266,14 @@ except:
         pass
     def pac():
         messagebox.showerror(RS(), f"{l("pac")} {l("not_available")}!")
+    def CMD():
+        pass
+    def decoy_mode(a=None, b=None):
+        pass
+    def extract_filename_from_path(a=None, b=None):
+        pass
+    def launch_ghost(a=None):
+        pass
     logger.exception(f"T - {l("component_import_error")} OtherFunction")
 
 try:
@@ -424,7 +432,7 @@ except:
 #global T_log_txt, start_interface, run_in_recovery, current_theme
 global debug_mode
 font_trey = "Default"
-trey_version = "2.4.10 Beta"
+trey_version = "2.4.11 Beta build 2"
 on_board_pc_version = l("not_stable")
 debug_mode = False
 
@@ -536,9 +544,10 @@ def Crowbar():
                     create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, debug_mode), "UM"),
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE), "FE"),
                     create_menu_item(not_sp, l("SP"), lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode), "SP"),
-                    create_menu_item(not_cc, l("CC"), lambda: CC(run_in_recovery), "CC"),
+                    create_menu_item(not_cc, l("CC"), lambda: run_component(CC, run_in_recovery), "CC"),
+                    create_menu_item(not_of, "CMD", lambda: run_component(CMD), "OF"),
                     create_menu_item(not_of, l("open_with"), open_with, "OF"),
-                    create_menu_item(not_r, l("enable_debug_mode"), t_enable_debug_mode, "OF"),
+                    create_menu_item(not_of, l("enable_debug_mode"), t_enable_debug_mode, "OF"),
                     create_menu_item(not_r, l("R"), R, "R")
                 )
 
@@ -605,8 +614,11 @@ def Crowbar():
                         "unload_bush": unload_bush,
                         "get_user_name": get_user_name,
                         "open_with": open_with,
-                        "reg_path": reg_file,
+                        "reg_file": reg_file,
                         "run_command": run_command,
+                        "decoy_mode": decoy_mode,
+                        "launch_ghost": launch_ghost,
+                        "extract_filename_from_path": extract_filename_from_path,
                         "PM": PM,
                         "RLP": RLP,
                         "RS": RS,
@@ -615,7 +627,6 @@ def Crowbar():
                         "SP": SP,
                         "UA": UA,
                         "UM": UM,
-                        "icon": icon if "icon" in locals() else None,
                         "logger": logger,
                     }, debug_mode), "Console"),
                     create_menu_item(not_sau, l("SAU"), lambda: run_component(SAU, current_theme), "SAU"),

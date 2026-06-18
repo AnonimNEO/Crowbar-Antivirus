@@ -18,7 +18,6 @@ from loguru import logger
 #Переменные среды
 from pathlib import Path
 #Работа с реестром
-#import winreg as reg
 import winreg
 #Работа с файлами и ОС
 import xml.etree.ElementTree as ET

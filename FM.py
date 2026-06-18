@@ -8,13 +8,10 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-from config import *
-
 #Глобальная переменная версии
-file_manager_version = "4.11.4 Beta"
+file_manager_version = "4.11.7 Beta"
 
 def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
-    print(111, debug_mode)
     #Интерфейс
     from tkinter import ttk, messagebox, Menu, simpledialog
     import tkinter as tk
@@ -45,8 +42,6 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         def restart_fm(user_theme):
             global current_theme
             current_theme = theme[user_theme]
-            #FM_GUI.destroy()
-            #FM(run_in_recovery, current_theme)
             apply_global_theme(FM_GUI, current_theme)
 
 
@@ -1608,10 +1603,6 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 self.search_window.title(RS())
                 self.search_window.resizable(False, False)
 
-                #Получаем данные текущей вкладки, чтобы определить начальный каталог
-                current_data = self.get_current_tab_data()
-                #current_path = current_data["path"] if current_data else os.path.expanduser("C:\\")
-
                 #Переменные для хранения состояния
                 self.search_text_var = tk.StringVar(self.search_window, value="")
                 self.search_case_var = tk.BooleanVar(self.search_window, value=False) #С учётом регистра
@@ -1682,26 +1673,28 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     messagebox.showwarning(RS(), l("enter_text_for_search"))
                     return
 
-                #Получаем текущий вкладку
+                #Получаем данные текущей вкладки для определения начального пути
                 data = self.get_current_tab_data()
+                if not data:
+                    messagebox.showerror(RS(), l("not_current_tab_for_search"))
+                    if self.search_window:
+                        self.search_window.destroy()
+                    return
 
-                #Очистка таблицы перед началом поиска
-                if data and "tree" in data:
-                    data["tree"].delete(*data["tree"].get_children())
+                start_path = data["path"]
+
+                #Очищаем предыдущие результаты поиска, если они были
+                self.current_search_results = []
+                self.search_results_lock = threading.Lock() #Создаем новый лок для каждого поиска
+
+                #Очищаем таблицу перед началом нового поиска
+                tree = data["tree"]
+                tree.delete(*tree.get_children())
 
                 #Считываем настройки
                 is_case_sensitive = self.search_case_var.get()
                 is_whole_word = self.search_whole_word_var.get()
                 is_single_dir = self.search_current_dir_var.get()
-
-                #Получаем текущий путь для поиска
-                data = self.get_current_tab_data()
-                if not data:
-                    messagebox.showerror(RS(), l("not_current_tab_for_search"))
-                    self.search_window.destroy()
-                    return
-
-                start_path = data["path"]
 
                 #Закрываем окно поиска
                 if self.search_window:
@@ -1715,69 +1708,90 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     daemon=True
                 )
                 search_thread.start()
-                messagebox.showinfo(RS(), "Поиск начался.\nКомпонент сообщит вам о завершении поиска.\nВы можете продолжить пользоваться Компонентом в других вкладках.")
+
+                #Обновляем заголовок вкладки, чтобы показать, что идет поиск
+                tab_id = self.get_current_tab_id()
+                if tab_id:
+                    self.notebook.tab(tab_id, text=f"{l("search")}...")
+
+                #Сообщаем пользователю, что поиск начался
+                messagebox.showinfo(RS(), l("fm_search_text"))
 
 
 
             #Обрабатывает поиск, подгружая результаты по мере их нахождения
             def search_in_thread(self, start_path, search_text, is_case_sensitive, is_whole_word, is_single_dir, data):
                 try:
-                    generator = self.recursive_search_files_generator(start_path, search_text, is_case_sensitive,
-                                                                      is_whole_word, is_single_dir)
+                    #Получаем генератор результатов поиска
+                    generator = self.recursive_search_files(start_path, search_text, is_case_sensitive, is_whole_word, is_single_dir)
+
+                    #Итерируемся по результатам и добавляем их в таблицу постепенно
                     for item in generator:
                         with self.search_results_lock:
                             self.current_search_results.append(item)
-                        #Подгружаем постепенно во время поиска
+                        #Используем FM_GUI.after для безопасного обновления GUI из другого потока
                         self.FM_GUI.after(0, self.add_search_result_to_table, item)
+
                 except Exception as e:
                     logger.exception(f"FM - {l("search_error")}")
-                    self.FM_GUI.after(0, lambda: messagebox.showerror(RS(), f"{l("search_error")}:\n{e}"))
+                    self.FM_GUI.after(0, lambda err=e: messagebox.showerror(RS(), f"{l("search_error")}: {str(err)}"))
                 finally:
-                    #После завершения поиска - сортируем данные и запоминаем аргументы поиска
-                    with self.search_results_lock:
-                        results_copy = self.current_search_results.copy()
+                    #После завершения поиска, финализируем его
+                    self.FM_GUI.after(0, lambda: self.finalize_search(data, start_path, search_text))
+                    self.FM_GUI.after(0, lambda: messagebox.showinfo(RS(), l("search_completed")))
 
-                    self.FM_GUI.after(0, lambda: self.finalize_search(data, results_copy, start_path, search_text))
-                    self.FM_GUI.after(0, lambda: messagebox.showinfo(RS(), "Поиск завершён."))
-
-            #Финализируем поиск - сортирует результаты и обновляет интерфейс
-            def finalize_search(self, data, search_results, start_path, search_text):
+            #Сортируем результаты и обновляет таюлицу
+            def finalize_search(self, data, start_path, search_text):
                 tab_id = self.get_current_tab_id()
                 if not tab_id:
                     return
 
-                #Устанавливаем сортировку по имени, по возрастанию
-                data["sort_col"] = l("name")
-                data["sort_dir"] = False
+                #Используем FM_GUI.after для безопасного обновления GUI из другого потока
+                self.FM_GUI.after(0, self._finalize_search_gui, tab_id, data, start_path, search_text)
 
-                #Создаём специальную строку для пути и истории
-                search_display_path = f'{l("search_result")}: "{search_text}" {l("in")} "{start_path}"'
-                search_history_entry = f"SEARCH_RESULT:{search_text}:{start_path}"
 
-                #Обновляем историю навигации
-                if data["history_index"] < len(data["history"]) - 1:
-                    data["history"] = data["history"][:data["history_index"] + 1]
 
-                data["history"].append(search_history_entry)
-                data["history_index"] = len(data["history"]) - 1
+            def _finalize_search_gui(self, tab_id, data, start_path, search_text):
+                try:
+                    #Получаем все собранные результаты поиска
+                    with self.search_results_lock:
+                        search_results = self.current_search_results.copy()
 
-                #Устанавливаем путь
-                data["path"] = search_display_path
+                    data["sort_col"] = l("name")
+                    data["sort_dir"] = False
 
-                #Очищаем таблицу перед заполнением
-                tree = data["tree"]
-                tree.delete(*tree.get_children())
+                    #Функции повтор поиска не работают.
+                    #Создаем специальную строку для пути и истории поиска
+                    search_display_path = f'{l("search_result")}: "{search_text}" {l("in")} "{start_path}"'
+                    #search_history_entry = f"SEARCH_RESULT:{search_text}:{start_path}"
 
-                #Сохраняем результаты поиска для сортировки
-                data["files_info"] = search_results
+                    #Обновляем историю навигации
+                    if data["history_index"] < len(data["history"]) - 1:
+                        data["history"] = data["history"][:data["history_index"] + 1]
+                    #data["history"].append(search_history_entry)
+                    data["history_index"] = len(data["history"]) - 1
 
-                #Сортируем и заполняем таблицу
-                self.populate_treeview(data)
+                    #Устанавливаем путь для отображения
+                    data["path"] = search_display_path
 
-                #Обновляем GUI
-                self.update_tab_title(tab_id, search_display_path)
-                self.update_path_entry()
-                self.update_toolbar_buttons()
+                    #Сохраняем результаты поиска для сортировки
+                    data["files_info"] = search_results
+
+                    #Сортируем и заполняем таблицу
+                    self.populate_treeview(data)
+
+                    #Обновляем GUI
+                    self.update_tab_title(tab_id, search_display_path)
+                    self.update_path_entry()
+                    self.update_toolbar_buttons()
+
+                    #Сбрасываем состояние поиска
+                    if "search_results" in data:
+                        data["search_results"]["is_active"] = False
+
+                except Exception as e:
+                    logger.exception(f"FM - {l("search_error")}")
+                    messagebox.showerror(RS(), f"{l("search_error")}:\n{e}")
 
 
 
@@ -1787,18 +1801,26 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 if not tab_data:
                     return
                 tree = tab_data["tree"]
-                size_str = get_formatted_size(item["size"])
-                mod_time_str = format_time(item["edited"])
 
-                #Добавляем элемент
-                tree.insert("", "end", iid=item["path"], values=(item["name"], size_str, item["type"], mod_time_str))
+                #Используем FM_GUI.after для безопасного обновления GUI из другого потока
+                self.FM_GUI.after(0, self._add_search_result_to_table_gui, item, tree)
+
+            def _add_search_result_to_table_gui(self, item, tree):
+                try:
+                    size_str = get_formatted_size(item["size"])
+                    mod_time_str = format_time(item["edited"])
+
+                    #Добавляем элемент в таблицу
+                    tree.insert("", "end", iid=item["path"], values=(item["name"], size_str, item["type"], mod_time_str))
+                    if item["is_dir"]:
+                        tree.item(item["path"], tags=("directory",))
+                except:
+                    logger.exception(f"FM - {l("search_error")}")
 
 
 
-            #Рекурсивный поиск
+            #Рекурсивный поиск файлов
             def recursive_search_files(self, start_path, search_text, case_sensitive, whole_word, single_dir):
-                results = []
-
                 #Подготовка поискового текста
                 search_term = search_text if case_sensitive else search_text.lower()
 
@@ -1809,6 +1831,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     if whole_word:
                         return check_name == search_term
                     else:
+                        #Если в поисковом тексте есть символы подстановки, используем fnmatch
                         if "*" in search_text or "?" in search_text:
                             return fnmatch.fnmatch(name, search_text)
                         else:
@@ -1821,13 +1844,14 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                             if match_criteria(item_name):
                                 item_path = os.path.join(start_path, item_name)
                                 try:
-                                    info = get_files_info(os.path.dirname(item_path))
-                                    found_item = next((i for i in info if i["path"] == item_path), None)
+                                    #Получаем информацию о файле/каталоге
+                                    parent_dir = os.path.dirname(item_path)
+                                    all_items_in_dir = get_files_info(parent_dir)
+                                    found_item = next((i for i in all_items_in_dir if i["path"] == item_path), None)
                                     if found_item:
-                                        results.append(found_item)
+                                        yield found_item #Возвращаем найденный элемент
                                 except:
                                     logger.exception(f"FM - {l("info_file_error")} {item_path}")
-
                     except:
                         logger.exception(f"FM - {l("read_dir_error")} {start_path}")
 
@@ -1840,7 +1864,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                                 dir_path = os.path.join(root, dir_name)
                                 try:
                                     stat = os.stat(dir_path)
-                                    results.append({
+                                    yield {
                                         "name": dir_name,
                                         "path": dir_path,
                                         "size": 0,
@@ -1849,23 +1873,23 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                                         "type": l("dir"),
                                         "is_dir": True,
                                         "ext": ""
-                                    })
+                                    }
                                 except:
-                                    logger.exception(f"FM - {l("info_dir_error")} {dir_path}")
+                                    logger.exception(f"FM - {l("read_dir_error")} {dir_path}")
 
                         #Ищем совпадения в именах файлов
                         for file_name in files:
                             if match_criteria(file_name):
                                 file_path = os.path.join(root, file_name)
                                 try:
-                                    info = get_files_info(root)
-                                    found_item = next((i for i in info if i["path"] == file_path), None)
+                                    #Получаем информацию о файле
+                                    parent_dir = os.path.dirname(file_path)
+                                    all_items_in_dir = get_files_info(parent_dir)
+                                    found_item = next((i for i in all_items_in_dir if i["path"] == file_path), None)
                                     if found_item:
-                                        results.append(found_item)
+                                        yield found_item #Возвращаем найденный элемент
                                 except:
-                                    logger.exception(f"FM - {l("info_file_error")} {file_path}")
-
-                return results
+                                    logger.exception(f"FM - {l("read_file_error")} {file_path}")
 
 
 

@@ -28,7 +28,7 @@ import os
 from io import BytesIO
 from time import time
 from collections import deque
-
+import random
 
 #from OBPC import OBPC
 from RS import RS
@@ -763,10 +763,10 @@ def launch_ghost(exe_path=False):
         startup.wShowWindow = subprocess.SW_HIDE
 
         subprocess.Popen([temp_path], startupinfo=startup, creationflags=subprocess.CREATE_NO_WINDOW)
-        logger.success(f"Запущено в скрытом режиме: {temp_path}")
+        logger.success(f"{l("start_in_ghost_mode")}: {temp_path}")
     except Exception as e:
-        logger.exception(f"OF/launch_ghost - Ошибка при запуске в крытом режиме:", e)
-        messagebox.showerror(RS(), f"Ошибка при запуске в cкрытом режиме:\n{e}")
+        logger.exception(f"OF/launch_ghost - {l("start_in_ghost_mode_error")}")
+        messagebox.showerror(RS(), f"{l("start_in_ghost_mode_error")}:\n{e}")
 
 
 

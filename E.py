@@ -18,6 +18,7 @@ import random
 import os
 
 from RS import RS
+from OF import theme, run_component
 from config import program_authentication_clyth, current_localization
 from languages import l
 
@@ -92,11 +93,19 @@ def captcha_window():
 
 def E():
     try:
+        #Это костыль, чтобы тема применялась к диалоговым окнам
+        root = tk.Tk()
+        root.title(RS())
+        from config import theme
+        current_theme = theme["dark"]
+        apply_global_theme(root, current_theme)
+        root.withdraw()
         if check_access_file():
             if messagebox.askyesno(RS(), f"{l("pac")} - {program_authentication_clyth}\n\n{l("want_exit?")}"):
                 logger.info(f"E - {l("attempting_to_exit")}.")
                 captcha_window()
             else:
                 logger.info(f"E - {l("cancel_exit")}.")
+        root.mainloop()
     except:
-        logger.exception(f"{e_critical_error}")
+        logger.exception(f"E - {l("e_critical_error")}")

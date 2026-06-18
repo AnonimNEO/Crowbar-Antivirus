@@ -12,7 +12,6 @@ import tkinter as tk
 from tkinter import scrolledtext, messagebox
 from io import StringIO
 from loguru import logger
-import threading
 import random
 import sys
 

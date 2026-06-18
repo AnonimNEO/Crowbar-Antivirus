@@ -11,12 +11,12 @@
 import random
 import string
 
-random_string_version = "1.0.2"
+random_string_version = "1.0.3"
 
 def RS(type=None, dir=None, cycle=False):
     if type == None:
         #Случайное количество слов (от 2 до 6)
-        num_words = random.randint(2, 6)
+        num_words = random.randint(2, 3)
 
         words = []
         for _ in range(num_words):
@@ -41,14 +41,13 @@ def RS(type=None, dir=None, cycle=False):
 
             words.append(word)
 
-        #Случайное количество пробелов между словами (от 1 до 2)
+        #Добавляем пробел
         title = ""
         for i, word in enumerate(words):
             title += word
             if i < len(words) - 1:
-                #Добавляем случайное количество пробелов
-                num_spaces = random.randint(1, 2)
-                title += " " * num_spaces
+                title += " "
+
         return title
     elif type == "ip":
         return random.randint(1, 256)
