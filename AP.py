@@ -14,7 +14,11 @@
 from tkinter import messagebox
 import tkinter as tk
 #Логирование Ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 #Обращение к веб-браузеру
 import webbrowser
 #Обращение к Системным Командам и Значениям
@@ -26,7 +30,7 @@ from languages import l
 from RS import RS
 
 global about_program_version
-about_program_version = "0.3.4 Beta"
+about_program_version = "0.3.5 Beta"
 image_references = {}
 er = l("error")
 

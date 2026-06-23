@@ -11,7 +11,11 @@
 #Обучение
 from tkinter import messagebox
 #Логирование Ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import datetime
 #Работа с ОС и файлами
 import getpass
@@ -24,9 +28,9 @@ from RS import RS
 from config import *
 
 global log_path, clear_temp_log
-clear_cache_version = "0.7.3 Beta"
+clear_cache_version = "0.7.4 Beta"
 
-@logger.catch
+#@logger.catch
 def CC(run_in_recovery):
     try:
         logger.info(f"CC - {l("start_clean")}...")

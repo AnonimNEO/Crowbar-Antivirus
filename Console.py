@@ -11,7 +11,11 @@
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
 from io import StringIO
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import random
 import sys
 
@@ -21,7 +25,7 @@ from languages import l
 from RS import RS
 import config
 
-crowbar_console_version = "0.1.5 Pre-Alpha"
+crowbar_console_version = "0.1.6 Pre-Alpha"
 
 class CrowbarConsole:
     def __init__(self, globals_dict=None, debug_mode=False):

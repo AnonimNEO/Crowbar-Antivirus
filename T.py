@@ -29,53 +29,66 @@ not_signal = False
 try:
     #Логирование Ошибок
     from loguru import logger
+    try:
+        from config import log_path
+    except:
+        log_path = ""
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    from OF import Logger
+    logger = Logger()
+    logger.add()
 except:
-    import logging
-    not_loguru = True
-    #Создаём заглушку логгера
-    class Loggers:
-        def __init__(self):
-            self.setup_fallback_logger()
+    try:
+        from loguru import logger
+        logger.exception(f"T - {l("import_error")} loguru+AES")
+    except:
+        import logging
+        not_loguru = True
+        #Создаём заглушку логгера
+        class Loggers:
+            def __init__(self):
+                self.setup_fallback_logger()
 
-        #Настраиваем стандартный логгер как замену
-        def setup_fallback_logger(self):
-            self.logger = logging.getLogger(__name__)
-            self.logger.setLevel(logging.ERROR)
+            #Настраиваем стандартный логгер как замену
+            def setup_fallback_logger(self):
+                self.logger = logging.getLogger(__name__)
+                self.logger.setLevel(logging.ERROR)
 
-            #Если логгер уже имеет обработчики, не добавляем новые
-            if not self.logger.handlers:
-                handler = logging.StreamHandler(sys.stdout)
-                formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%d-%m-%Y %H:%M:%S")
-                handler.setFormatter(formatter)
-                self.logger.addHandler(handler)
+                #Если логгер уже имеет обработчики, не добавляем новые
+                if not self.logger.handlers:
+                    handler = logging.StreamHandler(sys.stdout)
+                    formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%d-%m-%Y %H:%M:%S")
+                    handler.setFormatter(formatter)
+                    self.logger.addHandler(handler)
 
-        def debug(self, message):
-            self.logger.debug(message)
+            def debug(self, message):
+                self.logger.debug(message)
 
-        def info(self, message):
-            self.logger.info(message)
+            def info(self, message):
+                self.logger.info(message)
 
-        def warning(self, message):
-            self.logger.warning(message)
+            def warning(self, message):
+                self.logger.warning(message)
 
-        def error(self, message):
-            self.logger.error(message)
+            def error(self, message):
+                self.logger.error(message)
 
-        def critical(self, message):
-            self.logger.critical(message)
+            def critical(self, message):
+                self.logger.critical(message)
 
-        def success(self, message):
-            self.logger.info(f"[SUCCESS] {message}")
+            def success(self, message):
+                self.logger.info(f"[SUCCESS] {message}")
 
-        def exception(self, message):
-            self.logger.exception(message)
+            def exception(self, message):
+                self.logger.exception(message)
 
-        def add(self, *args, **kwargs):
-            pass
+            def add(self, *args, **kwargs):
+                pass
 
-    logger = Loggers()
+        logger = Loggers()
 
-    logger.exception(f"T - {l("import_error")} loguru! {l("replacement_is_used")}")
+        logger.exception(f"T - {l("import_error")} loguru! {l("replacement_is_used")}")
 
 #Интерфейс
 try:
@@ -432,16 +445,13 @@ except:
 
 global debug_mode
 font_trey = "Default"
-trey_version = "2.4.13 Beta"
+trey_version = "2.4.15 Beta"
 on_board_pc_version = l("not_stable")
-debug_mode = True
+debug_mode = False
 
 def Crowbar():
     if debug_mode:
         messagebox.showwarning(RS(), l("warning_debug_mode_on"))
-    if not os.path.exists(log_path):
-        os.makedirs(log_path)
-    logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="100 KB", compression="zip")
 
     current_disc = None
 

@@ -25,7 +25,11 @@ import zipfile
 import ast
 import re
 #Логирование
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import threading
 
 #Чтение конфига
@@ -37,7 +41,7 @@ from OF import run_command, apply_global_theme
 #Случайные заголовки
 from RS import RS
 
-settings_and_update_version = "1.2.3 Beta"
+settings_and_update_version = "1.2.4 Beta"
 
 def compiling_crowbar():
     global COMPILING_COMMAND

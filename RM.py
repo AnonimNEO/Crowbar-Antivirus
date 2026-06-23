@@ -12,11 +12,15 @@ import ctypes
 from ctypes import wintypes, c_ulong
 import threading
 import time
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import queue
 import winreg
 
-registry_monitor = "0.2.6 Pre-Alpha"
+registry_monitor = "0.2.7 Pre-Alpha"
 
 #Загрузка библиотеки
 advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)

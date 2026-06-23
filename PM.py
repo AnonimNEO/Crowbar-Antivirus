@@ -11,7 +11,11 @@
 #from config import *
 from languages import l
 #Логирование
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 #Интерфейс
 from tkinter import ttk, messagebox
 import tkinter as tk
@@ -27,7 +31,7 @@ except:
     from OF import Psutil
     psutil = Psutil()
 
-process_manager_version = "1.9.2 Beta"
+process_manager_version = "1.9.4 Beta"
 
 #Действие с процессами
 def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, run_in_recovery=False, debug_mode=False):
@@ -609,7 +613,7 @@ def PM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
         apply_global_theme(PM_GUI, current_theme)
 
-        create_menubar(PM_GUI, run_in_recovery, restart_pm, "PM", open_search_dialog, stop_search, PM_GUI_ELEMENTS, debug_mode=debug_mode)
+        create_menubar(PM_GUI, run_in_recovery, "PM", open_search_dialog, stop_search, PM_GUI_ELEMENTS, debug_mode=debug_mode)
 
         #Добавляем привязку клавиш Ctrl+F, Esc, Delete, S, U, C
         #Поиск

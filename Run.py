@@ -9,7 +9,11 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Логирование ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 #Интерфейс
 import tkinter as tk
 from tkinter import ttk, Menu
@@ -23,7 +27,7 @@ from OF import pac, apply_global_theme, create_menubar
 from config import theme, default_theme, program_authentication_clyth, current_localization
 from languages import l
 
-run_version = "1.1.4 Beta"
+run_version = "1.1.6 Beta"
 run_width_window = 400
 run_height_window = 200
 run_size_window = f"{run_width_window}x{run_height_window}"
@@ -278,12 +282,7 @@ def Run(current_theme="dark", debug_mode=False):
     apply_global_theme(RUN_GUI, current_theme)
     Run_As_Admin(RUN_GUI)
 
-    def restart_run(user_theme):
-        global current_theme
-        current_theme = theme[user_theme]
-        apply_global_theme(RUN_GUI, current_theme)
-
-    create_menubar(RUN_GUI, False, restart_run, debug_mode=debug_mode)
+    create_menubar(RUN_GUI, False, debug_mode=debug_mode)
 
     RUN_GUI.mainloop()
 

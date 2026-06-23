@@ -16,14 +16,18 @@ from typing import Tuple, Any
 import winreg
 import os
 #Логирование
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 
 #from OF2 import get_offline_reg_path, loaded_hive_names
 from OF import get_offline_reg_path, loaded_hive_names
 from config import current_localization
 from languages import l
 
-unlock_all_version = "1.2.4 Beta"
+unlock_all_version = "1.2.5 Beta"
 
 #Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:

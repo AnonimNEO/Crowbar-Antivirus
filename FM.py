@@ -9,7 +9,7 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Глобальная переменная версии
-file_manager_version = "4.11.7 Beta"
+file_manager_version = "4.11.9 Beta"
 
 def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     #Интерфейс
@@ -18,7 +18,11 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     #Дата и Время
     from datetime import datetime
     #Логирование
-    from loguru import logger
+    try:
+        from OF import Logger
+        logger = Logger()
+    except:
+        from loguru import logger
     #Получение имени пользователя
     import getpass
     #Для поиска
@@ -181,7 +185,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
 
                 #Создание Меню
-                create_menubar(FM_GUI, run_in_recovery, restart_fm, "FM", self.open_search_dialog, debug_mode=debug_mode)
+                create_menubar(FM_GUI, run_in_recovery, "FM", self.open_search_dialog, debug_mode=debug_mode)
 
                 #Добавление первой вкладки
                 #При запуске предложить выбрать путь

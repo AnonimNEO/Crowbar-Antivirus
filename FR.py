@@ -8,14 +8,18 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-file_replacer_version = "0.4.5 Beta"
+file_replacer_version = "0.4.7 Beta"
 
 def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
     #Интерфейс
     from tkinter import filedialog, messagebox, ttk, Menu
     import tkinter as tk
     #Логирование
-    from loguru import logger
+    try:
+        from OF import Logger
+        logger = Logger()
+    except:
+        from loguru import logger
     #Работа с файлами
     import subprocess
     import shutil
@@ -167,7 +171,7 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
               command=lambda: restore_file(target_path), 
               width=15).pack(side="left", padx=10)
 
-    create_menubar(FR_GUI, run_in_recovery, restart_fr, debug_mode=debug_mode)
+    create_menubar(FR_GUI, run_in_recovery, debug_mode=debug_mode)
 
     FR_GUI.mainloop()
 

@@ -18,7 +18,11 @@ import psutil
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import subprocess
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import winreg
 import queue
 
@@ -28,7 +32,7 @@ from languages import l
 from PM import action_process
 from RM import RegistryMonitor
 
-software_installation_manager = "0.1.9 Pre-Alpha"
+software_installation_manager = "0.1.10 Pre-Alpha"
 
 class SoftwareInstallManager:
     def __init__(self, SIM_GUI):

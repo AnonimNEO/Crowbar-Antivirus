@@ -10,7 +10,11 @@
 
 from tkinter import messagebox
 from languages import l
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import sys
 import os
 
@@ -170,7 +174,7 @@ except:
     def UM(a=None, b=None):
         pass
 
-crowbar_antivirus_scripts_handler_version = "0.4.5 Beta"
+crowbar_antivirus_scripts_handler_version = "0.4.6 Beta"
 
 current_theme = theme[default_theme]
 

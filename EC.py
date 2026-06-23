@@ -9,7 +9,11 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Логирование Ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 #Работа с ОС
 import ctypes
 from ctypes import wintypes
@@ -19,7 +23,7 @@ from OF import Psutil
 from languages import l
 from config import current_localization
 
-edit_criticality_version = "0.4.4 Beta"
+edit_criticality_version = "0.4.6 Beta"
 
 #Загрузка необходимых библиотек windows
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)

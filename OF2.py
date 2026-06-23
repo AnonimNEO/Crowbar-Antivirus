@@ -16,7 +16,7 @@ from loguru import logger
 import winreg
 
 global load_bush
-other_komponents_version = "0.6.2 Beta"
+other_komponents_version = "0.6.3 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -58,7 +58,7 @@ class Psutil:
 
 
 #Получаем оффлайн-пути реестра
-@logger.catch()
+#@logger.catch()
 def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery):
     if run_in_recovery:
         psutil = Psutil()

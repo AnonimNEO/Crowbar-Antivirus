@@ -10,16 +10,20 @@
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import os
 
 from languages import l
-from config import program_authentication_clyth, current_localization, clyth
+from config import program_authentication_clyth, current_localization, clyth, theme
 from RS import RS
 from AES import AES
-from OF import pac, extract_filename_from_path
+from OF import pac, extract_filename_from_path, apply_global_theme, create_menubar
 
-file_editor_version = "0.3.6 Beta"
+file_editor_version = "0.3.8 Beta"
 
 class FileEditor:
     def __init__(self, FE_GUI):
@@ -31,10 +35,10 @@ class FileEditor:
         self.is_modified = False
 
         #Переменные для стилей
-        self.font_family = "Courier"
-        self.font_size = 11
-        self.bg_color = "white"
-        self.fg_color = "black"
+        self.font_family = "Default"
+        self.font_size = 12
+        #self.bg_color =
+        #self.fg_color =
         self.line_numbers_enabled = False
 
         #Список для хранения позиций совпадений
@@ -42,7 +46,7 @@ class FileEditor:
         self.current_match_index = -1
 
         #Создаём меню
-        self.create_menu()
+        create_menubar(self.FE_GUI, False, "FE", self.open_file, self.save_file, None, True, self.save_as_file, self.on_closing)
 
         #Создаём панель поиска
         self.create_search_panel()
@@ -66,87 +70,7 @@ class FileEditor:
         #Обработчик закрытия окна
         self.FE_GUI.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-    #Создание главного меню
-    def create_menu(self):
-        menubar = tk.Menu(self.FE_GUI)
-        self.FE_GUI.config(menu=menubar)
 
-        #Меню "Файл"
-        file_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=l("file"), menu=file_menu)
-        file_menu.add_command(label=l("open"), command=self.open_file, accelerator="Ctrl+O")
-        file_menu.add_command(label=l("save"), command=self.save_file, accelerator="Ctrl+S")
-        file_menu.add_command(label=l("save_as"), command=self.save_as_file, accelerator="Ctrl+Shift+S")
-        file_menu.add_separator()
-        file_menu.add_command(label=l("exit"), command=self.on_closing, accelerator="Alt+F4")
-
-        #Меню "Редактирование"
-        edit_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=l("editing"), menu=edit_menu)
-        edit_menu.add_command(label=l("cancel"), command=lambda: self.text_widget.edit_undo(), accelerator="Ctrl+Z")
-        edit_menu.add_command(label=l("repeat"), command=lambda: self.text_widget.edit_redo(), accelerator="Ctrl+Y")
-        edit_menu.add_separator()
-        edit_menu.add_command(label=l("cut"), command=self.cut_text, accelerator="Ctrl+X")
-        edit_menu.add_command(label=l("copy"), command=self.copy_text, accelerator="Ctrl+C")
-        edit_menu.add_command(label=l("paste"), command=self.paste_text, accelerator="Ctrl+V")
-        edit_menu.add_separator()
-        edit_menu.add_command(label=l("select_all"), command=self.select_all, accelerator="Ctrl+A")
-
-        #Меню "Вид"
-        view_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label=l("view"), menu=view_menu)
-
-        #Подменю "Шрифт"
-        font_menu = tk.Menu(view_menu, tearoff=0)
-        view_menu.add_cascade(label=l("font"), menu=font_menu)
-
-        fonts = ["Courier", "Arial", "Times New Roman", "Helvetica", "Verdana", "Consolas"]
-        for font in fonts:
-            font_menu.add_command(label=font, command=lambda f=font: self.change_font(f))
-
-        #Подменю "Размер шрифта"
-        size_menu = tk.Menu(view_menu, tearoff=0)
-        view_menu.add_cascade(label=l("font_size"), menu=size_menu)
-
-        sizes = [8, 10, 11, 12, 14, 16, 18, 20, 24]
-        for size in sizes:
-            size_menu.add_command(label=str(size), command=lambda s=size: self.change_font_size(s))
-
-        view_menu.add_separator()
-
-        #Подменю "Тема"
-        theme_menu = tk.Menu(view_menu, tearoff=0)
-        view_menu.add_cascade(label=l("themes"), menu=theme_menu)
-
-        themes = {
-            l("white"): {"bg": "white", "fg": "black"},
-            l("dark"): {"bg": "#2b2b2b", "fg": "#ffffff"},
-            l("green"): {"bg": "#0a0a0a", "fg": "#00ff00"},
-            l("blue"): {"bg": "#1e1e30", "fg": "#00bfff"},
-            l("cuttlefish"): {"bg": "#f4ebd9", "fg": "#5c4033"}
-        }
-
-        for theme_name, colors in themes.items():
-            theme_menu.add_command(
-                label=theme_name,
-                command=lambda bg=colors["bg"], fg=colors["fg"]: self.apply_theme(bg, fg)
-            )
-
-        higher = tk.BooleanVar(value=True)
-
-        #Включаем или выключаем режим "поверх всех окон"
-        def toggle_topmost(GUI):
-            higher.set(not higher.get())
-            GUI.attributes("-topmost", higher.get())
-
-        def update_topmost_label(menubar, GUI):
-            status = l("on2") if higher.get() else l("off2")
-            menubar.entryconfig(4, label=f"{l("topmost")}: {status}")
-            GUI.after(100, lambda:update_topmost_label(menubar, GUI))
-
-        menubar.add_command(label=f"{l("topmost")}: {l("on2")}", command=lambda:toggle_topmost(self.FE_GUI))
-        menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}", command=pac)
-        update_topmost_label(menubar, self.FE_GUI)
 
     def create_context_menu(self):
         self.context_menu = tk.Menu(self.FE_GUI, tearoff=0)
@@ -525,8 +449,10 @@ class FileEditor:
 
 def FE(file_path=None):
     try:
+        from config import theme
+        current_theme = theme["dark"]
         FE_GUI = tk.Tk()
-        FE_GUI.attributes("-topmost", True)
+        apply_global_theme(FE_GUI, current_theme)
         editor = FileEditor(FE_GUI)
         if file_path:
             editor.load_file(file_path)

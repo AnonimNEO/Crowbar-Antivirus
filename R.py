@@ -9,7 +9,11 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Логирование Ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 #Работа с ОС
 import win32com.client
 import subprocess
@@ -20,9 +24,9 @@ from languages import l
 from config import *
 
 global restart_windows_bat
-restart_version = "0.9.3 Beta"
+restart_version = "0.9.4 Beta"
 
-@logger.catch
+#@logger.catch
 def R():
     global error
     error = 0

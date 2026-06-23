@@ -9,7 +9,11 @@
 #Coded by @AnonimNEO (Telegram)
 
 from tkinter import messagebox
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 import subprocess
 import os
 
@@ -17,7 +21,7 @@ import os
 from languages import l
 from config import current_localization
 
-get_full_access_version = "0.4.4 Alpha"
+get_full_access_version = "0.4.6 Alpha"
 
 #Проверяем, является ли путь ключом реестра
 def is_registry_path(path):

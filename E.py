@@ -12,7 +12,11 @@
 from tkinter import messagebox, simpledialog
 import tkinter as tk
 #Логирование Ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 #Капча
 import random
 import os
@@ -22,10 +26,10 @@ from OF import theme, run_component
 from config import program_authentication_clyth, current_localization
 from languages import l
 
-exit_version = "1.1.3 Beta"
+exit_version = "1.1.5 Beta"
 dyrachok_path = r"C:\ProgramData\dyrachok.txt"
 
-@logger.catch
+#@logger.catch
 def check_access_file():
     try:
         with open(dyrachok_path, "r") as f:
@@ -42,7 +46,7 @@ def check_access_file():
 
 
 
-@logger.catch
+#@logger.catch
 def tiktok_question():
     if messagebox.askyesno(RS(), l("watch_tiktok?")):
         try:

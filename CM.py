@@ -12,7 +12,11 @@
 from tkinter import ttk, Menu
 import tkinter as tk
 #Логирование Ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 
 #Импорт Компонентов
 try:
@@ -116,9 +120,9 @@ except Exception as e:
 from config import program_authentication_clyth
 from languages import l
 
-crowbar_menu_version = "2.3.9 Beta"
+crowbar_menu_version = "2.3.11 Beta"
 
-@logger.catch
+#@logger.catch
 def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     try:
         def restart_cm(user_theme):
@@ -354,7 +358,7 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         copyleft_label.pack(side="bottom", anchor="w", padx=10, pady=10)
 
         #Создаём меню
-        create_menubar(CM_GUI, run_in_recovery, restart_cm, debug_mode=debug_mode)
+        create_menubar(CM_GUI, run_in_recovery, debug_mode=debug_mode)
 
         #if run_in_recovery:
         #    def change_user():

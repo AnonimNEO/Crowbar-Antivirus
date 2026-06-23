@@ -14,7 +14,11 @@ import tkinter as tk
 #Дата и Время
 from datetime import datetime
 #Логирование Ошибок
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 #Переменные среды
 from pathlib import Path
 #Работа с реестром
@@ -32,7 +36,7 @@ from languages import l
 from PM import action_process_by_name
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-autorun_master_version = "3.7.14 Beta"
+autorun_master_version = "3.7.16 Beta"
 
 #Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -1424,15 +1428,10 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         #    command=lambda: load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
         #)
 
-        def restart_arm(user_theme):
-            global current_theme
-            current_theme = theme[user_theme]
-            apply_global_theme(ARM_GUI, current_theme)
-
         #Пункт "Вид" - Нерабочая фигня (сама сортировка по дате)
         #menubar.add_cascade(label=l("view"), menu=view_menu)
 
-        create_menubar(ARM_GUI, run_in_recovery, restart_arm, debug_mode=debug_mode)
+        create_menubar(ARM_GUI, run_in_recovery, debug_mode=debug_mode)
 
         ARM_GUI_ELEMENTS["notebook"] = ttk.Notebook(ARM_GUI)
         ARM_GUI_ELEMENTS["notebook"].pack(pady=10, padx=10, fill="both", expand=True)

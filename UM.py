@@ -16,7 +16,11 @@ import subprocess
 import os
 import threading
 #Логирование
-from loguru import logger
+try:
+    from OF import Logger
+    logger = Logger()
+except:
+    from loguru import logger
 
 from config import current_localization
 from languages import l
@@ -24,7 +28,7 @@ from OF import pac, apply_global_theme, create_menubar
 from RS import RS
 from config import theme, default_theme
 
-users_manager_version = "0.3.6 Beta"
+users_manager_version = "0.3.7 Beta"
 
 class UserManager:
     def run_net_command(self, args):
@@ -41,7 +45,7 @@ class UserManager:
     def __init__(self, UM_GUI):
         self.UM_GUI = UM_GUI
         UM_GUI.title(RS())
-        UM_GUI.geometry("400x350")
+        UM_GUI.geometry("400x375")
 
         self.users = [] 
         self.current_username = os.getlogin() 
@@ -229,7 +233,7 @@ def UM(current_theme=False, debug_mode=False):
     try:
         UM_GUI = tk.Tk()
 
-        create_menubar(UM_GUI, False, None, debug_mode=debug_mode)
+        create_menubar(UM_GUI, False, debug_mode=debug_mode)
 
         apply_global_theme(UM_GUI, current_theme)
 

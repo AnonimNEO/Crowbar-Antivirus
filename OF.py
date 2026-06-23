@@ -12,8 +12,6 @@
 from tkinter import ttk, messagebox, filedialog, simpledialog, Menu, scrolledtext
 import tkinter as tk
 from tkinter.messagebox import askyesno
-#Логирование Ошибок
-from loguru import logger
 #Работа с процессами
 import subprocess
 #Работа с потоками и процессами
@@ -30,12 +28,13 @@ from collections import deque
 import random
 
 #from OBPC import OBPC
+from AES import AES
 from RS import RS
 from languages import l
 from config import *
 
 global load_bush
-other_function_version = "0.13.7 Beta"
+other_function_version = "0.14.1 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -45,6 +44,43 @@ HIVE_MAP = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": 
 
 #Список для отслеживания загруженных кустов
 active_loaded_hives = []
+
+#Логирование Ошибок
+from loguru import logger as l_logger
+
+#Логирование
+class Logger:
+    def debug(self, message):
+        l_logger.debug(AES(message, clyth))
+
+    def info(self, message):
+        l_logger.info(AES(message, clyth))
+
+    def warning(self, message):
+        l_logger.warning(AES(message, clyth))
+
+    def error(self, message):
+        l_logger.error(AES(message, clyth))
+
+    def critical(self, message):
+        l_logger.critical(AES(message, clyth))
+
+    def success(self, message):
+        l_logger.success(AES(message, clyth))
+
+    def exception(self, message):
+        l_logger.exception(AES(message, clyth))
+
+    def catch(self, *args, **kwargs):
+        pass
+
+    def add(self, *args, **kwargs):
+        l_logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
+
+try:
+    logger = Logger()
+except:
+    logger = l_logger
 
 #Заглушка, библиотеки psutil которая всегда возвращает False/None.
 class Psutil:
@@ -81,9 +117,12 @@ def pac():
 
 
 
-@logger.catch()
+#@logger.catch()
 def run_component(func, *args):
     try:
+        if func is None:
+            logger.error("OF/run_component - func не может быть None")
+            return
         thread = threading.Thread(target=func, args=args, daemon=True)
         thread.start()
         logger.info(f"OF/run_component - {l("start_thread")} {func.__name__}")
@@ -92,9 +131,12 @@ def run_component(func, *args):
 
 
 
-@logger.catch()
+#@logger.catch()
 def run_component_process(func, *args):
     try:
+        if func is None:
+            logger.error("OF/run_component - func не может быть None")
+            return
         process = multiprocessing.Process(target=func, args=args)
         process.daemon = True
         process.start()
@@ -104,7 +146,7 @@ def run_component_process(func, *args):
 
 
 
-@logger.catch()
+#@logger.catch()
 def restart_ca():
     logger.info(f"OF/restart_ca - {l("restart_ca")}...")
     python = sys.executable
@@ -132,7 +174,7 @@ def restart_ca():
 
 
 
-@logger.catch()
+#@logger.catch()
 def apply_global_theme(window, current_theme):
     style = ttk.Style(window)
     style.theme_use("clam")
@@ -143,6 +185,26 @@ def apply_global_theme(window, current_theme):
     #Цвет выделения пунктов в верхней панели (меню)
     window.option_add("*Menu.activeBackground", current_theme["abg"])
     window.option_add("*Menu.activeForeground", current_theme["afg"])
+
+    #Стилизация текстовых полей (tk.Text)
+    window.option_add("*Text.Background", current_theme["bg"])
+    window.option_add("*Text.Foreground", current_theme["fg"])
+    window.option_add("*Text.InsertBackground", current_theme["fg"])
+    window.option_add("*Text.SelectBackground", current_theme["abg"])
+    window.option_add("*Text.SelectForeground", current_theme["afg"])
+
+    #Стилизация чекбоксов (tk.Checkbutton)
+    window.option_add("*Checkbutton.Background", current_theme["bg"])
+    window.option_add("*Checkbutton.Foreground", current_theme["fg"])
+    window.option_add("*Checkbutton.activeBackground", current_theme["abg"])
+    window.option_add("*Checkbutton.activeForeground", current_theme["afg"])
+    window.option_add("*Checkbutton.selectColor", current_theme["abg"])
+
+    #Стилизация обычных кнопок (tk.Button)
+    window.option_add("*Button.Background", current_theme["bbg"])
+    window.option_add("*Button.Foreground", current_theme["bfg"])
+    window.option_add("*Button.activeBackground", current_theme["abg"])
+    window.option_add("*Button.activeForeground", current_theme["afg"])
 
     #Настройка базового стиля для всех ttk виджетов
     style.configure(".",
@@ -326,8 +388,15 @@ def protect_window_from_moving(GUI, enable=True, debug_mode=False):
 
 
 
+def restart_gui_for_theme(GUI, user_theme):
+    global current_theme
+    current_theme = theme[user_theme]
+    apply_global_theme(GUI, current_theme)
+
+
+
 #Создаём пункты в панели
-def create_menubar(GUI, run_in_recovery, restart_theme_func, component=None, component_func=None, component_func2=None, elements=None, debug_mode=False):
+def create_menubar(GUI, run_in_recovery, component=None, component_func=None, component_func2=None, elements=None, debug_mode=False, component_func3=None, component_func4=None):
     menubar = Menu(GUI)
 
     if component == "FM":
@@ -343,6 +412,38 @@ def create_menubar(GUI, run_in_recovery, restart_theme_func, component=None, com
         actions_menu.add_command(label=l("cancel_search"), accelerator="Esc", command=lambda: component_func2(elements))
         menubar.add_cascade(label=l("actions"), menu=actions_menu)
         custom = 0
+    elif component == "FE":
+        #Меню "Файл"
+        file_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label=l("file"), menu=file_menu)
+        file_menu.add_command(label=l("open"), command=component_func, accelerator="Ctrl+O")
+        file_menu.add_command(label=l("save"), command=component_func2, accelerator="Ctrl+S")
+        file_menu.add_command(label=l("save_as"), command=component_func3, accelerator="Ctrl+Shift+S")
+        file_menu.add_separator()
+        file_menu.add_command(label=l("exit"), command=component_func4, accelerator="Alt+F4")
+
+        #Меню "Вид"
+        view_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label=l("view"), menu=view_menu)
+
+        #Подменю "Шрифт"
+        font_menu = tk.Menu(view_menu, tearoff=0)
+        view_menu.add_cascade(label=l("font"), menu=font_menu)
+
+        fonts = ["Courier", "Arial", "Times New Roman", "Helvetica", "Verdana", "Consolas"]
+        for font in fonts:
+            font_menu.add_command(label=font, command=lambda f=font: change_font(f))
+
+        #Подменю "Размер шрифта"
+        size_menu = tk.Menu(view_menu, tearoff=0)
+        view_menu.add_cascade(label=l("font_size"), menu=size_menu)
+
+        sizes = [8, 10, 11, 12, 14, 16, 18, 20, 24]
+        for size in sizes:
+            size_menu.add_command(label=str(size), command=lambda s=size: change_font_size(s))
+
+        view_menu.add_separator()
+        custom = 0
     else:
         custom = 0
 
@@ -350,7 +451,7 @@ def create_menubar(GUI, run_in_recovery, restart_theme_func, component=None, com
     theme_menu = Menu(menubar, tearoff=0)
     themes = [("dark", "dark"), ("white", "white"), ("red", "red"), ("green", "lime"), ("contrast", "black"), ("gray", "gray"), ("orange", "orange")]
     for label, theme_name in themes:
-        theme_menu.add_checkbutton(label=l(label), command=lambda t=theme_name: restart_theme_func(t))
+        theme_menu.add_checkbutton(label=l(label), command=lambda: restart_gui_for_theme(GUI, theme_name))
     menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
     #Переменные состояния
@@ -395,7 +496,7 @@ def create_menubar(GUI, run_in_recovery, restart_theme_func, component=None, com
 
 
 #Получаем оффлайн-пути реестра
-@logger.catch()
+#@logger.catch()
 def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery):
     if run_in_recovery:
         psutil = Psutil()
@@ -430,7 +531,7 @@ def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recov
 
 
 #Получаем диск с установленной шиндовс
-@logger.catch()
+#@logger.catch()
 def get_current_disc(run_in_recovery=False):
     try:
         if run_in_recovery:
@@ -456,7 +557,7 @@ def get_current_disc(run_in_recovery=False):
 
 
 #Загрузка кустов реестра
-@logger.catch()
+#@logger.catch()
 def load_bush(current_disc, user=False):
     global active_loaded_hives
 
@@ -502,7 +603,7 @@ def load_bush(current_disc, user=False):
 
 
 #Выгружаем кусты реестра
-@logger.catch()
+#@logger.catch()
 def unload_bush():
     global active_loaded_hives
 
@@ -517,7 +618,7 @@ def unload_bush():
 
 
 #Получаем Имя текущего пользователя
-@logger.catch()
+#@logger.catch()
 def get_user_name():
     try:
         user_name = os.getlogin()
@@ -773,7 +874,7 @@ def launch_ghost(exe_path=False):
 
 
 #Открыть С помощью
-@logger.catch()
+#@logger.catch()
 def open_with():
     target_file_path = filedialog.askopenfilename(title=RS(), filetypes=[("Все файлы", "*.*")])
     if target_file_path and os.path.isfile(target_file_path): #Проверка, что файл выбран и существует
@@ -795,7 +896,7 @@ def enable_debug_mode():
 
 
 
-@logger.catch()
+#@logger.catch()
 def reg_file(reg_file, reg_code):
     with open(reg_file, "w") as reg:
         reg.write(reg_code)
@@ -806,7 +907,7 @@ def reg_file(reg_file, reg_code):
 
 
 
-@logger.catch()
+#@logger.catch()
 def run_command(command):
     try:
         #Запускает команду и ждём её завершения

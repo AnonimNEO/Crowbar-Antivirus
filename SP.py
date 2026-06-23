@@ -8,14 +8,18 @@
 #Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 #Coded by @AnonimNEO (Telegram)
 
-scarecrow_protection_version = "0.3.13 Beta"
+scarecrow_protection_version = "0.3.16 Beta"
 
 def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_mode=False):
     #Интерфейс
     from tkinter import ttk, messagebox, Menu
     import tkinter as tk
     #Логирование Ошибок
-    from loguru import logger
+    try:
+        from OF import Logger
+        logger = Logger()
+    except:
+        from loguru import logger
     #Работа с реестром
     import winreg
     #Работа с файлами
@@ -396,7 +400,8 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
                 if messagebox.askyesno(RS(), l("sp_confirmation")):
                     for program, info in PROGRAM_INFO.items():
                         if self.checkbox_vars[program].get():
-                            logger.info(f"SP - {l("delete_simulation")} {program}")
+                            if debug_mode:
+                                logger.info(f"SP - {l("delete_simulation")} {program}")
                             if "path" in info:
                                 for path in info["path"]:
                                     self.delete_path(path)
@@ -410,17 +415,12 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
                             logger.info(f"SP - {l("delete_simulation_for")} {program} {l("completed")}")
                     messagebox.showinfo(RS(), l("delete_completed"))
 
-        def restart_sp(user_theme):
-            global current_theme
-            current_theme = theme[user_theme]
-            apply_global_theme(SP_GUI, current_theme)
-
         SP_GUI = tk.Tk()
         apply_global_theme(SP_GUI, current_theme)
         #GUI_SP = SP(SP_GUI)
         SPI(SP_GUI)
 
-        create_menubar(SP_GUI, run_in_recovery, restart_sp, debug_mode=debug_mode)
+        create_menubar(SP_GUI, run_in_recovery, debug_mode=debug_mode)
 
         SP_GUI.mainloop()
     except Exception as e:
