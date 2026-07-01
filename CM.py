@@ -25,6 +25,12 @@ except Exception as e:
     def ARM(a=None, b=None):
         pass
 
+#try:
+#    from B import B
+#except Exception as e:
+#    def B(a=None, b=None, c=None, d=None, e=None):
+#        pass
+
 try:
     from CC import CC
 except Exception as e:
@@ -120,7 +126,7 @@ except Exception as e:
 from config import program_authentication_clyth
 from languages import l
 
-crowbar_menu_version = "2.3.11 Beta"
+crowbar_menu_version = "2.3.12 Beta"
 
 #@logger.catch
 def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
@@ -337,6 +343,11 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                             command=lambda: run_component(FE))
         fe_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fe_btn)
+
+        #b_btn = ttk.Button(tab_manage, text=l("B"),
+        #                    command=lambda: run_component(B, run_in_recovery))
+        #b_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
+        #regular_buttons.append(b_btn)
 
         #Настройка сетки для адаптивности
         for tab in [tab_components, tab_utilities, tab_protect, tab_manage]:

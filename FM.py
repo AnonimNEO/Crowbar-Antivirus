@@ -9,7 +9,7 @@
 #Coded by @AnonimNEO (Telegram)
 
 #Глобальная переменная версии
-file_manager_version = "4.11.9 Beta"
+file_manager_version = "4.11.10 Beta"
 
 def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     #Интерфейс
@@ -201,10 +201,10 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 button_frame = ttk.Frame(self.toolbar_frame)
                 button_frame.pack(side="left")
 
-                self.btn_back = ttk.Button(button_frame, text="<-", command=self.on_back, state="disabled", width=3)
+                self.btn_back = ttk.Button(button_frame, text="←", command=self.on_back, state="disabled", width=3)
                 self.btn_back.pack(side="left", padx=(0, 2))
 
-                self.btn_forward = ttk.Button(button_frame, text="->", command=self.on_forward, state="disabled", width=3)
+                self.btn_forward = ttk.Button(button_frame, text="→", command=self.on_forward, state="disabled", width=3)
                 self.btn_forward.pack(side="left", padx=2)
 
                 self.btn_up = ttk.Button(button_frame, text="↑", command=self.on_up, state="disabled", width=3)

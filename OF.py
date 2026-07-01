@@ -26,6 +26,7 @@ from io import BytesIO
 from time import time
 from collections import deque
 import random
+import webbrowser
 
 #from OBPC import OBPC
 from AES import AES
@@ -48,37 +49,73 @@ active_loaded_hives = []
 #Логирование Ошибок
 from loguru import logger as l_logger
 
-#Логирование
-class Logger:
-    def debug(self, message):
-        l_logger.debug(AES(message, clyth))
+#Логирование с шифрованием
+if encrypt_logs:
+    class Logger:
+        def debug(self, message):
+            l_logger.debug(AES(message, clyth))
 
-    def info(self, message):
-        l_logger.info(AES(message, clyth))
+        def info(self, message):
+            l_logger.info(AES(message, clyth))
 
-    def warning(self, message):
-        l_logger.warning(AES(message, clyth))
+        def warning(self, message):
+            l_logger.warning(AES(message, clyth))
 
-    def error(self, message):
-        l_logger.error(AES(message, clyth))
+        def error(self, message):
+            l_logger.error(AES(message, clyth))
 
-    def critical(self, message):
-        l_logger.critical(AES(message, clyth))
+        def critical(self, message):
+            l_logger.critical(AES(message, clyth))
 
-    def success(self, message):
-        l_logger.success(AES(message, clyth))
+        def success(self, message):
+            l_logger.success(AES(message, clyth))
 
-    def exception(self, message):
-        l_logger.exception(AES(message, clyth))
+        def exception(self, message):
+            l_logger.exception(AES(message, clyth))
 
-    def catch(self, *args, **kwargs):
-        pass
+        def catch(self, *args, **kwargs):
+            pass
 
-    def add(self, *args, **kwargs):
-        l_logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
+        def add(self, *args, **kwargs):
+            l_logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
+else:
+    # Создаём класс-обёртку для l_logger, чтобы он был вызываемым
+    class Logger:
+        def __init__(self):
+            self._logger = l_logger
+        
+        def debug(self, message):
+            self._logger.debug(message)
+
+        def info(self, message):
+            self._logger.info(message)
+
+        def warning(self, message):
+            self._logger.warning(message)
+
+        def error(self, message):
+            self._logger.error(message)
+
+        def critical(self, message):
+            self._logger.critical(message)
+
+        def success(self, message):
+            self._logger.success(message)
+
+        def exception(self, message):
+            self._logger.exception(message)
+
+        def catch(self, *args, **kwargs):
+            pass
+
+        def add(self, *args, **kwargs):
+            self._logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
 
 try:
-    logger = Logger()
+    if encrypt_logs:
+        logger = Logger()
+    else:
+        logger = l_logger
 except:
     logger = l_logger
 
@@ -117,13 +154,19 @@ def pac():
 
 
 
+def documentation():
+    if messagebox.askyesno(RS(), "Встроенный браузер имеет пробелмы и на данный момент отсутствует в программе.\nОткрыть ссылку на документацию в браузере по умолчанию?"):
+        webbrowser.open("https://anonimneo.github.io/NEO-Organization/Programs/Crowbar/help.html")
+
+
+
 #@logger.catch()
 def run_component(func, *args):
     try:
         if func is None:
             logger.error("OF/run_component - func не может быть None")
             return
-        thread = threading.Thread(target=func, args=args, daemon=True)
+        thread = threading.Thread(target=func, args=args, daemon=False)
         thread.start()
         logger.info(f"OF/run_component - {l("start_thread")} {func.__name__}")
     except:
@@ -138,7 +181,7 @@ def run_component_process(func, *args):
             logger.error("OF/run_component - func не может быть None")
             return
         process = multiprocessing.Process(target=func, args=args)
-        process.daemon = True
+        process.daemon = False
         process.start()
         logger.info(f"OF/run_component - {l("start_process")} {func.__name__}")
     except:

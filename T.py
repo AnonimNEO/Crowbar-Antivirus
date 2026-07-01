@@ -28,7 +28,6 @@ not_signal = False
 
 try:
     #Логирование Ошибок
-    from loguru import logger
     try:
         from config import log_path
     except:
@@ -147,6 +146,7 @@ except:
 
 not_ap = False
 not_arm = False
+not_b = False
 not_cc = False
 not_config = False
 not_e = False
@@ -171,6 +171,15 @@ not_sim = False
 
 #Импорт Компонентов
 #from OBPC import OBPC, on_board_pc_version
+
+try:
+    from AES import AES
+except:
+    not_cc2 = True
+    def AES(a=None, b=None, c=None):
+        return "error"
+    logger.exception(f"T - {l("component_import_error")} AES")
+
 try:
     from AP import AP
 except:
@@ -184,21 +193,29 @@ except:
     logger.exception(f"T - {l("component_import_error")} AutoRunMaster")
 
 try:
+    from RS import RS, random_string_version
+except:
+    def RS(a=None):
+        return "error"
+    not_rs = True
+    logger.exception(f"T - {l("component_import_error")} RandomString")
+
+#try:
+#    from B import B, browser_version
+#except:
+#    not_b = True
+#    def B(a=None, b=None, c=None, d=None, e=None):
+#        pass
+#    logger.exception(f"T - {l("component_import_error")} Browser")
+
+try:
     from CC import CC, clear_cache_version
 except:
     not_cc = True
     logger.exception(f"T - {l("component_import_error")} ClearCache")
 
 try:
-    from AES import AES
-except:
-    not_cc2 = True
-    def AES(a=None, b=None, c=None):
-        return "error"
-    logger.exception(f"T - {l("component_import_error")} AES")
-
-try:
-    from config import log_path, T_log_txt, theme, default_theme, program_authentication_clyth, start_interface, start_cash, start_lp
+    from config import log_path, T_log_txt, theme, default_theme, program_authentication_clyth, start_interface, start_cash, start_lp, documentation_html
     import config
 except:
     not_config = True
@@ -261,15 +278,7 @@ except:
     logger.exception(f"T - {l("component_import_error")} MountUnlocker")
 
 try:
-    from RS import RS, random_string_version
-except:
-    def RS(a=None):
-        return "error"
-    not_rs = True
-    logger.exception(f"T - {l("component_import_error")} RandomString")
-
-try:
-    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, other_function_version, CMD, decoy_mode, extract_filename_from_path, launch_ghost
+    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, other_function_version, CMD, decoy_mode, extract_filename_from_path, launch_ghost, documentation
 except:
     not_of = True
     def restart_ca():
@@ -288,6 +297,8 @@ except:
     def extract_filename_from_path(a=None, b=None):
         pass
     def launch_ghost(a=None):
+        pass
+    def documentation():
         pass
     logger.exception(f"T - {l("component_import_error")} OtherFunction")
 
@@ -375,6 +386,8 @@ try:
             broken_components.append(f"{c} AP: {na}")
         if not_arm:
             broken_components.append(f"{c} ARM: {na}")
+        if not_b:
+            broken_components.append(f"{c} B: {na}")
         if not_cc:
             broken_components.append(f"{c} CC: {na}")
         if not_e:
@@ -445,7 +458,7 @@ except:
 
 global debug_mode
 font_trey = "Default"
-trey_version = "2.4.15 Beta"
+trey_version = "2.4.18 Beta"
 on_board_pc_version = l("not_stable")
 debug_mode = False
 
@@ -546,21 +559,75 @@ def Crowbar():
                     global debug_mode
                     debug_mode = enable_debug_mode()
 
-                unlocker_menu = Menu(
+                menu_items = [
                     create_menu_item(not_arm, l("ARM"), lambda: run_component_process(ARM, run_in_recovery, current_theme, debug_mode), "ARM"),
                     create_menu_item(not_pm, l("PM"), lambda: run_component_process(PM, run_in_recovery, current_theme, debug_mode), "PM"),
                     create_menu_item(not_fm, l("FM"), lambda: run_component_process(FM, run_in_recovery, current_theme, debug_mode), "FM"),
                     create_menu_item(not_fr, l("FR"), lambda: run_component(FR, run_in_recovery, current_theme, debug_mode), "FR"),
                     create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, debug_mode), "UM"),
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE), "FE"),
-                    create_menu_item(not_sp, l("SP"), lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode), "SP"),
+                    #create_menu_item(not_b, l("B"), lambda: run_component(B, run_in_recovery), "B"),
+                    create_menu_item(not_sp, l("SP"),lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode), "SP"),
                     create_menu_item(not_cc, l("CC"), lambda: run_component(CC, run_in_recovery), "CC"),
-                    create_menu_item(not_sim, l("SIM"), lambda: run_component(SIM, run_in_recovery, current_theme, debug_mode), "SIM"),
+                ]
+
+                if debug_mode:
+                    menu_items.append(
+                        create_menu_item(not_sim, l("SIM"), lambda: run_component(SIM, run_in_recovery, current_theme, debug_mode), "SIM"),
+                        create_menu_item(not_rlp, l("RLP"), lambda: run_component(RLP, run_in_recovery), "RLP"),
+                        create_menu_item(not_console, l("Console"), lambda: open_console({
+                            "run_component": run_component,
+                            "run_component_process": run_component_process,
+                            "run_in_recovery": run_in_recovery,
+                            "current_theme": current_theme,
+                            "debug_mode": debug_mode,
+                            "AP": AP,
+                            "ARM": ARM,
+                            "B": B,
+                            "CC": CC,
+                            "AES": AES,
+                            "CM": CM,
+                            "config": config,
+                            "EC": EC,
+                            "FE": FE,
+                            "FM": FM,
+                            "FR": FR,
+                            "GFA": GFA,
+                            #OF
+                            "Psutil": Psutil,
+                            "run_component": run_component,
+                            "apply_global_theme": apply_global_theme,
+                            "get_offline_reg_path": get_offline_reg_path,
+                            "get_current_disc": get_current_disc,
+                            "load_bush": load_bush,
+                            "unload_bush": unload_bush,
+                            "get_user_name": get_user_name,
+                            "open_with": open_with,
+                            "reg_file": reg_file,
+                            "run_command": run_command,
+                            "decoy_mode": decoy_mode,
+                            "launch_ghost": launch_ghost,
+                            "extract_filename_from_path": extract_filename_from_path,
+                            "PM": PM,
+                            "RLP": RLP,
+                            "RS": RS,
+                            "Run": Run,
+                            "SAU": SAU,
+                            "SP": SP,
+                            "UA": UA,
+                            "UM": UM,
+                            "logger": logger,
+                        }, debug_mode), "Console"),
+                    )
+
+                menu_items.extend([
                     create_menu_item(not_of, "CMD", lambda: run_component(CMD), "OF"),
                     create_menu_item(not_of, l("open_with"), open_with, "OF"),
                     create_menu_item(not_of, l("enable_debug_mode"), t_enable_debug_mode, "OF"),
                     create_menu_item(not_r, l("R"), R, "R")
-                )
+                ])
+
+                unlocker_menu = Menu(*menu_items)
 
                 #Меню По ПКМ
                 image = create_image(20, 20)
@@ -597,48 +664,8 @@ def Crowbar():
                         unlock_all_version,
                         users_manager_version
                     ), "AP"),
-                    create_menu_item(not_console, l("Console"), lambda: open_console({
-                        "run_component": run_component,
-                        "run_component_process": run_component_process,
-                        "run_in_recovery": run_in_recovery,
-                        "current_theme": current_theme,
-                        "debug_mode": debug_mode,
-                        "AP": AP,
-                        "ARM": ARM,
-                        "CC": CC,
-                        "AES": AES,
-                        "CM": CM,
-                        "config": config,
-                        "EC": EC,
-                        "FE": FE,
-                        "FM": FM,
-                        "FR": FR,
-                        "GFA": GFA,
-                        #OF
-                        "Psutil": Psutil,
-                        "run_component": run_component,
-                        "apply_global_theme": apply_global_theme,
-                        "get_offline_reg_path": get_offline_reg_path,
-                        "get_current_disc": get_current_disc,
-                        "load_bush": load_bush,
-                        "unload_bush": unload_bush,
-                        "get_user_name": get_user_name,
-                        "open_with": open_with,
-                        "reg_file": reg_file,
-                        "run_command": run_command,
-                        "decoy_mode": decoy_mode,
-                        "launch_ghost": launch_ghost,
-                        "extract_filename_from_path": extract_filename_from_path,
-                        "PM": PM,
-                        "RLP": RLP,
-                        "RS": RS,
-                        "Run": Run,
-                        "SAU": SAU,
-                        "SP": SP,
-                        "UA": UA,
-                        "UM": UM,
-                        "logger": logger,
-                    }, debug_mode), "Console"),
+                    #create_menu_item(not_b, l("documentation"), lambda: run_component(B, documentation_html), "B"),
+                    create_menu_item(not_tkinter, l("documentation"), documentation, "B"),
                     create_menu_item(not_sau, l("SAU"), lambda: run_component(SAU, current_theme), "SAU"),
                     create_menu_item(not_config, f"{l("pac")} - {program_authentication_clyth}", pac, "config"),
                     create_menu_item(not_e, l("E"), E, "Exit")

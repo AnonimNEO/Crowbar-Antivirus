@@ -7,7 +7,8 @@ all_line = "~13000"
 #Каталог логов
 log_path = "log"
 
-encrypt_logs = True
+#Шифрование логов
+encrypt_logs = False
 
 #Каталог изображений
 images_path = "."
@@ -166,6 +167,10 @@ documentation_html = """
   			overflow-y: auto;
 		}
 
+		.sidebar-container.collapsed {
+			width: 40px;
+		}
+
 		.sidebar-toggle {
 			background-color: darkred;
 			color: white;
@@ -201,6 +206,13 @@ documentation_html = """
 			overflow-y: auto;
 			border-right: 2px solid red;
 			flex: 1;
+		}
+
+		.sidebar.collapsed {
+			width: 0;
+			padding: 0;
+			border-right: none;
+			overflow: hidden;
 		}
 
 		.sidebar ul {
@@ -239,7 +251,7 @@ documentation_html = """
 			overflow-y: auto;
 			min-width: 0;
 			height: 100vh;
-  			//overflow-y: auto;
+  			overflow-y: auto;
 			background-color: #1a1a1a;
 		}
 
@@ -286,6 +298,13 @@ documentation_html = """
 			color: orange;
 		}
 
+		.faq-item {
+			margin-bottom: 20px;
+			padding-bottom: 20px;
+			border-bottom: 1px solid black;
+			color: white;
+		}
+
 		.component-item {
 			margin-bottom: 20px;
 			padding: 15px;
@@ -298,6 +317,15 @@ documentation_html = """
 		.component-item h3 {
 			margin-top: 0;
 			color: orange;
+		}
+
+		.requirements-list {
+			background-color: darkred;
+			padding: 15px;
+			border-radius: 4px;
+			margin-top: 10px;
+			border: 1px solid black;
+			color: white;
 		}
 
 		.requirements-list li {
@@ -318,7 +346,7 @@ documentation_html = """
 </head>
 <body>
 	<header>
-		<h1 id="documentation">Документация Антивируса Монтировка 2.4.17 Beta</h1>
+		<h1>Документация Антивируса Монтировка</h1>
 		<p><b>Свободный</b> антивирус на Python</p>
 	</header>
 	<div class="container">
@@ -395,7 +423,7 @@ documentation_html = """
 				<div class="component-item">
 					<h3>Для установки выполните следующие шаги:</h3>
 					<ol>
-						<li>Перейдите на <b><a id="link" href="https://anonimneo.github.io/NEO-Organization/Programs/Crowbar/crowbar.html" target="_blank">официальный сайт</a></b></li>
+						<li>Перейдите на <b><a href="https://anonimneo.github.io/NEO-Organization/Programs/Crowbar/crowbar.html" target="_blank">официальный сайт</a></b></li>
 						<li>Нажмите на кнопку "Скачать исходный код"</li>
 						<li>После того как вы попали на гитхаб, нажмите на пункт "релизы"</li>
 						<li>Затем вы можете выбрать версию. Если вы хотите протестировать программу без полноценной установки - то ваш выбор "Готовый Антивирус Монтировка". Если же вы хотите установить и полноценно настроить программу под себя - то тогда ваш выбор "Установщик Антивируса Монтировка"</li>
@@ -637,7 +665,7 @@ documentation_html = """
 				</div>
 				<div class="component-item">
 					<h2>Программисты:</h2>
-					<h2 id="AnonimNEO" class="programmer">AnonimNEO</h2>
+					<h2 class="programmer">AnonimNEO</h2>
 				</div>
 				<div class="component-item">
 					<h2>Язык программирования:</h2>
@@ -692,148 +720,7 @@ documentation_html = """
 			sidebarContainer.classList.toggle("collapsed");
 		});
 
-		let clickCount = 0;
-		const maxClicks = 9;
-		let docActivated = false;
-		const AnonimNEOElement = document.getElementById("AnonimNEO");
-
-		if (AnonimNEOElement) {
-			AnonimNEOElement.addEventListener("click", () => {
-			clickCount++;
-			if (clickCount === maxClicks && !docActivated) {
-				clickCount = 0;
-				console.log("documentation")
-				docActivated = true;
-
-				const docElement = document.getElementById("documentation"); // Замени селектор
-
-				if (docElement) {
-					docElement.style.cursor = "pointer";
-					docElement.addEventListener("click", (d) => {
-					d.preventDefault();
-					const m = confirm("Модифицируем ссылку?");
-					if (m) {
-						const linkElement = document.getElementById("link");
-						if (linkElement) {
-							linkElement.href = "https://youtu.be/KKnZFfG7Apg";
-						}
-					}
-					else{
-						alert("Твой выбор.")
-					}
-				});
-			  }
-			}
-		  });
-		}
-
-		(function() {
-		  	let isSpinning = false;
-		  	let spinSpeed = 2;
-		  	//let rotationAxis = "xyz";
-
-		    const style = document.createElement("style");
-		    style.textContent = `
-@keyframes spin3d {
-	0% {
-		transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
-	}
-	100% {
-		transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
-	}
-}
-
-@keyframes spinX {
-	0% { transform: rotateX(0deg); }
-	100% { transform: rotateX(360deg); }
-}
-
-@keyframes spinY {
-	 0% { transform: rotateY(0deg); }
-	100% { transform: rotateY(360deg); }
-}
-
-@keyframes spinZ {
-	 0% { transform: rotateZ(0deg); }
-	100% { transform: rotateZ(360deg); }
-}
-
-.spinning {
-	animation: spin3d ${spinSpeed}s linear infinite !important;
-	perspective: 1000px;
-}
-
-.spinning.axisX {
-	animation: spinX ${spinSpeed}s linear infinite !important;
-}
-
-.spinning.axisY {
-	 animation: spinY ${spinSpeed}s linear infinite !important;
-}
-
-.spinning.axisZ {
-	animation: spinZ ${spinSpeed}s linear infinite !important;
-}
-
-@keyframes glitch {
-	0% {
-		text-shadow: -2px 0 #ff00de, 2px 0 #00ffff;
-	}
-	14% {
-		text-shadow: -2px 0 #ff00de, 2px 0 #00ffff;
-	}
-	15% {
-		text-shadow: -2px 0 #00ffff, 2px 0 #ff00de;
-	}
-	49% {
-		text-shadow: -2px 0 #00ffff, 2px 0 #ff00de;
-	}
-	50% {
-		text-shadow: -2px 0 #ff00de, 2px 0 #00ffff;
-	}
-	100% {
-		text-shadow: -2px 0 #ff00de, 2px 0 #00ffff;
-	}
-}
-
-.glitch {
-	 animation: glitch 0.3s infinite !important;
-	color: #0ff;
-}
-`;
-		document.head.appendChild(style);
-
-		function spinAll() {
-		const elements = document.querySelectorAll("*");
-			elements.forEach((el, index) => {
-			el.classList.add("spinning");
-
-			//Разные оси для разных элементов
-			if (index % 3 === 1) el.classList.add("axisX");
-			if (index % 3 === 0) el.classList.add("axisY");
-			else el.classList.add("axisZ");
-			});
-		}
-
-		function stopAll() {
-			document.querySelectorAll(".spinning").forEach(el => {
-				el.classList.remove("spinning", "axisX", "axisY", "axisZ");
-			});
-		}
-
-		document.addEventListener("keydown", (e) => {
-			if (e.metaKey && e.key === "Delete") {
-				e.preventDefault();
-				isSpinning = !isSpinning;
-
-			if (isSpinning) {
-				spinAll();
-			} else {
-				stopAll();
-				}
-			}
-		});
-		})();
+		("about");
 	</script>
 </body>
 </html>
