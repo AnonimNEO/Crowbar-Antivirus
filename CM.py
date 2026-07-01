@@ -126,16 +126,11 @@ except Exception as e:
 from config import program_authentication_clyth
 from languages import l
 
-crowbar_menu_version = "2.3.12 Beta"
+crowbar_menu_version = "2.3.13 Beta"
 
 #@logger.catch
 def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     try:
-        def restart_cm(user_theme):
-            global current_theme
-            current_theme = theme[user_theme]
-            apply_global_theme(CM_GUI, current_theme)
-
         #Обновляем размер шрифта и кнопок при изменении размера окна
         def on_window_resize(event):
             #Проверяем, что событие вызвано именно окном CM_GUI
@@ -340,7 +335,7 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         regular_buttons.append(um_btn)
 
         fe_btn = ttk.Button(tab_manage, text=l("FE"),
-                            command=lambda: run_component(FE))
+                            command=lambda: run_component(FE, None, current_theme))
         fe_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fe_btn)
 

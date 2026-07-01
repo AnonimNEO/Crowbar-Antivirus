@@ -23,7 +23,7 @@ from RS import RS
 from AES import AES
 from OF import pac, extract_filename_from_path, apply_global_theme, create_menubar
 
-file_editor_version = "0.3.8 Beta"
+file_editor_version = "0.3.9 Beta"
 
 class FileEditor:
     def __init__(self, FE_GUI):
@@ -37,8 +37,6 @@ class FileEditor:
         #Переменные для стилей
         self.font_family = "Default"
         self.font_size = 12
-        #self.bg_color =
-        #self.fg_color =
         self.line_numbers_enabled = False
 
         #Список для хранения позиций совпадений
@@ -46,7 +44,7 @@ class FileEditor:
         self.current_match_index = -1
 
         #Создаём меню
-        create_menubar(self.FE_GUI, False, "FE", self.open_file, self.save_file, None, True, self.save_as_file, self.on_closing)
+        create_menubar(self.FE_GUI, False, "FE", self.open_file, self.save_file, None, True, self.save_as_file, self.on_closing, self.change_font, self.change_font_size)
 
         #Создаём панель поиска
         self.create_search_panel()
@@ -119,14 +117,6 @@ class FileEditor:
     def change_font_size(self, size):
         self.font_size = size
         self.text_widget.config(font=(self.font_family, self.font_size))
-
-
-
-    def apply_theme(self, bg_color, fg_color):
-        self.bg_color = bg_color
-        self.fg_color = fg_color
-        self.text_widget.config(bg=bg_color, fg=fg_color, insertbackground=fg_color)
-        self.FE_GUI.config(bg=bg_color)
 
 
 
@@ -447,10 +437,11 @@ class FileEditor:
 
 
 
-def FE(file_path=None):
+def FE(file_path=None, current_theme=False):
     try:
-        from config import theme
-        current_theme = theme["dark"]
+        if not current_theme:
+            from config import theme, default_theme
+            current_theme = theme[default_theme]
         FE_GUI = tk.Tk()
         apply_global_theme(FE_GUI, current_theme)
         editor = FileEditor(FE_GUI)

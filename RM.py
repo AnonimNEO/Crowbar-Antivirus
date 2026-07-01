@@ -20,7 +20,7 @@ except:
 import queue
 import winreg
 
-registry_monitor = "0.2.7 Pre-Alpha"
+registry_monitor = "0.2.8 Pre-Alpha"
 
 #Загрузка библиотеки
 advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)
@@ -355,7 +355,6 @@ class RegistryMonitor(threading.Thread):
         return changes
 
     def run(self):
-        global debug_mode
         h_key = None
         h_event = None
         previous_snapshot = {}
@@ -395,7 +394,7 @@ class RegistryMonitor(threading.Thread):
                         self.event_queue.put(f'Значение: "{key}" (Тип: {data.get("type")}) = {data.get("data")}')
                 self.event_queue.put("RM - Конец сканирования начального состояния")
             else:
-                if debug_mode:
+                if self.debug_mode:
                     self.event_queue.put(f"RM - Нет данных для отображения при инициализации ({self.key_path})")
 
             #Создаем событие для уведомлений

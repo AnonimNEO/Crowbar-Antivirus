@@ -458,7 +458,7 @@ except:
 
 global debug_mode
 font_trey = "Default"
-trey_version = "2.4.18 Beta build 2"
+trey_version = "2.4.19 Beta"
 on_board_pc_version = l("not_stable")
 debug_mode = False
 
@@ -565,7 +565,7 @@ def Crowbar():
                     create_menu_item(not_fm, l("FM"), lambda: run_component_process(FM, run_in_recovery, current_theme, debug_mode), "FM"),
                     create_menu_item(not_fr, l("FR"), lambda: run_component(FR, run_in_recovery, current_theme, debug_mode), "FR"),
                     create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, debug_mode), "UM"),
-                    create_menu_item(not_fe, l("FE"), lambda: run_component(FE), "FE"),
+                    create_menu_item(not_fe, l("FE"), lambda: run_component(FE, None, current_theme), "FE"),
                     #create_menu_item(not_b, l("B"), lambda: run_component(B, run_in_recovery), "B"),
                     create_menu_item(not_sp, l("SP"),lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode), "SP"),
                     create_menu_item(not_cc, l("CC"), lambda: run_component(CC, run_in_recovery), "CC"),

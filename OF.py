@@ -35,7 +35,7 @@ from languages import l
 from config import *
 
 global load_bush
-other_function_version = "0.14.1 Beta"
+other_function_version = "0.14.2 Beta"
 
 #Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -219,13 +219,12 @@ def restart_ca():
 
 #@logger.catch()
 def apply_global_theme(window, current_theme):
-    style = ttk.Style(window)
+    style = ttk.Style()
     style.theme_use("clam")
 
     #Настройка стандартных tk-виджетов (включая верхнюю панель/меню)
     window.option_add("*Background", current_theme["bg"])
     window.option_add("*Foreground", current_theme["fg"])
-    #Цвет выделения пунктов в верхней панели (меню)
     window.option_add("*Menu.activeBackground", current_theme["abg"])
     window.option_add("*Menu.activeForeground", current_theme["afg"])
 
@@ -439,24 +438,21 @@ def restart_gui_for_theme(GUI, user_theme):
 
 
 #Создаём пункты в панели
-def create_menubar(GUI, run_in_recovery, component=None, component_func=None, component_func2=None, elements=None, debug_mode=False, component_func3=None, component_func4=None):
+def create_menubar(GUI, run_in_recovery, component=None, component_func=None, component_func2=None, elements=None, debug_mode=False, component_func3=None, component_func4=None, component_func5=None, component_func6=None):
     menubar = Menu(GUI)
 
     if component == "FM":
         custom = 0
         menubar.add_command(label=l("search"), command=component_func)
     elif component == "ARM":
-        pass
         custom = 0
     elif component == "PM":
-        #Создаем выпадающее меню "Действия"
         actions_menu = tk.Menu(menubar, tearoff=0)
         actions_menu.add_command(label=l("search"), accelerator="Ctrl+F", command=lambda: component_func(elements))
         actions_menu.add_command(label=l("cancel_search"), accelerator="Esc", command=lambda: component_func2(elements))
         menubar.add_cascade(label=l("actions"), menu=actions_menu)
         custom = 0
     elif component == "FE":
-        #Меню "Файл"
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label=l("file"), menu=file_menu)
         file_menu.add_command(label=l("open"), command=component_func, accelerator="Ctrl+O")
@@ -465,36 +461,30 @@ def create_menubar(GUI, run_in_recovery, component=None, component_func=None, co
         file_menu.add_separator()
         file_menu.add_command(label=l("exit"), command=component_func4, accelerator="Alt+F4")
 
-        #Меню "Вид"
         view_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label=l("view"), menu=view_menu)
 
-        #Подменю "Шрифт"
         font_menu = tk.Menu(view_menu, tearoff=0)
         view_menu.add_cascade(label=l("font"), menu=font_menu)
 
         fonts = ["Courier", "Arial", "Times New Roman", "Helvetica", "Verdana", "Consolas"]
         for font in fonts:
-            font_menu.add_command(label=font, command=lambda f=font: change_font(f))
+            font_menu.add_command(label=font, command=lambda f=font: component_func5(f))
 
-        #Подменю "Размер шрифта"
         size_menu = tk.Menu(view_menu, tearoff=0)
         view_menu.add_cascade(label=l("font_size"), menu=size_menu)
 
         sizes = [8, 10, 11, 12, 14, 16, 18, 20, 24]
         for size in sizes:
-            size_menu.add_command(label=str(size), command=lambda s=size: change_font_size(s))
-
-        view_menu.add_separator()
+            size_menu.add_command(label=str(size), command=lambda s=size: component_func6(s))
         custom = 0
     else:
         custom = 0
 
-    #Меню тем
     theme_menu = Menu(menubar, tearoff=0)
     themes = [("dark", "dark"), ("white", "white"), ("red", "red"), ("green", "lime"), ("contrast", "black"), ("gray", "gray"), ("orange", "orange")]
     for label, theme_name in themes:
-        theme_menu.add_checkbutton(label=l(label), command=lambda: restart_gui_for_theme(GUI, theme_name))
+        theme_menu.add_checkbutton(label=l(label), command=lambda tn=theme_name: restart_gui_for_theme(GUI, tn))
     menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
     #Переменные состояния
@@ -932,7 +922,7 @@ def open_with():
 
 
 def enable_debug_mode():
-    if askyesno(RS, l("enable_debug_mode_text")):
+    if askyesno(RS(), l("enable_debug_mode_text")):
         logger.warning(f"OF/enable_debug_mode - {l("debug_mode_on")}.")
         return True
     return False
