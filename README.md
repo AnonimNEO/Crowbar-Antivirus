@@ -8,7 +8,7 @@
 Если вы считаете, что это проект бесполезен или он сделан через жопу, то поставьте **Linux** и не парьтесь об этом.
 
 # Хотите узнать побольше?
-У программы есть [документация][https://anonimneo.github.io/NEO-Organization/Programs/Crowbar/help.html]
+У программы есть [документация](https://anonimneo.github.io/NEO-Organization/Programs/Crowbar/help.html)
 
 # Минимальные требования
 Вес исполняемого файла: **~20MB**
