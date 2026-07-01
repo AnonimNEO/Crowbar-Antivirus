@@ -458,7 +458,7 @@ except:
 
 global debug_mode
 font_trey = "Default"
-trey_version = "2.4.18 Beta"
+trey_version = "2.4.18 Beta build 2"
 on_board_pc_version = l("not_stable")
 debug_mode = False
 

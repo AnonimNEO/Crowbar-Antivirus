@@ -30,7 +30,7 @@ from languages import l
 from RS import RS
 
 global about_program_version
-about_program_version = "0.3.5 Beta"
+about_program_version = "0.3.6 Beta"
 image_references = {}
 er = l("error")
 
@@ -155,7 +155,7 @@ def AP(autorun_master_version=er,
 
 
         def open_website(event):
-            webbrowser.open("https://sites.google.com/view/neo-organization")
+            webbrowser.open("https://anonimneo.github.io/NEO-Organization//")
 
 
 
