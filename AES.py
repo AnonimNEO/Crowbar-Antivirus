@@ -78,3 +78,7 @@ def AES(text, password, decrypt=False):
         #Соединяем соль, IV и зашифрованный текст, затем кодируем в base64
         encrypted_data = salt + iv + ciphertext
         return base64.b64encode(encrypted_data).decode("utf-8")
+
+if __name__ == "__main__":
+    decrypt = input("Расшифруем? ").strip().lower() in ("1", "true", "yes", "y", "да")
+    print(AES(input("Текст: "), input("Ключ: "), decrypt))
