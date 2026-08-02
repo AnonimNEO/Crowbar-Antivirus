@@ -1,12 +1,12 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -23,7 +23,7 @@ from RS import RS
 from AES import AES
 from OF import pac, extract_filename_from_path, apply_global_theme, create_menubar
 
-file_editor_version = "0.3.9 Beta"
+file_editor_version = "0.3.10 Beta"
 
 class FileEditor:
     def __init__(self, FE_GUI):
@@ -34,38 +34,38 @@ class FileEditor:
         self.current_file = None
         self.is_modified = False
 
-        #Переменные для стилей
+        # Переменные для стилей
         self.font_family = "Default"
         self.font_size = 12
         self.line_numbers_enabled = False
 
-        #Список для хранения позиций совпадений
+        # Список для хранения позиций совпадений
         self.matches_positions = []
         self.current_match_index = -1
 
-        #Создаём меню
+        # Создаём меню
         create_menubar(self.FE_GUI, False, "FE", self.open_file, self.save_file, None, True, self.save_as_file, self.on_closing, self.change_font, self.change_font_size)
 
-        #Создаём панель поиска
+        # Создаём панель поиска
         self.create_search_panel()
 
-        #Создаём главный фрейм
+        # Создаём главный фрейм
         self.main_frame = tk.Frame(self.FE_GUI)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        #Создаём текстовое поле
+        # Создаём текстовое поле
         self.create_text_widget()
 
-        #Создаём строку состояния
+        # Создаём строку состояния
         self.create_status_bar()
 
-        #Создаём контекстное меню
+        # Создаём контекстное меню
         self.create_context_menu()
 
-        #Привязываем сочетания клавиш
+        # Привязываем сочетания клавиш
         self.bind_shortcuts()
 
-        #Обработчик закрытия окна
+        # Обработчик закрытия окна
         self.FE_GUI.protocol("WM_DELETE_WINDOW", self.on_closing)
 
 
@@ -81,7 +81,7 @@ class FileEditor:
         self.context_menu.add_separator()
         self.context_menu.add_command(label=l("select_all"), command=self.select_all)
 
-        #Привязываем показ контекстного меню на ПКМ
+        # Привязываем показ контекстного меню на ПКМ
         self.text_widget.bind("<Button-3>", self.show_context_menu)
 
 
@@ -124,11 +124,11 @@ class FileEditor:
         frame = tk.Frame(self.main_frame)
         frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        #Прокрутка
+        # Прокрутка
         scrollbar = tk.Scrollbar(frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        #Текстовое поле
+        # Текстовое поле
         self.text_widget = tk.Text(
             frame,
             yscrollcommand=scrollbar.set,
@@ -140,7 +140,7 @@ class FileEditor:
         self.text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.text_widget.yview)
 
-        #Отслеживание изменений
+        # Отслеживание изменений
         self.text_widget.bind("<KeyRelease>", self.on_text_change)
 
 
@@ -172,7 +172,7 @@ class FileEditor:
         if not self.is_modified:
             self.is_modified = True
             self.update_status_bar()
-        #Обновляем поиск
+        # Обновляем поиск
         if self.search_active:
             self.perform_search()
 
@@ -290,26 +290,26 @@ class FileEditor:
     def on_closing(self):
         if self.is_modified:
             response = messagebox.askyesnocancel(RS(), l("save_changes?"))
-            if response is None: #Отмена
+            if response is None: # Отмена
                 return
-            elif response: #Да
+            elif response: # Да
                 self.save_file()
         self.FE_GUI.destroy()
 
 
 
-    #Создаём панель поиска
+    # Создаём панель поиска
     def create_search_panel(self):
         self.search_active = True
         self.search_panel = tk.Frame(self.FE_GUI, bd=1, relief=tk.RAISED)
         self.search_panel.pack(side=tk.TOP, fill=tk.X)
-        #Текстовое поле поиска
+        # Текстовое поле поиска
         self.search_var = tk.StringVar()
         self.search_entry = tk.Entry(self.search_panel, textvariable=self.search_var)
         self.search_entry.pack(side=tk.LEFT, padx=5, pady=2, fill=tk.X, expand=True)
         self.search_entry.bind("<KeyRelease>", lambda e: self.perform_search())
 
-        #Чекбоксы
+        # Чекбоксы
         self.case_var = tk.BooleanVar(value=True)
         self.word_var = tk.BooleanVar(value=False)
 
@@ -319,19 +319,19 @@ class FileEditor:
         self.case_check.pack(side=tk.LEFT, padx=5)
         self.word_check.pack(side=tk.LEFT, padx=5)
 
-        #Кнопки навигации
+        # Кнопки навигации
         self.prev_button = tk.Button(self.search_panel, text=l("back"), command=self.search_prev)
         self.next_button = tk.Button(self.search_panel, text=l("next"), command=self.search_next)
         self.prev_button.pack(side=tk.LEFT, padx=2)
         self.next_button.pack(side=tk.LEFT, padx=2)
 
-        #Кнопка закрытия поиска
+        # Кнопка закрытия поиска
         self.close_search_button = tk.Button(self.search_panel, text="×", command=self.toggle_search_panel)
         self.close_search_button.pack(side=tk.RIGHT, padx=2)
 
 
 
-    #Показываем или скрывает панель поиска
+    # Показываем или скрывает панель поиска
     def toggle_search_panel(self):
         if self.search_active:
             self.search_panel.pack_forget()
@@ -348,7 +348,7 @@ class FileEditor:
 
 
 
-    #Выполняем поиск и выделяем совпадения
+    # Выполняем поиск и выделяем совпадения
     def perform_search(self):
         self.clear_search_highlight()
         pattern = self.search_var.get()
@@ -377,13 +377,13 @@ class FileEditor:
             end = self.text_widget.index(f"1.0+{end_idx}c")
             self.matches_positions.append((start, end))
 
-        #Выделяем все совпадения одним цветом
+        # Выделяем все совпадения одним цветом
         self.text_widget.tag_remove("search_highlight", "1.0", tk.END)
         for start, end in self.matches_positions:
             self.text_widget.tag_add("search_highlight", start, end)
         self.text_widget.tag_config("search_highlight", foreground="blue", background="yellow")
 
-        #Выделяем текущее совпадение другим цветом
+        # Выделяем текущее совпадение другим цветом
         self.text_widget.tag_remove("current_match", "1.0", tk.END)
         if self.matches_positions:
             self.current_match_index = 0
@@ -395,25 +395,25 @@ class FileEditor:
 
 
 
-    #Перемещаем курсор к совпадению по индексу и выделяем его цветом
+    # Перемещаем курсор к совпадению по индексу и выделяем его цветом
     def focus_match(self, index):
         if not self.matches_positions:
             return
         if index < 0 or index >= len(self.matches_positions):
             return
         start, end = self.matches_positions[index]
-        #Убираем выделение текущего совпадения
+        # Убираем выделение текущего совпадения
         self.text_widget.tag_remove("current_match", "1.0", tk.END)
         self.text_widget.tag_remove(tk.SEL, "1.0", tk.END)
         self.text_widget.tag_add("current_match", start, end)
         self.text_widget.see(start)
         self.text_widget.mark_set(tk.INSERT, start)
-        #Выделяем текущее совпадение
+        # Выделяем текущее совпадение
         self.text_widget.tag_add(tk.SEL, start, end)
 
 
 
-    #Переходим к следующему совпадению
+    # Переходим к следующему совпадению
     def search_next(self):
         if not self.matches_positions:
             return
@@ -422,7 +422,7 @@ class FileEditor:
 
 
 
-    #Переходим к предыдущему совпадению
+    # Переходим к предыдущему совпадению
     def search_prev(self):
         if not self.matches_positions:
             return
@@ -431,7 +431,7 @@ class FileEditor:
 
 
 
-    #Удаляем выделение от поиска
+    # Удаляем выделение от поиска
     def clear_search_highlight(self):
         self.text_widget.tag_remove("search_highlight", "1.0", tk.END)
 

@@ -1,23 +1,23 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
+# Интерфейс
 from tkinter import messagebox, simpledialog
 import tkinter as tk
-#Логирование Ошибок
+# Логирование Ошибок
 try:
     from OF import Logger
     logger = Logger()
 except:
     from loguru import logger
-#Капча
+# Капча
 import random
 import os
 
@@ -26,10 +26,10 @@ from OF import theme, run_component
 from config import program_authentication_clyth, current_localization
 from languages import l
 
-exit_version = "1.1.5 Beta"
+exit_version = "1.1.6 Beta"
 dyrachok_path = r"C:\ProgramData\dyrachok.txt"
 
-#@logger.catch
+# @logger.catch
 def check_access_file():
     try:
         with open(dyrachok_path, "r") as f:
@@ -39,14 +39,14 @@ def check_access_file():
             messagebox.showwarning(RS(), l("dyrachok_test_text"))
             return False
         else:
-            #logger.success("E - Проверка на дурочка прошла успешно.")
+            # logger.success("E - Проверка на дурочка прошла успешно.")
             return True
     except FileNotFoundError:
         return True
 
 
 
-#@logger.catch
+# @logger.catch
 def tiktok_question():
     if messagebox.askyesno(RS(), l("watch_tiktok?")):
         try:
@@ -74,7 +74,7 @@ def math_window():
     number_input = tk.simpledialog.askinteger(RS(), f"{l("enter_result_example")}: √({n} * {n})")
 
     if number_input == n:
-        #logger.info("E - ввод примера верен.")
+        # logger.info("E - ввод примера верен.")
         tiktok_question()
     else:
         logger.critical(f"E - {l("bad_result_example")}.")
@@ -87,7 +87,7 @@ def captcha_window():
     captcha_input = tk.simpledialog.askinteger(RS(), f"{l("enter_number")}: {n}")
 
     if captcha_input == n:
-        #logger.info("E - ввод числа верен.")
+        # logger.info("E - ввод числа верен.")
         math_window()
     else:
         logger.critical(f"E - {l("bad_enter_number")}")
@@ -97,7 +97,7 @@ def captcha_window():
 
 def E():
     try:
-        #Это костыль, чтобы тема применялась к диалоговым окнам
+        # Это костыль, чтобы тема применялась к диалоговым окнам
         root = tk.Tk()
         root.title(RS())
         from config import theme

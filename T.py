@@ -1,14 +1,14 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-#Локализация
+# Локализация
 from languages import l
 
 import ctypes
@@ -27,7 +27,7 @@ not_threading = False
 not_signal = False
 
 try:
-    #Логирование Ошибок
+    # Логирование Ошибок
     try:
         from config import log_path
     except:
@@ -44,17 +44,17 @@ except:
     except:
         import logging
         not_loguru = True
-        #Создаём заглушку логгера
+        # Создаём заглушку логгера
         class Loggers:
             def __init__(self):
                 self.setup_fallback_logger()
 
-            #Настраиваем стандартный логгер как замену
+            # Настраиваем стандартный логгер как замену
             def setup_fallback_logger(self):
                 self.logger = logging.getLogger(__name__)
                 self.logger.setLevel(logging.ERROR)
 
-                #Если логгер уже имеет обработчики, не добавляем новые
+                # Если логгер уже имеет обработчики, не добавляем новые
                 if not self.logger.handlers:
                     handler = logging.StreamHandler(sys.stdout)
                     formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%d-%m-%Y %H:%M:%S")
@@ -89,7 +89,7 @@ except:
 
         logger.exception(f"T - {l("import_error")} loguru! {l("replacement_is_used")}")
 
-#Интерфейс
+# Интерфейс
 try:
     from tkinter import messagebox, simpledialog
     import tkinter as tk
@@ -98,20 +98,20 @@ except:
     logger.exception(f"T - {l("import_error")} tkinter")
 
 try:
-    #Рисование иконки в трее и вставка картинок
+    # Рисование иконки в трее и вставка картинок
     from PIL import Image, ImageDraw, ImageFont
 except:
     not_pillow = True
     logger.exception(f"T - {l("import_error")} Pillow")
 
-#Получение прав Администратора
+# Получение прав Администратора
 try:
     from elevate import elevate
 except:
     not_elevate = True
     logger.exception(f"T - {l("import_error")} elevate")
 
-#Движок иконки в трее
+# Движок иконки в трее
 try:
     from pystray import MenuItem, Menu
     import pystray
@@ -119,7 +119,7 @@ except:
     not_pystray = True
     logger.exception(f"T - {l("import_error")} pystray", e)
 
-#Работа с потоками
+# Работа с потоками
 try:
     from io import BytesIO
 except:
@@ -169,8 +169,8 @@ not_console = False
 not_rm = False
 not_sim = False
 
-#Импорт Компонентов
-#from OBPC import OBPC, on_board_pc_version
+# Импорт Компонентов
+# from OBPC import OBPC, on_board_pc_version
 
 try:
     from AES import AES
@@ -200,13 +200,13 @@ except:
     not_rs = True
     logger.exception(f"T - {l("component_import_error")} RandomString")
 
-#try:
-#    from B import B, browser_version
-#except:
-#    not_b = True
-#    def B(a=None, b=None, c=None, d=None, e=None):
-#        pass
-#    logger.exception(f"T - {l("component_import_error")} Browser")
+# try:
+#     from B import B, browser_version
+# except:
+#     not_b = True
+#     def B(a=None, b=None, c=None, d=None, e=None):
+#         pass
+#     logger.exception(f"T - {l("component_import_error")} Browser")
 
 try:
     from CC import CC, clear_cache_version
@@ -360,14 +360,14 @@ except:
     not_rm = True
     logger.exception(f"T - {l("component_import_error")} RegistryMonitor")
 
-#Импорт консоли разработчика
+# Импорт консоли разработчика
 try:
     from Console import open_console, crowbar_console_version
 except:
     not_console = True
     logger.exception(f"T - {l("component_import_error")} Console")
 
-#Импорт движка скриптов
+# Импорт движка скриптов
 try:
     from CASH import CASH, crowbar_antivirus_scripts_handler_version
 except:
@@ -458,7 +458,7 @@ except:
 
 global debug_mode
 font_trey = "Default"
-trey_version = "2.4.19 Beta"
+trey_version = "2.4.20 Beta"
 on_board_pc_version = l("not_stable")
 debug_mode = False
 
@@ -497,7 +497,7 @@ def Crowbar():
 
     check_and_restore_fonts_if_needed(run_in_recovery, debug_mode)
 
-    #Основная программа
+    # Основная программа
     try:
         current_theme = theme[default_theme]
         if not run_in_recovery:
@@ -526,7 +526,7 @@ def Crowbar():
                     text_position = (width // 2 - text_width // 2, height // 2 - text_height // 2)
                     square.text(text_position, text, fill=(255, 0, 0), font=font)
 
-                    #Сохраняем буфер в глобальной переменной
+                    # Сохраняем буфер в глобальной переменной
                     _icon_buffer = BytesIO()
                     icon_trey.save(_icon_buffer, format="PNG")
                     _icon_buffer.seek(0)
@@ -535,7 +535,7 @@ def Crowbar():
 
                 def start_icon():
                     if run_in_recovery:
-                        #logger.warning("T - Режим восстановления: Трей отключен.")
+                        # logger.warning("T - Режим восстановления: Трей отключен.")
                         return
                     try:
                         icon.visible = True
@@ -547,7 +547,7 @@ def Crowbar():
                 else:
                     current_disc_r = "C:\\"
 
-                #Создаём меню в зависимости от условия доступности компонента
+                # Создаём меню в зависимости от условия доступности компонента
                 def create_menu_item(condition, enabled_text, enabled_func, component_name):
                     if condition:
                         disabled_text = f"[!] {l("component")} {component_name} {l("not_available")}."
@@ -566,7 +566,7 @@ def Crowbar():
                     create_menu_item(not_fr, l("FR"), lambda: run_component(FR, run_in_recovery, current_theme, debug_mode), "FR"),
                     create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, debug_mode), "UM"),
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE, None, current_theme), "FE"),
-                    #create_menu_item(not_b, l("B"), lambda: run_component(B, run_in_recovery), "B"),
+                    # create_menu_item(not_b, l("B"), lambda: run_component(B, run_in_recovery), "B"),
                     create_menu_item(not_sp, l("SP"),lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode), "SP"),
                     create_menu_item(not_cc, l("CC"), lambda: run_component(CC, run_in_recovery), "CC"),
                 ]
@@ -593,7 +593,7 @@ def Crowbar():
                             "FM": FM,
                             "FR": FR,
                             "GFA": GFA,
-                            #OF
+                            # OF
                             "Psutil": Psutil,
                             "run_component": run_component,
                             "apply_global_theme": apply_global_theme,
@@ -629,7 +629,7 @@ def Crowbar():
 
                 unlocker_menu = Menu(*menu_items)
 
-                #Меню По ПКМ
+                # Меню По ПКМ
                 image = create_image(20, 20)
                 del(_icon_buffer)
                 menu = Menu(
@@ -664,7 +664,7 @@ def Crowbar():
                         unlock_all_version,
                         users_manager_version
                     ), "AP"),
-                    #create_menu_item(not_b, l("documentation"), lambda: run_component(B, documentation_html), "B"),
+                    # create_menu_item(not_b, l("documentation"), lambda: run_component(B, documentation_html), "B"),
                     create_menu_item(not_tkinter, l("documentation"), documentation, "B"),
                     create_menu_item(not_sau, l("SAU"), lambda: run_component(SAU, current_theme), "SAU"),
                     create_menu_item(not_config, f"{l("pac")} - {program_authentication_clyth}", pac, "config"),

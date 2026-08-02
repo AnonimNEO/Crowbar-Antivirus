@@ -1,30 +1,30 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
+# Интерфейс
 from tkinter import ttk, filedialog, messagebox, simpledialog
 import tkinter as tk
-#Дата и Время
+# Дата и Время
 from datetime import datetime
-#Работа с реестром
+# Работа с реестром
 import winreg as reg
-#Работа с Файлами
+# Работа с Файлами
 import win32com.client
 import shutil
 import os
-#Работа с Архивами
+# Работа с Архивами
 import zipfile
-#Работа с выражениями
+# Работа с выражениями
 import ast
 import re
-#Логирование
+# Логирование
 try:
     from OF import Logger
     logger = Logger()
@@ -32,16 +32,16 @@ except:
     from loguru import logger
 import threading
 
-#Чтение конфига
+# Чтение конфига
 import config
 from config import theme, default_theme, program_authentication_clyth, current_localization
 from languages import l
-#Запуск команд
+# Запуск команд
 from OF import run_command, apply_global_theme
-#Случайные заголовки
+# Случайные заголовки
 from RS import RS
 
-settings_and_update_version = "1.2.4 Beta"
+settings_and_update_version = "1.2.5 Beta"
 
 def compiling_crowbar():
     global COMPILING_COMMAND
@@ -58,26 +58,26 @@ def compiling_crowbar():
 
 def save_settings(settings_data, config_comments=None):
     if config_comments is None:
-        config_comments = {} #Если комментарии не переданы, используем пустой словарь
+        config_comments = {} # Если комментарии не переданы, используем пустой словарь
 
     try:
         with open("config.py", "w", encoding="utf-8") as config_file:
             for key, value in settings_data.items():
-                #Записываем комментарий, если он есть
+                # Записываем комментарий, если он есть
                 comment = config_comments.get(key)
                 if comment:
-                    #Комментарии всегда должны начинаться с "#"
-                    config_file.write(f"#{comment}\n")
+                    # Комментарии всегда должны начинаться с "# "
+                    config_file.write(f"# {comment}\n")
 
-                #Записываем саму переменную
+                # Записываем саму переменную
                 if isinstance(value, (list, dict, set)):
-                    #Используем repr для точного строкового представления сложных объектов
+                    # Используем repr для точного строкового представления сложных объектов
                     config_file.write(f"{key} = {repr(value)}\n")
                 else:
-                    #Используем repr для точного строкового представления всех остальных типов
+                    # Используем repr для точного строкового представления всех остальных типов
                     config_file.write(f"{key} = {repr(value)}\n")
 
-                #Добавляем пустую строку для лучшей читаемости
+                # Добавляем пустую строку для лучшей читаемости
                 config_file.write("\n")
 
         logger.success(f"SAU - {l("setting_saved_in")} config.py")
@@ -89,7 +89,7 @@ def save_settings(settings_data, config_comments=None):
 
 
 
-#Резервное копирование настроек
+# Резервное копирование настроек
 def backup_settings(export=False):
     try:
         global SETTINGS_BACKUP_PREFIX
@@ -113,7 +113,7 @@ def backup_settings(export=False):
 
 
 
-#Распаковки архива
+# Распаковки архива
 def extract_archive(ARCHIVE_PATH):
     try:
         if not os.path.exists(ARCHIVE_PATH):
@@ -138,7 +138,7 @@ def extract_archive(ARCHIVE_PATH):
 
 
 def move_all_files(src_folder, dest_folder):
-    #Перемещает все содержимое указанной папки в другую папку
+    # Перемещает все содержимое указанной папки в другую папку
     try:
         for item in os.listdir(src_folder):
             src_path = os.path.join(src_folder, item)
@@ -201,22 +201,22 @@ def copy_files():
     return True
 
 
-#Создаём Ярлык
+# Создаём Ярлык
 def create_lnk(target_path, shortcut_name):
     try:
-        #Получаем путь к рабочему столу
+        # Получаем путь к рабочему столу
         desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
 
         shortcut_path = os.path.join(desktop_path, f"{shortcut_name}.lnk")
 
-        #Создаем объект Shell
+        # Создаем объект Shell
         shell = win32com.client.Dispatch("WScript.Shell")
 
-        #Создаем ярлык
+        # Создаем ярлык
         shortcut = shell.CreateShortCut(shortcut_path)
         shortcut.TargetPath = target_path
-        shortcut.WorkingDirectory = os.path.dirname(target_path) #Рабочий каталог ярлыка
-        shortcut.save() #Сохраняем ярлык
+        shortcut.WorkingDirectory = os.path.dirname(target_path) # Рабочий каталог ярлыка
+        shortcut.save() # Сохраняем ярлык
 
         logger.info(f"SAU - {l("create_lnk_success")}.")
     except Exception as e:
@@ -224,16 +224,16 @@ def create_lnk(target_path, shortcut_name):
 
 
 
-#Добавляем программу в автозапуск
+# Добавляем программу в автозапуск
 def add_to_autorun(target_path):
     try:
-        #Открываем ключ реестра для редактирования
+        # Открываем ключ реестра для редактирования
         registry_key = reg.OpenKey(reg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\", 0, reg.KEY_WRITE)
 
-        #Заменяем значение
+        # Заменяем значение
         reg.SetValueEx(registry_key, "Userinit", 0, reg.REG_SZ, f"C:\\Windows\\System32\\userinit.exe, {target_path}")
 
-        #Закрываем ключ реестра
+        # Закрываем ключ реестра
         reg.CloseKey(registry_key)
         logger.info(f"{l("meaning")} Userinit {l("successfully_changed_to")} C:\\Windows\\System32\\userinit.exe, {target_path}")
 
@@ -244,7 +244,7 @@ def add_to_autorun(target_path):
 
 
 
-#Подготовка к перекомпиляции
+# Подготовка к перекомпиляции
 def preparing_for_recompilation(settings_data, config_comments):
     backup_filepath = backup_settings()
     if not backup_filepath:
@@ -281,7 +281,7 @@ def preparing_for_recompilation(settings_data, config_comments):
 
 
 
-#Проверка является ли путь строкой
+# Проверка является ли путь строкой
 def validate_path(path):
     if not isinstance(path, str):
         return False, l("path_must_string")
@@ -289,7 +289,7 @@ def validate_path(path):
 
 
 
-#Проверка на превышение значения в переменной
+# Проверка на превышение значения в переменной
 def validate_int_with_limit(value, max_value):
     try:
         num = int(value)
@@ -302,7 +302,7 @@ def validate_int_with_limit(value, max_value):
 
 
 
-#Проверка правильного синтаксиса списков
+# Проверка правильного синтаксиса списков
 def validate_string_list(value):
     if not isinstance(value, str):
         return False, l("enter_string")
@@ -311,17 +311,17 @@ def validate_string_list(value):
     if not s:
         return False, l("field_cannot_be_empty")
 
-    #Проверка базовых скобок
+    # Проверка базовых скобок
     if not ((s.startswith("[") and s.endswith("]")) or
             (s.startswith("(") and s.endswith(")")) or
             (s.startswith("{") and s.endswith("}"))):
         return False, f'{l("use")}: ["а"], ("а",), {1,2}, {"k":"v"}'
 
     try:
-        #Пытаемся безопасно превратить строку в объект Python
+        # Пытаемся безопасно превратить строку в объект Python
         parsed = ast.literal_eval(s)
 
-        #Проверяем, что результат — один из ожидаемых коллекций
+        # Проверяем, что результат — один из ожидаемых коллекций
         if isinstance(parsed, (list, tuple, set, dict)):
             return True, ""
         return False, l("must_list")
@@ -333,7 +333,7 @@ def validate_string_list(value):
 
 
 
-#Проверка на то что значение является строкой
+# Проверка на то что значение является строкой
 def validate_string(value):
     if not isinstance(value, str):
         return False, l("enter_string")
@@ -341,7 +341,7 @@ def validate_string(value):
 
 
 
-#Проверка на то что значение является словарём
+# Проверка на то что значение является словарём
 def validate_dict_config(value):
     if not isinstance(value, dict):
         return False, l("must_be_dictionary")
@@ -351,21 +351,21 @@ def validate_dict_config(value):
 
 
 
-#Создание виджета для ввода данных
+# Создание виджета для ввода данных
 def create_input_widget(frame, variable_name, variable_type, default_value, row_num):
     label = ttk.Label(frame, text=variable_name)
     label.grid(row=row_num, column=0, padx=3, pady=1, sticky=tk.W)
 
-    #Валидация будет использоваться только в Entry, но ее нужно определить
+    # Валидация будет использоваться только в Entry, но ее нужно определить
     validation_command = frame.register(lambda P, var_type=variable_type: validate_path(var_type))
 
-    #row_increment - переменная для отслеживания, сколько строк занял виджет (обычно 1, но 2, если есть метка ошибки снизу)
+    # row_increment - переменная для отслеживания, сколько строк занял виджет (обычно 1, но 2, если есть метка ошибки снизу)
     row_increment = 1
 
-    #Инициализируем переменные, которые будут возвращены
+    # Инициализируем переменные, которые будут возвращены
     var = tk.StringVar(value=str(default_value) if variable_type in ("bool", "int") else default_value)
     widget = None
-    column_span = 1 #По умолчанию 1, для str_path
+    column_span = 1 # По умолчанию 1, для str_path
 
     if variable_type == "bool":
         var.set(str(default_value))
@@ -386,7 +386,7 @@ def create_input_widget(frame, variable_name, variable_type, default_value, row_
             if path:
                 var.set(path)
 
-        #Кнопка "Обзор" занимает столбец 2
+        # Кнопка "Обзор" занимает столбец 2
         browse_button = ttk.Button(frame, text=l("review"), command=browse_path)
         browse_button.grid(row=row_num, column=2, padx=3, pady=1)
 
@@ -408,22 +408,22 @@ def create_input_widget(frame, variable_name, variable_type, default_value, row_
     if widget:
         widget.grid(row=row_num, column=1, padx=3, pady=1, sticky=tk.EW, columnspan=column_span)
 
-    #Создание метки ошибки
+    # Создание метки ошибки
     error_label = ttk.Label(frame, text="", foreground="red")
 
     if column_span == 2:
         error_label.grid(row=row_num + 1, column=1, columnspan=2, padx=3, sticky=tk.W)
         row_increment = 2
     else:
-        #Если поле ввода занимает только столбец 1 (т.е. есть кнопка "Обзор"), то метку ошибки размещаем в столбце 2 (на той же строке)
+        # Если поле ввода занимает только столбец 1 (т.е. есть кнопка "Обзор"), то метку ошибки размещаем в столбце 2 (на той же строке)
         error_label.grid(row=row_num, column=2, padx=3, pady=1, sticky=tk.W)
-        row_increment = 1 #Виджет занял одну строку
+        row_increment = 1 # Виджет занял одну строку
 
     return var, widget, error_label, row_increment
 
 
 
-#Чтение комментариев
+# Чтение комментариев
 def read_config(user_config=False):
     comments = {}
     current_comment = ""
@@ -431,29 +431,29 @@ def read_config(user_config=False):
         if user_config:
             config_path = filedialog.askopenfilename(title=RS(), filetypes=[("Python файлы", "*.py*")])
         else:
-            #Пытаемся открыть файл config.py, находящийся в том же каталоге
+            # Пытаемся открыть файл config.py, находящийся в том же каталоге
             config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.py")
         with open(config_path, "r", encoding="utf-8") as f:
             for line in f:
                 stripped_line = line.strip()
 
-                #Если строка начинается с символа комментария, сохраняем ее
-                if stripped_line.startswith("#"):
-                    #Удаляем символ комментария и пробелы
+                # Если строка начинается с символа комментария, сохраняем ее
+                if stripped_line.startswith("# "):
+                    # Удаляем символ комментария и пробелы
                     current_comment = stripped_line[1:].strip()
 
-                #Если строка содержит "="
-                elif "=" in stripped_line and not stripped_line.startswith("#"):
-                    #Извлекаем имя переменной до знака "="
+                # Если строка содержит "="
+                elif "=" in stripped_line and not stripped_line.startswith("# "):
+                    # Извлекаем имя переменной до знака "="
                     var_name_match = re.match(r"^\s*([a-zA-Z_]\w*)\s*=", stripped_line)
                     if var_name_match:
                         var_name = var_name_match.group(1)
                         if current_comment:
                             comments[var_name] = current_comment
                         else:
-                            #Если комментария нет, ставим пустую строку
+                            # Если комментария нет, ставим пустую строку
                             comments[var_name] = ""
-                        #Сбрасываем текущий комментарий после того, как он был использован
+                        # Сбрасываем текущий комментарий после того, как он был использован
                         current_comment = ""
     except FileNotFoundError:
         logger.error(f"SAU - {l("file")} config.py")
@@ -464,9 +464,9 @@ def read_config(user_config=False):
 
 
 
-#Главное Окно
+# Главное Окно
 def crowbar_settings(current_theme):
-    #Считываем комментарии из config.py
+    # Считываем комментарии из config.py
     config_comments = read_config()
 
     SAU_GUI = tk.Tk()
@@ -477,7 +477,7 @@ def crowbar_settings(current_theme):
 
     apply_global_theme(SAU_GUI, current_theme)
 
-    #Создание скроллбара
+    # Создание скроллбара
     main_frame = ttk.Frame(SAU_GUI)
     main_frame.pack(fill="both", expand=True, padx=5, pady=5)
 
@@ -488,18 +488,18 @@ def crowbar_settings(current_theme):
     scrollbar.pack(side=tk.RIGHT, fill="y")
 
     canvas.configure(yscrollcommand=scrollbar.set)
-    #Используем bind_all для реакции на колесо мыши
+    # Используем bind_all для реакции на колесо мыши
     canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
 
     frame = ttk.Frame(canvas)
-    #Создаем внутреннее окно и сохраняем его ID
+    # Создаем внутреннее окно и сохраняем его ID
     canvas_window_id = canvas.create_window((0, 0), window=frame, anchor="nw")
 
-    #Функция для привязки: она будет вызываться при изменении размера холста
+    # Функция для привязки: она будет вызываться при изменении размера холста
     def on_canvas_configure(event):
-        #Используем ID для установки ширины внутреннего фрейма равной ширине холста
+        # Используем ID для установки ширины внутреннего фрейма равной ширине холста
         canvas.itemconfig(canvas_window_id, width=event.width)
-        #Обновляем область прокрутки
+        # Обновляем область прокрутки
         canvas.configure(scrollregion=canvas.bbox("all"))
 
     canvas.bind("<Configure>", on_canvas_configure)
@@ -507,11 +507,11 @@ def crowbar_settings(current_theme):
     notebook = ttk.Notebook(frame)
     notebook.pack(fill="both", expand=True, padx=5, pady=5)
 
-    #Создаем вкладки
+    # Создаем вкладки
     general_tab = ttk.Frame(notebook)
     notebook.add(general_tab, text=f"{l("pac")} - {program_authentication_clyth}")
 
-    #Раздел для общих настроек
+    # Раздел для общих настроек
     general_frame = ttk.Frame(general_tab)
     general_frame.pack(padx=0, pady=0, fill="x")
 
@@ -519,10 +519,10 @@ def crowbar_settings(current_theme):
     general_frame.grid_columnconfigure(1, weight=1)
     general_frame.grid_columnconfigure(2, weight=0)
 
-    #Словарь для хранения виджетов
+    # Словарь для хранения виджетов
     widgets = {}
 
-    #Функция для определения типа переменной
+    # Функция для определения типа переменной
     def get_variable_type(var_name, var_value):
         type_mapping = {
             "str_path": ["settings_path", "log_path", "images_path"],
@@ -533,7 +533,7 @@ def crowbar_settings(current_theme):
             "str_list": ["bad_process", "exception_process", "black_theme", "dark_theme", "white_theme", "red_theme", "gray_theme", "orange_theme", "lime_theme", "theme"],
         }
 
-        #Проверяем если значение - это словарь с типом
+        # Проверяем если значение - это словарь с типом
         if isinstance(var_value, dict) and "type" in var_value:
             return var_value["type"], var_value.get("name", var_name)
 
@@ -543,23 +543,23 @@ def crowbar_settings(current_theme):
 
         return "str", var_name
 
-    #Создаем виджеты для каждой переменной из config.py
+    # Создаем виджеты для каждой переменной из config.py
     row_counter = 0
     for var_name, var_value in config.__dict__.items():
-        #Не пропускаем специальные переменные
+        # Не пропускаем специальные переменные
         if var_name.startswith("__"):
             continue
 
         if var_name in globals() or var_name in locals():
             continue
 
-        #Получаем тип и отображаемое имя переменной
+        # Получаем тип и отображаемое имя переменной
         var_type, display_name = get_variable_type(var_name, var_value)
 
-        #Извлекаем значение если переменная словарь
+        # Извлекаем значение если переменная словарь
         actual_value = var_value.get("value", var_value) if isinstance(var_value, dict) and "value" in var_value else var_value
 
-        #Добавляем метку с комментарием перед созданием виджета
+        # Добавляем метку с комментарием перед созданием виджета
         comment_text = config_comments.get(var_name, "")
         if comment_text:
             comment_label = ttk.Label(general_frame, text=comment_text, foreground="gray")
@@ -576,10 +576,10 @@ def crowbar_settings(current_theme):
             "error_label": error_label,
             "comment": comment_text,
         }
-        #Увеличиваем счетчик на 1 или 2, в зависимости от того, есть ли метка ошибки снизу
+        # Увеличиваем счетчик на 1 или 2, в зависимости от того, есть ли метка ошибки снизу
         row_counter += row_increment_step
 
-    #Удаляем объект
+    # Удаляем объект
     def delete_item(path):
         try:
             if os.path.isdir(path):
@@ -596,7 +596,7 @@ def crowbar_settings(current_theme):
 
 
 
-    #Сохранение настроек
+    # Сохранение настроек
     def apply_settings():
         settings_data = {}
         config_comments_to_save = {}
@@ -621,11 +621,11 @@ def crowbar_settings(current_theme):
                 if is_valid:
                     settings_data[var_name] = int(value)
             
-            elif var_type in ("str_list", "dict"): #Объединяем проверку коллекций
+            elif var_type in ("str_list", "dict"): # Объединяем проверку коллекций
                 is_valid, error_message = validate_string_list(value)
                 if is_valid:
                     try:
-                        #Если валидация прошла, сохраняем уже объект, а не строку
+                        # Если валидация прошла, сохраняем уже объект, а не строку
                         settings_data[var_name] = ast.literal_eval(value.strip())
                     except Exception as e:
                         is_valid = False
@@ -640,7 +640,7 @@ def crowbar_settings(current_theme):
             elif var_type == "bool":
                 settings_data[var_name] = value == "True"
             
-            else: #str
+            else: # str
                 is_valid, error_message = validate_string(value)
                 if is_valid:
                     settings_data[var_name] = value
@@ -656,20 +656,20 @@ def crowbar_settings(current_theme):
         if not messagebox.askyesno(RS(), l("recompilation_required_continue")):
             return
 
-        #Блокируем интерфейс
+        # Блокируем интерфейс
         set_ui_state("disabled")
 
         def run_compilation():
             try:
-                #Бэкап
+                # Бэкап
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=l("create_backup")), progress_bar.config(value=10)])
                 if not backup_settings(): raise Exception(l("create_backup_error"))
 
-                #Сохранение настроек
+                # Сохранение настроек
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=l("save_settings")), progress_bar.config(value=25)])
                 if not save_settings(settings_data, config_comments_to_save): raise Exception(l("save_settings_error"))
 
-                #Распаковка исходного кода
+                # Распаковка исходного кода
                 SAU_GUI.after(0, lambda: (compilation_label.config(text=l("unpacking_source_code")), progress_bar.config(value=40)))
                 if not extract_archive(ARCHIVE_PATH): raise Exception(l("unpacking_source_code_error"))
 
@@ -680,14 +680,14 @@ def crowbar_settings(current_theme):
                     os.rename("T.py", f"{PROGRAM_NAME}.py")
                     logger.info(f"SAU - {l("file")} {l("success")} {l("renamed")} {PROGRAM_NAME}.py")
                 else:
-                    #Если файла T.py нет, проверяем, вдруг он уже называется как нужно
+                    # Если файла T.py нет, проверяем, вдруг он уже называется как нужно
                     if not os.path.exists(f"{PROGRAM_NAME}.py"):
                         raise Exception(f"{l("file")} T.py {l("not_found")} {l("in")} {l("archive")}!")
 
-                #Компиляция
+                # Компиляция
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=f"{l("compilation")} {l("in")} EXE..."), progress_bar.config(value=60)])
                 if not compiling_crowbar(): raise Exception(f"{l("error")} {l("during_recompilation")}")
-                #Копирование файлов
+                # Копирование файлов
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=l("copying_files")), progress_bar.config(value=90)])
 
                 def finalize():
@@ -710,7 +710,7 @@ def crowbar_settings(current_theme):
                 progress_bar.config(value=0)
                 set_ui_state("normal")
 
-        #Запуск потока
+        # Запуск потока
         threading.Thread(target=run_compilation, daemon=True).start()
 
     def delete_cache():
@@ -718,10 +718,10 @@ def crowbar_settings(current_theme):
             return
 
         global config_log_path
-        #Файлы, которые нельзя удалять
+        # Файлы, которые нельзя удалять
         protected_names = [f"{PROGRAM_NAME}.exe", "config.py", config_log_path]
         
-        #Расширения-исключения
+        # Расширения-исключения
         protected_extensions = (".txt", ".log", ".exe")
 
         current_dir = os.getcwd()
@@ -764,10 +764,10 @@ def crowbar_settings(current_theme):
     progress_bar.pack(fill="x", padx=5, pady=2)
     progress_bar["value"] = 0
 
-    #Список всех кнопок для быстрого управления доступом
+    # Список всех кнопок для быстрого управления доступом
     action_buttons = []
 
-    #Переключает активность всех кнопок управления
+    # Переключает активность всех кнопок управления
     def set_ui_state(state="normal"):
         for btn in action_buttons:
             btn.config(state=state)
@@ -808,13 +808,13 @@ def crowbar_settings(current_theme):
     open_log_button = ttk.Button(button_frame, text=f"{l("open")} {l("log")}", command=open_log_file)
     open_log_button.grid(row=1, column=2, columnspan=2, padx=3, pady=2, sticky="ew")
 
-    #Сохраняем ссылки для управления состоянием
+    # Сохраняем ссылки для управления состоянием
     action_buttons.extend([
         export_button, import_button, delete_cache_button, 
         apply_button, open_dir_button, open_log_button
     ])
 
-    #Обновляем геометрию, чтобы скроллбар работал корректно
+    # Обновляем геометрию, чтобы скроллбар работал корректно
     frame.update_idletasks()
     canvas.config(scrollregion=canvas.bbox("all"))
 
@@ -824,7 +824,7 @@ def SAU(current_theme):
     if messagebox.askyesno(RS(), l("sau_start_text")):
         global PROGRAM_NAME, ARCHIVE_PASSWORD
         SETTINGS_BACKUP_PREFIX = "settings_backup"
-        #ARCHIVE_PATH = "crowbar_code.zip"
+        # ARCHIVE_PATH = "crowbar_code.zip"
         ARCHIVE_PASSWORD = b"0000"
         PROGRAM_NAME = simpledialog.askstring(title=RS(), prompt=l("enter_program_name"))
         if not os.path.isfile("icon\\T_icon.ico"):

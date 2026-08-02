@@ -1,28 +1,28 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-scarecrow_protection_version = "0.3.16 Beta"
+scarecrow_protection_version = "0.3.17 Beta"
 
 def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_mode=False):
-    #Интерфейс
+    # Интерфейс
     from tkinter import ttk, messagebox, Menu
     import tkinter as tk
-    #Логирование Ошибок
+    # Логирование Ошибок
     try:
         from OF import Logger
         logger = Logger()
     except:
         from loguru import logger
-    #Работа с реестром
+    # Работа с реестром
     import winreg
-    #Работа с файлами
+    # Работа с файлами
     import shutil
     import os
 
@@ -43,11 +43,11 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
         un_tool_dir = r"Program Files\Uninstall Tool"
         ph2_dir = r"Program Files\Process Hacker 2"
 
-        #Иерархия значений:
-        #-название программы
-        #--path: список каталогов для создания
-        #--files: список файлов для создания
-        #--registry_keys: список ключей реестра и их значений (словарь: ключ - путь, значение - данные)
+        # Иерархия значений:
+        # -название программы
+        # --path: список каталогов для создания
+        # --files: список файлов для создания
+        # --registry_keys: список ключей реестра и их значений (словарь: ключ - путь, значение - данные)
         PROGRAM_INFO = {
             "VMware": {
                 "path": [
@@ -255,18 +255,18 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
                 master.geometry("300x215")
                 master.resizable(True, True)
 
-                #Фрейм для кнопок
+                # Фрейм для кнопок
                 self.button_frame = ttk.Frame(master)
                 self.button_frame.pack(side=tk.BOTTOM, pady=10)
 
-                #Кнопки
+                # Кнопки
                 self.run_button = tk.Button(self.button_frame, text=l("simulation"), command=self.run_simulation)
                 self.run_button.pack(side=tk.LEFT, padx=10)
 
                 self.delete_button = tk.Button(self.button_frame, text=l("removal"), command=self.delete_simulation)
                 self.delete_button.pack(side=tk.LEFT, padx=10)
 
-                #Фрейм для чекбоксов со скроллбаром
+                # Фрейм для чекбоксов со скроллбаром
                 self.checkbox_frame = ttk.Frame(master)
                 self.checkbox_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=10)
 
@@ -290,7 +290,7 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
                 self.checkbox_vars = {}
                 self.checkboxes = {}
 
-                #Создаем чекбоксы в два столбца
+                # Создаем чекбоксы в два столбца
                 self.create_checkboxes()
 
 
@@ -298,14 +298,14 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
             def create_checkboxes(self):
                 programs = list(PROGRAM_INFO.keys())
                 num_programs = len(programs)
-                half_programs = (num_programs + 1) // 2 #Рассчитываем середину, округляя вверх
+                half_programs = (num_programs + 1) // 2 # Рассчитываем середину, округляя вверх
 
                 for i in range(num_programs):
                     program = programs[i]
                     var = tk.BooleanVar(value=False)
                     checkbox = ttk.Checkbutton(self.scrollable_frame, text=program, variable=var)
 
-                    #Размещение чекбоксов в два стола
+                    # Размещение чекбоксов в два стола
                     if i < half_programs:
                         checkbox.grid(row=i, column=0, sticky="w", padx=1, pady=2)
                     else:
@@ -328,7 +328,7 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
             def create_file(self, path):
                 try:
                     with open(path, "w"):
-                        pass #Создаём пустой файл
+                        pass # Создаём пустой файл
                     logger.info(f"SP - {l("create_file")}: {path}")
                 except OSError as e:
                     logger.error(f"SP - {l("create_file_error")} {path}:\n{e}")
@@ -417,7 +417,7 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
 
         SP_GUI = tk.Tk()
         apply_global_theme(SP_GUI, current_theme)
-        #GUI_SP = SP(SP_GUI)
+        # GUI_SP = SP(SP_GUI)
         SPI(SP_GUI)
 
         create_menubar(SP_GUI, run_in_recovery, debug_mode=debug_mode)

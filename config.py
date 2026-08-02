@@ -1,124 +1,124 @@
-#Текущий язык (доступные языки: ru)
+# Текущий язык (доступные языки: ru)
 current_localization = "ru"
 
-#Общее количество строчек кода
+# Общее количество строчек кода
 all_line = "~13000"
 
-#Каталог логов
+# Каталог логов
 log_path = "log"
 
-#Шифрование логов
+# Шифрование логов
 encrypt_logs = False
 
-#Каталог изображений
+# Каталог изображений
 images_path = "."
 
-#Файл базы плохих процессов
+# Файл базы плохих процессов
 bad_process_txt = "bad_process.txt"
 
-#Файл максимальной нагрузки на CPU
+# Файл максимальной нагрузки на CPU
 ultimate_load_cpu_txt = "ultimate_load_cpu.txt"
 
-#Файл максимальной нагрузки на RAM
+# Файл максимальной нагрузки на RAM
 ultimate_load_ram_txt = "ultimate_load_ram.txt"
 
-#Файл базы исключений
+# Файл базы исключений
 exception_process_txt = "exception_process.txt"
 
-#Имя лог файла очистки temp
+# Имя лог файла очистки temp
 clear_temp_log = "Clear_Temp_log"
 
-#Главный лог файл
+# Главный лог файл
 T_log_txt = "Crawbar_log.txt"
 
-#Ключ Шифрования
-clyth = "8235423472"
+# Ключ Шифрования
+clyth = "63263262"
 
-#Ключ подтверждения подлинного окна
+# Ключ подтверждения подлинного окна
 program_authentication_clyth = "88005553535"
 
-#icon - только иконка, only-windows - только окно, window - иконка и окно
+# icon - только иконка, only-windows - только окно, window - иконка и окно
 start_interface = "icon"
 
-#Контрастная тема
-black_theme = {"bg": "black", "fg": "white", "bbg": "darkblue", "bfg": "white", "abg": "blue", "afg": "white", "lbg":  "black", "lfg": "white", "stb": "#090909", "tbg": "darkblue", "tfg": "white"}
+# Контрастная тема
+black_theme = {"bg": "black", "fg": "white", "bbg": "darkblue", "bfg": "white", "abg": "blue", "afg": "white", "lbg":  "black", "lfg": "white", "stb": "# 090909", "tbg": "darkblue", "tfg": "white"}
 
-#Тёмная тема
-dark_theme = {"bg": "#1e1f22", "fg": "white", "bbg": "#243048", "bfg": "white", "abg": "#548af7", "afg": "white", "lbg":  "#1e1f22", "lfg": "white", "stb": "#1e1f22", "tbg": "#243048", "tfg": "white"}
+# Тёмная тема
+dark_theme = {"bg": "# 1e1f22", "fg": "white", "bbg": "# 243048", "bfg": "white", "abg": "# 548af7", "afg": "white", "lbg":  "# 1e1f22", "lfg": "white", "stb": "# 1e1f22", "tbg": "# 243048", "tfg": "white"}
 
-#Светлая тема
+# Светлая тема
 white_theme = {"bg": "white", "fg": "black", "bbg": "white", "bfg": "black", "abg": "gray", "afg": "black", "lbg":  "white", "lfg": "black", "stb": "gray", "tbg": "white", "tfg": "black"}
 
-#Красная тема
+# Красная тема
 red_theme = {"bg": "black", "fg": "white", "bbg": "darkred", "bfg": "white", "abg": "red", "afg": "black", "lbg":  "black", "lfg": "white", "stb": "red", "tbg": "darkred", "tfg": "white"}
 
-#Серая тема
+# Серая тема
 gray_theme =  {"bg": "gray", "fg": "white", "bbg": "gray", "bfg": "white", "abg": "white", "afg": "black", "lbg":  "gray", "lfg": "white", "stb": "gray", "tbg": "black", "tfg": "white"}
 
-#Оранжевая тема
+# Оранжевая тема
 orange_theme =  {"bg": "gray", "fg": "white", "bbg": "darkorange", "bfg": "white", "abg": "orange", "afg": "black", "lbg":  "gray", "lfg": "darkorange", "stb": "gray", "tbg": "darkorange", "tfg": "black"}
 
-#Зелёная тема
+# Зелёная тема
 lime_theme =  {"bg": "green", "fg": "white", "bbg": "green", "bfg": "white", "abg": "lime", "afg": "black", "lbg":  "green", "lfg": "lime", "stb": "green", "tbg": "lime", "tfg": "black"}
 
-#(НЕ РЕДАКТИРОВАТЬ) Кортеж тем
+# (НЕ РЕДАКТИРОВАТЬ) Кортеж тем
 theme = {"black": black_theme, "dark": dark_theme, "white": white_theme, "red": red_theme, "gray": gray_theme, "orange": orange_theme, "lime": lime_theme}
 
-#Тема по умолчанию
+# Тема по умолчанию
 default_theme = "dark"
 
-#Автозапуск LoadProtection
+# Автозапуск LoadProtection
 start_lp = False
 
-#Старт движка скриптов
+# Старт движка скриптов
 start_cash = True
 
-#Способ перезагрузки win32com, os, subprocess, bat
+# Способ перезагрузки win32com, os, subprocess, bat
 restart_windows = "win32com"
 
-#Через сколько секунд выполнить перезагрузку
+# Через сколько секунд выполнить перезагрузку
 time_to_restart = "1"
 
-#Для win32com, перезапустить ли ОС? True - да | False - нет
+# Для win32com, перезапустить ли ОС? True - да | False - нет
 reboot_os = True
 
-#Для win32com, закрыть ПО принудительно? True - да | False - нет
+# Для win32com, закрыть ПО принудительно? True - да | False - нет
 force_software = True
 
-#Для способа bat, имя файла .bat (обязательно .bat)
+# Для способа bat, имя файла .bat (обязательно .bat)
 restart_windows_bat = "restart_windows.bat"
 
-#Имя пользователя по умолчанию
+# Имя пользователя по умолчанию
 default_user_name = "Admin"
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до обновления списка процессов
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до обновления списка процессов
 time_to_update_process_list = 5
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до обновления списка процессов в LoadProtection
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до обновления списка процессов в LoadProtection
 time_to_close_window = 5
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до закрытия вопроса после заморозки
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до закрытия вопроса после заморозки
 time_sleep_to_close_question = 30
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до закрытия окна вопроса о добавлении базе исключения
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд до закрытия окна вопроса о добавлении базе исключения
 time_sleep_to_close_question2 = 60
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд ожидания когда LoadProtection повторит сканирование
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Количество секунд ожидания когда LoadProtection повторит сканирование
 time_sleep_to_scan = 5
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Стандартное значения предельной нагрузки на CPU
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Стандартное значения предельной нагрузки на CPU
 ultimate_load_cpu = 25
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Стандартное значение предельной нагрузки на RAM
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) Стандартное значение предельной нагрузки на RAM
 ultimate_load_ram = 20
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) База запрещённых процессов по имени
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) База запрещённых процессов по имени
 bad_process = ["virus", "malware", "trojan", "yandex", "browser", "max"]
 
-#(НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) База Исключений
+# (НА БУДУЩЕЕ, МОЖЕТЕ НЕ РЕДАКТИРОВАТЬ) База Исключений
 exception_process = ["System Idle Process", "System.exe", "dwm.exe", "mmc.exe", "cmd.exe", "conhost.exe", "explorer.exe", "smss.exe", "Memory Compression", "Interrupts", "Registry", "csrss.exe", "wininit.exe", "services.exe", "RuntimeBroker.exe", "InputPersonalization.exe", "ApplicationFrameHost.exe", "WindowsInternal.ComposableShell.Experiences.TextInput.InputApp.exe", "taskhostw.exe", "sihost.exe", "spoolsv.exe", "SearchIndexer.exe", "SearchFilterHost.exe", "SearchProtocolHost.exe", "SearchProtocolHost.exe", "dllhost.exe", "lsass.exe", "fontdrvhost.exe", "csrss.exe", "winlogon.exe", "fontdrvhost.exe", "TiWorker.exe", "regedit.exe", "MsMpEng.exe"]
 
-#(НЕ РЕДАКТИРОВАТЬ) Документация
+# (НЕ РЕДАКТИРОВАТЬ) Документация
 documentation_html = """
 <!DOCTYPE html>
 <html lang="ru">
@@ -134,7 +134,7 @@ documentation_html = """
 		body {
 			font-family: Arial, sans-serif;
 			line-height: 1.5;
-			background: #1a1a1a;
+			background: # 1a1a1a;
 			margin: 0;
 			padding: 0;
 			display: flex;
@@ -144,7 +144,7 @@ documentation_html = """
 		}
 
 		header {
-			background: linear-gradient(135deg, darkred 0%, #770000 100%);
+			background: linear-gradient(135deg, darkred 0%, # 770000 100%);
 			color: white;
 			padding: 15px;
 			text-align: center;
@@ -187,7 +187,7 @@ documentation_html = """
 		}
 
 		.sidebar-toggle:hover {
-			background-color: #cc0000;
+			background-color: # cc0000;
 		}
 
 		.sidebar-toggle span {
@@ -200,7 +200,7 @@ documentation_html = """
 
 		.sidebar {
 			width: 250px;
-			background-color: #2a2a2a;
+			background-color: # 2a2a2a;
 			padding: 20px;
 			transition: all 0.3s ease;
 			overflow-y: auto;
@@ -252,7 +252,7 @@ documentation_html = """
 			min-width: 0;
 			height: 100vh;
   			overflow-y: auto;
-			background-color: #1a1a1a;
+			background-color: # 1a1a1a;
 		}
 
 		img {
@@ -268,7 +268,7 @@ documentation_html = """
 			border: 1px solid red;
 			border-radius: 4px;
 			background-color: darkred;
-			<!-- background-color: #E27C1A; -->
+			<!-- background-color: # E27C1A; -->
 		}
 
 		section.active {
@@ -308,7 +308,7 @@ documentation_html = """
 		.component-item {
 			margin-bottom: 20px;
 			padding: 15px;
-			background-color: #2a2a2a;
+			background-color: # 2a2a2a;
 			border-left: 4px solid orange;
 			border-radius: 4px;
 			color: white;

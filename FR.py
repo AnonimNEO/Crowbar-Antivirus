@@ -1,26 +1,26 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-file_replacer_version = "0.4.7 Beta"
+file_replacer_version = "0.4.8 Beta"
 
 def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
-    #Интерфейс
+    # Интерфейс
     from tkinter import filedialog, messagebox, ttk, Menu
     import tkinter as tk
-    #Логирование
+    # Логирование
     try:
         from OF import Logger
         logger = Logger()
     except:
         from loguru import logger
-    #Работа с файлами
+    # Работа с файлами
     import subprocess
     import shutil
     import os
@@ -71,21 +71,21 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
             return
 
         try:
-            #Получаем права собственности (для WinRE)
-            #/F - путь к файлу, /A - передать права группе администраторов
+            # Получаем права собственности (для WinRE)
+            # /F - путь к файлу, /A - передать права группе администраторов
             subprocess.run(f'takeown /f "{final_tgt}" /a', shell=True, check=False)
             
-            #Даем полные права администраторам
-            #/grant - предоставить права, :F - Full access (полный доступ)
+            # Даем полные права администраторам
+            # /grant - предоставить права, :F - Full access (полный доступ)
             subprocess.run(f'icacls "{final_tgt}" /grant administrators:F', shell=True, check=False)
 
-            #Создаем бэкап
+            # Создаем бэкап
             backup_path = final_tgt + ".backup"
             if os.path.exists(final_tgt):
                 shutil.copy2(final_tgt, backup_path)
                 logger.info(f"FR - {l("create_backup")}: {backup_path}")
 
-            #Копируем новый файл
+            # Копируем новый файл
             shutil.copy2(final_src, final_tgt)
             logger.success(f"FR - {l("success")} {l("replaced")}: {final_tgt}")
             messagebox.showinfo(RS(), f"{l("file")} {l("replaced")} {l("on_disc")} {current_disc}")
@@ -111,7 +111,7 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
 
         if messagebox.askyesno(RS(), f"{l("restore")} {os.path.basename(final_tgt)} {l("from_backup")}?"):
             try:
-                #Возвращаем бэкап на место основного файла
+                # Возвращаем бэкап на место основного файла
                 shutil.move(backup_path, final_tgt)
                 logger.success(f"FR - {l("restore_from_backup")}: {final_tgt}")
                 messagebox.showinfo(RS(), f"{l("file")} {l("success")} {l("restored")}.")
@@ -141,7 +141,7 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
         f"Explorer ({l("explorer")})": r"C:\Windows\explorer.exe"
     }
 
-    #GUI элементы
+    # GUI элементы
     tk.Label(FR_GUI, text=f"1){l("what_to_replace")}:").pack(anchor="w", padx=10, pady=(10, 0))
     src_frame = tk.Frame(FR_GUI)
     src_frame.pack(fill="x", padx=10)
@@ -159,7 +159,7 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
     tk.Entry(tgt_frame, textvariable=target_path).pack(side="left", expand=True, fill="x")
     tk.Button(tgt_frame, text=l("review"), command=lambda: browse_target(target_path)).pack(side="right", padx=5)
 
-    #Кнопки действий
+    # Кнопки действий
     btn_frame = tk.Frame(FR_GUI)
     btn_frame.pack(pady=15)
 

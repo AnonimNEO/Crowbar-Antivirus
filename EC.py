@@ -1,20 +1,20 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-#Логирование Ошибок
+# Логирование Ошибок
 try:
     from OF import Logger
     logger = Logger()
 except:
     from loguru import logger
-#Работа с ОС
+# Работа с ОС
 import ctypes
 from ctypes import wintypes
 import psutil
@@ -23,41 +23,41 @@ from OF import Psutil
 from languages import l
 from config import current_localization
 
-edit_criticality_version = "0.4.6 Beta"
+edit_criticality_version = "0.4.7 Beta"
 
-#Загрузка необходимых библиотек windows
+# Загрузка необходимых библиотек windows
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 ntdll = ctypes.WinDLL("ntdll", use_last_error=True)
 
-#Определение структур и констант
+# Определение структур и констант
 PROCESS_QUERY_INFORMATION = 0x0400
 PROCESS_SET_INFORMATION = 0x0200
 STATUS_SUCCESS = 0
 
-#0x1D (29) - ProcessBreakOnTermination: используется для установки/запроса критичности.
-#Значение (ULONG): 1 - критический, 0 - некритический
+# 0x1D (29) - ProcessBreakOnTermination: используется для установки/запроса критичности.
+# Значение (ULONG): 1 - критический, 0 - некритический
 PROCESS_INFORMATION_CLASS_CRITICAL = 0x1D
 
-#Определяем функции windows API
+# Определяем функции windows API
 def define_functions():
-    #kernel32.OpenProcess
+    # kernel32.OpenProcess
     kernel32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
     kernel32.OpenProcess.restype = wintypes.HANDLE
 
-    #kernel32.CloseHandle
+    # kernel32.CloseHandle
     kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
     kernel32.CloseHandle.restype = wintypes.BOOL
 
-    #ntdll.NtSetInformationProcess (Для установки критичности)
+    # ntdll.NtSetInformationProcess (Для установки критичности)
     ntdll.NtSetInformationProcess.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.c_void_p, wintypes.ULONG]
     ntdll.NtSetInformationProcess.restype = wintypes.LONG
 
-    #ntdll.NtQueryInformationProcess (Для запроса критичности)
+    # ntdll.NtQueryInformationProcess (Для запроса критичности)
     ntdll.NtQueryInformationProcess.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.c_void_p, wintypes.ULONG, ctypes.POINTER(wintypes.ULONG)]
     ntdll.NtQueryInformationProcess.restype = wintypes.LONG
 
 
-#Получаем имя процесса
+# Получаем имя процесса
 def get_process_name(process_id):
     try:
         process = psutil.Process(process_id)
@@ -66,13 +66,13 @@ def get_process_name(process_id):
         return f"Unknown_PID_{process_id}"
 
 
-#Получаем текущий статус критичности процесса
+# Получаем текущий статус критичности процесса
 def get_process_critical_status(process_id, debug_mode=False):
     process_handle = None
     try:
         define_functions()
 
-        #Открываем процесс с правом на запрос информации
+        # Открываем процесс с правом на запрос информации
         process_handle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION, False, process_id)
 
         if not process_handle:
@@ -81,11 +81,11 @@ def get_process_critical_status(process_id, debug_mode=False):
                 logger.error(f"EC - {l("open_process_error")} (pid: {process_id}). {l("error_code")}: {error_code}")
             return None
 
-        #Переменная для хранения результата
+        # Переменная для хранения результата
         critical_value = ctypes.c_ulong(0)
         return_length = ctypes.c_ulong(0)
 
-        #Вызываем NtQueryInformationProcess с классом 0x1D
+        # Вызываем NtQueryInformationProcess с классом 0x1D
         result = ntdll.NtQueryInformationProcess(process_handle, PROCESS_INFORMATION_CLASS_CRITICAL, ctypes.byref(critical_value), ctypes.sizeof(critical_value), ctypes.byref(return_length))
 
         if result == STATUS_SUCCESS:
@@ -105,13 +105,13 @@ def get_process_critical_status(process_id, debug_mode=False):
             kernel32.CloseHandle(process_handle)
 
 
-#Меняем значение критичности на процессе
+# Меняем значение критичности на процессе
 def set_process_critical(process_id, critical):
     process_handle = None
     try:
         define_functions()
 
-        #Получаем handle процесса с правами на изменение и запрос информации
+        # Получаем handle процесса с правами на изменение и запрос информации
         process_handle = kernel32.OpenProcess(PROCESS_SET_INFORMATION | PROCESS_QUERY_INFORMATION, False, process_id)
 
         if not process_handle:
@@ -120,10 +120,10 @@ def set_process_critical(process_id, critical):
             logger.error(f"EC - {l("open_process_error")} {process_name} (pid: {process_id}). {l("error_code")}: {error_code}")
             return False
 
-        #Значение 1 для True (критический), 0 для False (некритический)
+        # Значение 1 для True (критический), 0 для False (некритический)
         critical_value = ctypes.c_ulong(1 if critical else 0)
 
-        #Вызываем NtSetInformationProcess с классом 0x1D
+        # Вызываем NtSetInformationProcess с классом 0x1D
         result = ntdll.NtSetInformationProcess(process_handle, PROCESS_INFORMATION_CLASS_CRITICAL, ctypes.byref(critical_value), ctypes.sizeof(critical_value))
 
         if result == STATUS_SUCCESS:
@@ -144,6 +144,13 @@ def set_process_critical(process_id, critical):
 
 
 def EC(process_id, critical=None, debug_mode=False):
+    """
+    Функция для изменения критичности для процесса
+    process_id - id процесса для операции
+    critical - Какую критичность выставить (True/False)
+    debug_mode - включить режим отладки (если True будет больше логов)
+    return - None если процесс не найден, False при ошибке изменения критичности, True если операция прошла успешно
+    """
     try:
         process_name = get_process_name(process_id)
 
@@ -152,14 +159,14 @@ def EC(process_id, critical=None, debug_mode=False):
                 logger.debug(f"EC - {l("process")} {process_name} (pid: {process_id}) {l("not_found")}!")
             return None
 
-        #Если critical=None, только считываем статус
+        # Если critical=None, только считываем статус
         if critical is None:
             current_status = get_process_critical_status(process_id)
             return current_status
 
-        #Иначе устанавливаем новое значение и проверяем результат
+        # Иначе устанавливаем новое значение и проверяем результат
         if set_process_critical(process_id, critical):
-            #Проверяем, успешно ли изменилось значение
+            # Проверяем, успешно ли изменилось значение
             verified_status = get_process_critical_status(process_id)
 
             if verified_status == critical:

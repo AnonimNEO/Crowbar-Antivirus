@@ -1,12 +1,12 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
 import sys
 import os
@@ -31,32 +31,32 @@ from RS import RS
 from config import *
 from languages import l
 
-browser_version = "0.2.7 Beta"
+browser_version = "0.2.8 Beta"
 
-#страница для контроля открытия ссылок и скачиваний
+# страница для контроля открытия ссылок и скачиваний
 class CustomWebEnginePage(QWebEnginePage):
     def __init__(self, browser_window, parent=None):
         super().__init__(parent)
         self.browser_window = browser_window
 
-        #Подключаем сигнал скачивания
+        # Подключаем сигнал скачивания
         self.profile().downloadRequested.connect(self.on_download_requested)
 
 
 
     def createWindow(self, window_type):
-        #Создаём новую вкладку вместо нового окна
+        # Создаём новую вкладку вместо нового окна
         self.browser_window.add_new_tab()
         return self.browser_window.get_current_browser().page()
 
 
 
     def on_download_requested(self, download):
-        #Получаем имя файла и URL
+        # Получаем имя файла и URL
         file_name = download.suggestedFileName()
         download_url = download.url().toString()
 
-        #Открываем диалог сохранения
+        # Открываем диалог сохранения
         file_path, _ = QFileDialog.getSaveFileName(
             self.browser_window,
             RS(),
@@ -65,21 +65,21 @@ class CustomWebEnginePage(QWebEnginePage):
         )
 
         if file_path:
-            #Если пользователь выбрал путь, устанавливаем его
+            # Если пользователь выбрал путь, устанавливаем его
             download.setDownloadFileName(file_path)
 
-            #Принимаем скачивание
+            # Принимаем скачивание
             download.accept()
 
             if self.browser_window.log:
                 logger.info(f"B - {l("download_start")}: {file_name} -> {file_path}")
 
-            #Подключаемся к сигналам завершения/ошибки
+            # Подключаемся к сигналам завершения/ошибки
             download.isFinishedChanged.connect(
                 lambda: self.on_download_finished(file_path, file_name) if download.isFinished() else None
             )
         else:
-            #Если пользователь отменил диалог, отклоняем скачивание
+            # Если пользователь отменил диалог, отклоняем скачивание
             download.cancel()
             if self.browser_window.log:
                 logger.info(f"B - {l("download_cancel")}: {file_name}")
@@ -121,18 +121,18 @@ class BrowserWindow(QMainWindow):
         self.setWindowTitle(RS())
         self.setGeometry(100, 100, 1400, 900)
 
-        #Главный виджет
+        # Главный виджет
         main_widget = QWidget()
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        #панель
+        # панель
         control_panel = QHBoxLayout()
         control_panel.setContentsMargins(5, 5, 5, 5)
         control_panel.setSpacing(5)
 
-        #Кнопки навигации
+        # Кнопки навигации
         self.btn_back = QPushButton("←")
         self.btn_back.setMaximumWidth(40)
         self.btn_back.setMaximumHeight(35)
@@ -151,14 +151,14 @@ class BrowserWindow(QMainWindow):
         self.btn_refresh.clicked.connect(self.refresh_page)
         control_panel.addWidget(self.btn_refresh)
 
-        #Адресная строка
+        # Адресная строка
         self.address_bar = QLineEdit()
         self.address_bar.setPlaceholderText(l("enter_url_or_file_path"))
         self.address_bar.setMaximumHeight(35)
         self.address_bar.returnPressed.connect(self.load_from_address_bar)
         control_panel.addWidget(self.address_bar)
 
-        #Выбор темы
+        # Выбор темы
         self.theme_selector = QComboBox()
         self.theme_selector.addItems(theme.keys())
         self.theme_selector.currentTextChanged.connect(lambda: self.apply_theme(theme_name))
@@ -166,20 +166,20 @@ class BrowserWindow(QMainWindow):
         self.theme_selector.setMaximumHeight(35)
         control_panel.addWidget(self.theme_selector)
 
-        #Добавляем панель управления в главный layout
+        # Добавляем панель управления в главный layout
         control_panel_widget = QWidget()
         control_panel_widget.setMaximumHeight(50)
         control_panel_widget.setLayout(control_panel)
         main_layout.addWidget(control_panel_widget)
 
-        #вкладки
+        # вкладки
         self.tab_widget = QTabWidget()
         self.tab_widget.setStyleSheet(f"QTabBar::tab {{ height: 30px; }}")
-        self.tab_widget.setMovable(True) #Возможность перетаскивать вкладки
-        self.tab_widget.setTabsClosable(True) #Кнопка закрытия на вкладке
+        self.tab_widget.setMovable(True) # Возможность перетаскивать вкладки
+        self.tab_widget.setTabsClosable(True) # Кнопка закрытия на вкладке
         self.tab_widget.tabCloseRequested.connect(self.close_tab)
 
-        #Кнопка "+" для добавления новой вкладки
+        # Кнопка "+" для добавления новой вкладки
         self.btn_new_tab = QPushButton("+")
         self.btn_new_tab.setMaximumWidth(40)
         self.btn_new_tab.setMaximumHeight(30)
@@ -191,10 +191,10 @@ class BrowserWindow(QMainWindow):
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
 
-        #Создаём первую вкладку
+        # Создаём первую вкладку
         self.create_tab(l("new_tab"))
 
-        #Загружаем содержимое в первую вкладку
+        # Загружаем содержимое в первую вкладку
         current_browser = self.get_current_browser()
         if html:
             self.load_html(html)
@@ -211,7 +211,7 @@ class BrowserWindow(QMainWindow):
 
         current_browser.urlChanged.connect(self.on_url_changed)
 
-        #Применяем тему
+        # Применяем тему
         self.apply_theme(self.current_theme)
 
 
@@ -219,7 +219,7 @@ class BrowserWindow(QMainWindow):
     def create_tab(self, title=l("new_tab")):
         browser = QWebEngineView()
 
-        #Устанавливаем кастомную страницу для контроля ссылок и скачиваний
+        # Устанавливаем кастомную страницу для контроля ссылок и скачиваний
         custom_page = CustomWebEnginePage(self, browser)
         browser.setPage(custom_page)
 
@@ -227,12 +227,12 @@ class BrowserWindow(QMainWindow):
         self.tab_widget.addTab(browser, title)
         self.tab_widget.setCurrentWidget(browser)
 
-        #Подключаем сигнал изменения URL
+        # Подключаем сигнал изменения URL
         browser.urlChanged.connect(self.on_url_changed)
 
 
 
-    #Открываем нвовую вкладку
+    # Открываем нвовую вкладку
     def add_new_tab(self):
         self.create_tab(l("new_tab"))
         current_browser = self.get_current_browser()
@@ -240,7 +240,7 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Закрываем вкладку
+    # Закрываем вкладку
     def close_tab(self, index):
         if len(self.tabs) > 1:
             self.tab_widget.removeTab(index)
@@ -250,14 +250,14 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Смена вкладки
+    # Смена вкладки
     def get_current_browser(self):
         current_widget = self.tab_widget.currentWidget()
         return current_widget if isinstance(current_widget, QWebEngineView) else None
 
 
 
-    #Кнопка <-
+    # Кнопка <-
     def go_back(self):
         browser = self.get_current_browser()
         if browser:
@@ -265,7 +265,7 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Кнопка ->
+    # Кнопка ->
     def go_forward(self):
         browser = self.get_current_browser()
         if browser:
@@ -273,7 +273,7 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Кнопка |-> (обновить)
+    # Кнопка |-> (обновить)
     def refresh_page(self):
         browser = self.get_current_browser()
         if browser:
@@ -281,7 +281,7 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Загружаем ссылку
+    # Загружаем ссылку
     def load_url(self, url):
         browser = self.get_current_browser()
         if browser:
@@ -291,7 +291,7 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Загружаем файл
+    # Загружаем файл
     def load_file(self, file_path):
         path = Path(file_path)
         if path.exists():
@@ -308,7 +308,7 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Загружаем HTML код из переменной
+    # Загружаем HTML код из переменной
     def load_html(self, html_content):
         browser = self.get_current_browser()
         if browser:
@@ -316,7 +316,7 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Загружаем ссылку из адресной строки
+    # Загружаем ссылку из адресной строки
     def load_from_address_bar(self):
         text = self.address_bar.text().strip()
         if not text:
@@ -329,11 +329,11 @@ class BrowserWindow(QMainWindow):
 
 
 
-    #Обновляем адресную строку и заголовок вкладки
+    # Обновляем адресную строку и заголовок вкладки
     def on_url_changed(self, url):
         self.address_bar.setText(url.toString())
 
-        #Обновляем название вкладки
+        # Обновляем название вкладки
         browser = self.get_current_browser()
         if browser:
             title = browser.page().title()
@@ -341,17 +341,17 @@ class BrowserWindow(QMainWindow):
                 title = url.toString()
 
             current_index = self.tab_widget.currentIndex()
-            self.tab_widget.setTabText(current_index, title[:30])  # Обрезаем название
+            self.tab_widget.setTabText(current_index, title[:30])  #  Обрезаем название
 
 
 
-    #Применяем тему
+    # Применяем тему
     def apply_theme(self, theme_name):
         global theme
         theme = theme[theme_name]
         self.current_theme = theme_name
 
-        #CSS стили для интерфейса
+        # CSS стили для интерфейса
         style_sheet = f"""
         QMainWindow {{
             background-color: {theme["bg"]};
@@ -398,8 +398,8 @@ class BrowserWindow(QMainWindow):
 
 
 
-#Если file=True, url рассматривается как путь к файлу
-#html - HTML код для отображения в строковой переменной
+# Если file=True, url рассматривается как путь к файлу
+# html - HTML код для отображения в строковой переменной
 def B(url="https://duckduckgo.com", file=False, html=False, run_in_recovery=False, debug_mode=False):
     if debug_mode:
         logger.debug(f"B -{l("browser_called")} : url={url}, file={file}, html={html}, run_in_recovery={run_in_recovery}")

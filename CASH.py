@@ -1,12 +1,12 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
 from tkinter import messagebox
 from languages import l
@@ -18,7 +18,7 @@ except:
 import sys
 import os
 
-#Импорт Компонентов
+# Импорт Компонентов
 try:
     from AP import AP
 except:
@@ -174,11 +174,11 @@ except:
     def UM(a=None, b=None):
         pass
 
-crowbar_antivirus_scripts_handler_version = "0.4.6 Beta"
+crowbar_antivirus_scripts_handler_version = "0.4.7 Beta"
 
 current_theme = theme[default_theme]
 
-#Получаем настройки скрипта
+# Получаем настройки скрипта
 def get_script_config(code):
     config = {
         "delete_script_after_exec": False,
@@ -186,12 +186,12 @@ def get_script_config(code):
         "enable_while": False,
     }
 
-    #Ищем строки с переменными конфигурации
+    # Ищем строки с переменными конфигурации
     for line in code.split("\n"):
         line = line.strip()
 
-        #Пропускаем комментарии и пустые строки
-        if not line or line.startswith("#"):
+        # Пропускаем комментарии и пустые строки
+        if not line or line.startswith("# "):
             continue
 
         if "delete_script_after_exec" in line and "=" in line:
@@ -215,8 +215,8 @@ def get_script_config(code):
             except:
                 pass
 
-        #Выходим, если начался код скрипта
-        if line and not line.startswith("#") and not any(var in line for var in
+        # Выходим, если начался код скрипта
+        if line and not line.startswith("# ") and not any(var in line for var in
             ["delete_script_after_exec", "launch_when_program_starts", "enable_while", "valid_version"]):
             break
 
@@ -227,13 +227,13 @@ def get_script_config(code):
 def CASH(run_in_recovery, debug_mode=False):
     while True:
         if len(sys.argv) > 1:
-            #Был передан файл
+            # Был передан файл
             file_path = sys.argv[1]
             if debug_mode:
                 logger.debug(f"CASH - {l("file_transferred")}: {file_path}")
-            #Получаем расширение файла
+            # Получаем расширение файла
             _, file_extension = os.path.splitext(file_path)
-            f_e = file_extension.lower() #Преобразуем в нижний регистр
+            f_e = file_extension.lower() # Преобразуем в нижний регистр
             if f_e == ".txt" or f_e == ".md" or f_e == ".py":
                 FE(file_path)
                 break
@@ -246,7 +246,7 @@ def CASH(run_in_recovery, debug_mode=False):
                         with open(file_path, "r", encoding="cp1251") as script:
                             code = script.read()
                     except UnicodeDecodeError:
-                        #Попытка с игнорированием ошибок
+                        # Попытка с игнорированием ошибок
                         with open(file_path, "r", encoding="utf-8", errors="ignore") as script:
                             code = script.read()
 
@@ -257,9 +257,9 @@ def CASH(run_in_recovery, debug_mode=False):
                 if debug_mode:
                     logger.debug(f"CASH - {l("script_config")}: {config}")
 
-                #Создаём контекст выполнения с доступными функциями программы
+                # Создаём контекст выполнения с доступными функциями программы
                 exec_globals = {
-                    #"__builtins__": __builtins__,
+                    # "__builtins__": __builtins__,
                     "logger": logger,
                     "sys": sys,
                     "os": os,
@@ -280,7 +280,7 @@ def CASH(run_in_recovery, debug_mode=False):
                     "FM": FM,
                     "FR": FR,
                     "GFA": GFA,
-                    #OF
+                    # OF
                     "Psutil": Psutil,
                     "run_component": run_component,
                     "apply_global_theme": apply_global_theme,
@@ -308,7 +308,7 @@ def CASH(run_in_recovery, debug_mode=False):
                     logger.exception(f"CASH - {l("exec_script_error")} {file_path}")
                     messagebox.showerror(RS(), f"{l("exec_script_error")}:\n{e}")
 
-                #Используем полученную конфигурацию
+                # Используем полученную конфигурацию
                 delete_script_after_exec = config["delete_script_after_exec"]
                 launch_when_program_starts = config["launch_when_program_starts"]
                 enable_while = config["enable_while"]
@@ -321,17 +321,17 @@ def CASH(run_in_recovery, debug_mode=False):
                     except:
                         logger.exception(f"CASH - {l("script_deleted_error")}: {file_path}")
 
-                #Выходим из цикла
+                # Выходим из цикла
                 if not enable_while:
                     break
-                #Если enable_while=True, цикл продолжится и скрипт выполнится снова
+                # Если enable_while=True, цикл продолжится и скрипт выполнится снова
                 if not enable_while:
                     logger.success(f"CASH - {l("execution_completed")}.")
             else:
                 messagebox.showwarning(RS(), l("command_not_found_for_file"))
                 break
         else:
-            break #Выход, если файл не был передан
+            break # Выход, если файл не был передан
 
 if __name__ == "__main__":
     CASH(False, True)

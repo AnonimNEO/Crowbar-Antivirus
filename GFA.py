@@ -1,12 +1,12 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
 from tkinter import messagebox
 try:
@@ -17,13 +17,13 @@ except:
 import subprocess
 import os
 
-#from RS import RS
+# from RS import RS
 from languages import l
 from config import current_localization
 
-get_full_access_version = "0.4.6 Alpha"
+get_full_access_version = "0.4.7 Alpha"
 
-#Проверяем, является ли путь ключом реестра
+# Проверяем, является ли путь ключом реестра
 def is_registry_path(path):
     registry_prefixes = [
         "HKEY_LOCAL_MACHINE", "HKLM",
@@ -36,7 +36,7 @@ def is_registry_path(path):
 
 
 
-#Устанавливаем полные права на файл или каталог
+# Устанавливаем полные права на файл или каталог
 def grant_file_access(path, username):
     if not os.path.exists(path):
         logger.error(f"GFA - {l("not_dir")}: {path}")
@@ -59,7 +59,7 @@ def grant_file_access(path, username):
 
 
 
-#Устанавливаем полные права на ключ реестра
+# Устанавливаем полные права на ключ реестра
 def grant_registry_access(path, full_username):
     try:
         import win32security
@@ -73,7 +73,7 @@ def grant_registry_access(path, full_username):
     try:
         registry_path = normalize_registry_path(path)
 
-        #Разбираем путь на корневой ключ и под-путь
+        # Разбираем путь на корневой ключ и под-путь
         parts = registry_path.split("\\", 1)
         root_key_name = parts[0].upper()
         subkey_path = parts[1] if len(parts) > 1 else ""
@@ -87,12 +87,12 @@ def grant_registry_access(path, full_username):
         }
 
         if root_key_name not in root_keys:
-            #logger.error(f"GFA - Неизвестный ключ реестра: {root_key_name}")
+            # logger.error(f"GFA - Неизвестный ключ реестра: {root_key_name}")
             return False
 
         root_key = root_keys[root_key_name]
 
-        #Открываем ключ с доступом администратора
+        # Открываем ключ с доступом администратора
         try:
             key = winreg.OpenKey(root_key, subkey_path, 0, winreg.KEY_ALL_ACCESS)
         except PermissionError:
@@ -102,7 +102,7 @@ def grant_registry_access(path, full_username):
             logger.error(f"GFA - {l("key_not_found")}: {registry_path}")
             return False
 
-        #Получаем SID пользователя
+        # Получаем SID пользователя
         try:
             sid = win32security.LookupAccountName(None, full_username)[0]
         except Exception as e:
@@ -110,7 +110,7 @@ def grant_registry_access(path, full_username):
             winreg.CloseKey(key)
             return False
 
-        #Получаем текущий дескриптор безопасности из ключа реестра
+        # Получаем текущий дескриптор безопасности из ключа реестра
         try:
             sec_desc = win32security.GetSecurityInfo(
                 int(key),
@@ -122,7 +122,7 @@ def grant_registry_access(path, full_username):
             winreg.CloseKey(key)
             return False
 
-        #Получаем текущий DACL
+        # Получаем текущий DACL
         try:
             dacl = sec_desc.GetSecurityDescriptorDacl()
         except:
@@ -131,11 +131,11 @@ def grant_registry_access(path, full_username):
         if dacl is None:
             dacl = win32security.ACL()
 
-        #Добавляем полные права (GENERIC_ALL) для пользователя, используем константы из ntsecuritycon
+        # Добавляем полные права (GENERIC_ALL) для пользователя, используем константы из ntsecuritycon
         try:
             dacl.AddAccessAllowedAceEx(
                 win32security.ACL_REVISION,
-                con.CONTAINER_INHERIT_ACE | con.OBJECT_INHERIT_ACE,  # Правильные флаги наследования
+                con.CONTAINER_INHERIT_ACE | con.OBJECT_INHERIT_ACE,  #  Правильные флаги наследования
                 con.GENERIC_ALL,
                 sid
             )
@@ -144,7 +144,7 @@ def grant_registry_access(path, full_username):
             winreg.CloseKey(key)
             return False
 
-        #Устанавливаем новый DACL через дескриптор ключа
+        # Устанавливаем новый DACL через дескриптор ключа
         try:
             sec_desc.SetSecurityDescriptorDacl(1, dacl, 0)
             win32security.SetSecurityInfo(
@@ -189,11 +189,17 @@ def normalize_registry_path(path):
 
 
 
-#Получаем полные права на файл, каталог или ключ реестра
+# Получаем полные права на файл, каталог или ключ реестра
 def GFA(path, run_in_recovery=False):
-    #if run_in_recovery:
-    #    messagebox.showwarning(RS(), "Невозможно получить права в среде восстановления.")
-    #    return False
+    """
+    Универсальная функция для получения полных прав на каталог, файл или ключ реестра
+    path - путь к каталогу, файлу или ключ реестра
+    run_in_recovery - Код работает в среде восстановления? Тогда True
+    return - False при ошибке, True при удачном завершении операции
+    """
+    # if run_in_recovery:
+    #     messagebox.showwarning(RS(), "Невозможно получить права в среде восстановления.")
+    #     return False
 
     try:
         username = os.getenv("USERNAME")

@@ -1,36 +1,36 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-#Вставка картинок
-#from PIL import Image, ImageTk
-#Графический Интерфейс
+# Вставка картинок
+# from PIL import Image, ImageTk
+# Графический Интерфейс
 from tkinter import messagebox
 import tkinter as tk
-#Логирование Ошибок
+# Логирование Ошибок
 try:
     from OF import Logger
     logger = Logger()
 except:
     from loguru import logger
-#Обращение к веб-браузеру
+# Обращение к веб-браузеру
 import webbrowser
-#Обращение к Системным Командам и Значениям
+# Обращение к Системным Командам и Значениям
 import os
 
-#Импорт Компонентов
+# Импорт Компонентов
 from config import *
 from languages import l
 from RS import RS
 
 global about_program_version
-about_program_version = "0.3.6 Beta"
+about_program_version = "0.3.7 Beta"
 image_references = {}
 er = l("error")
 
@@ -60,42 +60,42 @@ def AP(autorun_master_version=er,
        unlock_all_version=er,
        users_manager_version=er):
     try:
-        #Загрузка изображений
+        # Загрузка изображений
         def load_images(master):
-            image_labels_container = [] #Список для хранения ссылок на метки изображений
-            image_files = [] #Список найденных файлов изображений
+            image_labels_container = [] # Список для хранения ссылок на метки изображений
+            image_files = [] # Список найденных файлов изображений
 
-            #Проверяем существование каталога
+            # Проверяем существование каталога
             if not os.path.isdir(images_path):
                 return image_labels_container
 
-            #Получаем список файлов в каталоге
+            # Получаем список файлов в каталоге
             try:
                 image_files = [f for f in os.listdir(images_path) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
             except Exception as e:
                 logger.exception(f"AP - {l("read_dir_error")} {images_path}")
                 return image_labels_container
 
-            #Проверяем наличие файлов
+            # Проверяем наличие файлов
             if not image_files:
                 return image_labels_container
 
-            #Если каталог существует и файлы найдены, создаем фрейм для них
+            # Если каталог существует и файлы найдены, создаем фрейм для них
             image_frame = tk.Frame(master, bg="black")
             image_frame.pack(pady=20)
 
-            #Загружаем изображения и создаем метки
+            # Загружаем изображения и создаем метки
             for image_file in image_files:
                 img_path = os.path.join(images_path, image_file)
                 try:
                     img = Image.open(img_path)
-                    #Изменение размера изображения
+                    # Изменение размера изображения
                     img.thumbnail((100, 100))
                     img_tk = ImageTk.PhotoImage(img)
 
-                    #Используем image_frame для создания Label
+                    # Используем image_frame для создания Label
                     label = tk.Label(image_frame, image=img_tk, bg="black")
-                    #Сохраняем ссылку на ImageTk.PhotoImage, чтобы избежать сборки мусора
+                    # Сохраняем ссылку на ImageTk.PhotoImage, чтобы избежать сборки мусора
                     image_references[img_path] = img_tk
 
                     label.pack(side=tk.LEFT, padx=5)
@@ -103,9 +103,9 @@ def AP(autorun_master_version=er,
 
                 except Exception as e:
                     logger.exception(f"AP - {l("read_image_error")} {image_file}")
-                    continue #если одно изображение не загрузилось, продолжаем с другими
+                    continue # если одно изображение не загрузилось, продолжаем с другими
 
-            return image_labels_container #Возвращаем список загруженных меток, чтобы знать, создался ли фрейм
+            return image_labels_container # Возвращаем список загруженных меток, чтобы знать, создался ли фрейм
 
 
 
@@ -171,7 +171,7 @@ def AP(autorun_master_version=er,
             donate_window.configure(bg="black")
             donate_window.resizable(False, False)
 
-            #Создаем фрейм для центрирования элементов
+            # Создаем фрейм для центрирования элементов
             frame = tk.Frame(donate_window, bg="black")
             frame.pack(expand=True, padx=20, pady=20)
 
@@ -195,7 +195,7 @@ def AP(autorun_master_version=er,
         about_window.title(RS())
         about_window.configure(bg="black")
 
-        #Текст
+        # Текст
         label = tk.Label(about_window, text=l("about_program_text"), bg="black", fg="white", font=("ComicSans", 16))
         label.pack(pady=20)
 

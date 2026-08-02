@@ -1,12 +1,12 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
@@ -25,7 +25,7 @@ from languages import l
 from RS import RS
 import config
 
-crowbar_console_version = "0.1.6 Pre-Alpha"
+crowbar_console_version = "0.1.7 Pre-Alpha"
 
 class CrowbarConsole:
     def __init__(self, globals_dict=None, debug_mode=False):
@@ -39,12 +39,12 @@ class CrowbarConsole:
         self.CC_GUI.title(RS())
         self.CC_GUI.geometry("650x400")
 
-        #Вывод консоли
+        # Вывод консоли
         self.output_text = scrolledtext.ScrolledText(
             self.CC_GUI,
             wrap=tk.WORD,
-            bg="#1e1e1e",
-            fg="#00ff00",
+            bg="# 1e1e1e",
+            fg="# 00ff00",
             font=("Default", 10),
             height=20
         )
@@ -55,17 +55,17 @@ class CrowbarConsole:
 
         self.output_text.config(state=tk.DISABLED)
 
-        #Поле ввода
+        # Поле ввода
         input_frame = tk.Frame(self.CC_GUI)
         input_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        tk.Label(input_frame, text=">>>", fg="#00ff00", bg="black").pack(side=tk.LEFT, padx=5)
+        tk.Label(input_frame, text=">>>", fg="# 00ff00", bg="black").pack(side=tk.LEFT, padx=5)
 
         self.input_entry = tk.Entry(
             input_frame,
             font=("Default", 10),
-            bg="#1e1e1e",
-            fg="#00ff00",
+            bg="# 1e1e1e",
+            fg="# 00ff00",
             insertbackground="black"
         )
         self.input_entry.pack(fill=tk.X, expand=True, padx=5)
@@ -93,20 +93,20 @@ class CrowbarConsole:
             self.output_text.config(state=tk.DISABLED)
             return
 
-        #Вывод команды
+        # Вывод команды
         self.output_text.config(state=tk.NORMAL)
         self.output_text.insert(tk.END, f"> {command}\n")
         self.output_text.config(state=tk.DISABLED)
 
         try:
-            #Перенаправляем stdout для захвата print
+            # Перенаправляем stdout для захвата print
             old_stdout = sys.stdout
             sys.stdout = StringIO()
 
-            #Выполняем команду
+            # Выполняем команду
             exec(command, self.globals_dict)
 
-            #Получаем вывод
+            # Получаем вывод
             output = sys.stdout.getvalue()
             sys.stdout = old_stdout
 
@@ -131,7 +131,7 @@ class CrowbarConsole:
         finally:
             sys.stdout = old_stdout
 
-        #Прокручиваем в конец
+        # Прокручиваем в конец
         self.output_text.config(state=tk.NORMAL)
         self.output_text.see(tk.END)
         self.output_text.config(state=tk.DISABLED)

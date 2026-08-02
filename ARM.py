@@ -1,29 +1,29 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
+# Интерфейс
 from tkinter import ttk, Menu, messagebox, simpledialog
 import tkinter as tk
-#Дата и Время
+# Дата и Время
 from datetime import datetime
-#Логирование Ошибок
+# Логирование Ошибок
 try:
     from OF import Logger
     logger = Logger()
 except:
     from loguru import logger
-#Переменные среды
+# Переменные среды
 from pathlib import Path
-#Работа с реестром
+# Работа с реестром
 import winreg
-#Работа с файлами и ОС
+# Работа с файлами и ОС
 import xml.etree.ElementTree as ET
 import win32com.client
 import os
@@ -36,12 +36,12 @@ from languages import l
 from PM import action_process_by_name
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-autorun_master_version = "3.7.16 Beta"
+autorun_master_version = "3.7.17 Beta"
 
-#Класс для взаимодействия с Планировщиком Задач в обычной среде
+# Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
     def __init__(self):
-        #Инициализация COM-объекта Планировщика Задач
+        # Инициализация COM-объекта Планировщика Задач
         try:
             self.scheduler = win32com.client.Dispatch("Schedule.Service")
             self.scheduler.Connect()
@@ -52,7 +52,7 @@ class TaskSchedulerManager:
             logger.exception(f"ARM - {l("scheduler_error")}")
             messagebox.showerror(RS(), f"{l("scheduler_error")}.\n{e}")
 
-    #Функция для получения каталога задач
+    # Функция для получения каталога задач
     def get_folder(self, task_path):
         folder_path = os.path.dirname(task_path)
         if not folder_path:
@@ -63,22 +63,22 @@ class TaskSchedulerManager:
         except Exception:
             return None
 
-    #Вспомогательная функция для обхода всех задач в каталоге
+    # Вспомогательная функция для обхода всех задач в каталоге
     def traverse_folder(self, folder, all_tasks):
         if not folder:
             return
 
-        #Получаем задачи в текущем каталоге
+        # Получаем задачи в текущем каталоге
         tasks = folder.GetTasks(0)
         for task in tasks:
             all_tasks.append(task)
 
-        #Рекурсивно обходим подкаталоги
+        # Рекурсивно обходим подкаталоги
         subfolders = folder.GetFolders(0)
         for subfolder in subfolders:
             self.traverse_folder(subfolder, all_tasks)
 
-    #Получает список всех задач через COM-интерфейс
+    # Получает список всех задач через COM-интерфейс
     def get_all_tasks(self):
         if not self.root_folder:
             return []
@@ -87,7 +87,7 @@ class TaskSchedulerManager:
         self.traverse_folder(self.root_folder, all_com_tasks)
         return all_com_tasks
 
-    #Включает или отключает задачу через COM
+    # Включает или отключает задачу через COM
     def set_task_state_com(self, task_path_full, enable):
         if not self.scheduler:
             return False
@@ -111,7 +111,7 @@ class TaskSchedulerManager:
             logger.exception(f"ARM - {l("edit_task_error")} {task_path_full}")
             return False
 
-    #Удаляет задачу через COM
+    # Удаляет задачу через COM
     def delete_task_com(self, task_path_full):
         if not self.scheduler:
             return False
@@ -138,10 +138,10 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         winreg.REG_NONE: "REG_NONE"
     }
 
-    #Обратное соответствие
+    # Обратное соответствие
     REG_TYPE_MAP_REV = {v: k for k, v in REG_TYPE_MAP.items()}
 
-    #Список для диалога "Создать"
+    # Список для диалога "Создать"
     CREATABLE_REG_TYPES = ["REG_SZ", "REG_EXPAND_SZ", "REG_MULTI_SZ", "REG_DWORD", "REG_QWORD", "REG_BINARY"]
 
     ARM_GUI_ELEMENTS = {
@@ -155,14 +155,14 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         "focus_after_update": None
     }
 
-    #Путь к каталогу автозагрузки пользователя
+    # Путь к каталогу автозагрузки пользователя
     if run_in_recovery:
         current_disc, found_disc = get_current_disc(run_in_recovery)
         if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
             user_name = simpledialog.askstring(title=RS(), prompt=f"{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}: ")
         else:
             user_name = default_user_name
-        #Путь к каталогу автозагрузки оффлайн-системы
+        # Путь к каталогу автозагрузки оффлайн-системы
         user_startup_path_str = f"{current_disc}\\Users\\{user_name}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"
         user_startup = Path(user_startup_path_str)
     else:
@@ -176,7 +176,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     ARM_CORE_GLOBALS = {
         "user_startup_path": user_startup,
         "REG_KEYS": {
-            l("custom"): None, #Для файлов
+            l("custom"): None, # Для файлов
             l("registry"): [
                 (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Run", "Run"),
                 (winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\RunOnce", "RunOnce"),
@@ -205,7 +205,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", "EnableCursorSuppression"),
             ]
         },
-        #Добавляем карту для преобразования констант HKEY_ в строки
+        # Добавляем карту для преобразования констант HKEY_ в строки
         "HKEY_MAP": {
             winreg.HKEY_CLASSES_ROOT: "HKEY_CLASSES_ROOT",
             winreg.HKEY_CURRENT_USER: "HKEY_CURRENT_USER",
@@ -215,14 +215,14 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         },
         "OFFLINE_HKEY_MAP": {
             winreg.HKEY_LOCAL_MACHINE: (winreg.HKEY_LOCAL_MACHINE, loaded_hive_names["SOFTWARE"], r"Software"),
-            #Для ключей, начинающихся с HKLM\Software
-            #Ключи, не начинающиеся с HKLM\Software, не будут работать
+            # Для ключей, начинающихся с HKLM\Software
+            # Ключи, не начинающиеся с HKLM\Software, не будут работать
             winreg.HKEY_CURRENT_USER: (winreg.HKEY_LOCAL_MACHINE, loaded_hive_names["USER"], None)
         }
     }
 
     try:
-        #Форматируем Unix-таймштамп в читаемую строку
+        # Форматируем Unix-таймштамп в читаемую строку
         def format_time(timestamp):
             if timestamp == 0:
                 return l("error")
@@ -230,7 +230,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #В зависимости от вкладки и типа элемента возвращает имя файла или путь
+        # В зависимости от вкладки и типа элемента возвращает имя файла или путь
         def get_filename_from_item(item_data, current_tab):
             if current_tab == l("custom"):
                 return item_data.get(f"{l("name")} {l("file2")}", "")
@@ -243,7 +243,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Получаем автозагрузку пользователя
+        # Получаем автозагрузку пользователя
         def get_user_startup(ARM_CORE_GLOBALS):
             user_startup_path = ARM_CORE_GLOBALS["user_startup_path"]
             ARM_data = []
@@ -276,10 +276,10 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Получаем данные из заданного ключа реестра
+        # Получаем данные из заданного ключа реестра
         def read_registry_key(ARM_CORE_GLOBALS, hkey_const, subkey_path, value_name=None):
-            #Если value_name = None, читает все значения в ключе
-            #Если value_name указано, читает только это значение
+            # Если value_name = None, читает все значения в ключе
+            # Если value_name указано, читает только это значение
             hkey_map = ARM_CORE_GLOBALS["HKEY_MAP"]
             ARM_data = []
 
@@ -406,7 +406,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Получаем данные из ключей Run и RunOnce пользователя
+        # Получаем данные из ключей Run и RunOnce пользователя
         def get_registry_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
             ARM_data = []
@@ -416,7 +416,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Получаем значения из Winlogon
+        # Получаем значения из Winlogon
         def get_system_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
             ARM_data = []
@@ -426,7 +426,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Получаем значения параметров AppInit_DLLs и LoadAppInit_DLLs
+        # Получаем значения параметров AppInit_DLLs и LoadAppInit_DLLs
         def get_dll_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
             ARM_data = []
@@ -436,7 +436,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Получаем значения параметров для вкладки CmdLine
+        # Получаем значения параметров для вкладки CmdLine
         def get_cmdline_startup(ARM_CORE_GLOBALS):
             reg_keys = ARM_CORE_GLOBALS["REG_KEYS"]
             ARM_data = []
@@ -446,7 +446,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Создаём новый параметр реестра
+        # Создаём новый параметр реестра
         def create_reg_value(hkey_const, subkey_path, name, reg_type_str, ARM_GUI_ELEMENTS):
             reg_type = REG_TYPE_MAP_REV.get(reg_type_str)
             if reg_type is None:
@@ -485,7 +485,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Обновляем существующий параметр реестра
+        # Обновляем существующий параметр реестра
         def update_reg_value(hkey_const, subkey_path, name, new_value, reg_type, item_id, ARM_GUI_ELEMENTS):
             if run_in_recovery:
                 final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
@@ -494,12 +494,12 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 final_subkey = subkey_path
 
             try:
-                #Преобразование значения в нужный тип
+                # Преобразование значения в нужный тип
                 if reg_type in (winreg.REG_DWORD, winreg.REG_QWORD):
                     try:
                         value_to_set = int(new_value)
                     except ValueError:
-                        #raise ValueError(f"ARM - Некорректное числовое значение для типа {REG_TYPE_MAP.get(reg_type, 'неизвестный')}")
+                        # raise ValueError(f"ARM - Некорректное числовое значение для типа {REG_TYPE_MAP.get(reg_type, 'неизвестный')}")
                         pass
 
                 elif reg_type == winreg.REG_MULTI_SZ:
@@ -513,7 +513,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
                         value_to_set = bytes.fromhex(hex_string)
                     except ValueError as e:
-                        #raise ValueError(f"ARM - Некорректная шестнадцатеричная строка для REG_BINARY.\n{e}")
+                        # raise ValueError(f"ARM - Некорректная шестнадцатеричная строка для REG_BINARY.\n{e}")
                         pass
 
                 else:
@@ -539,7 +539,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Удаляем параметр реестра
+        # Удаляем параметр реестра
         def delete_reg_value(hkey_const, subkey_path, name, item_id, ARM_GUI_ELEMENTS):
             if run_in_recovery:
                 final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
@@ -564,7 +564,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Удаляем файл
+        # Удаляем файл
         def delete_file(file_path, file_name):
             file = Path(file_path)
             try:
@@ -588,17 +588,17 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Вспомогательная функция для получения пути к папке задач
+        # Вспомогательная функция для получения пути к папке задач
         def get_tasks_directory():
-            #Если режим восстановления - используем букву вмонтированного диска
+            # Если режим восстановления - используем букву вмонтированного диска
             if run_in_recovery:
                 return Path(f"{current_disc}Windows\\System32\\Tasks")
-            #Если обычная система - берем системный путь через переменную окружения
+            # Если обычная система - берем системный путь через переменную окружения
             return Path(os.environ.get("SystemRoot", "C:\\Windows")) / "System32" / "Tasks"
 
 
 
-        #Вспомогательная функция для удаления пространства имен из тегов XML
+        # Вспомогательная функция для удаления пространства имен из тегов XML
         def strip_namespace(tag):
             if "}" in tag:
                 return tag.split("}", 1)[1]
@@ -606,10 +606,10 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Сохраняем кодировки UTF-16
+        # Сохраняем кодировки UTF-16
         def save_xml_task(tree, file_path):
             try:
-                #Windows Tasks часто требуют UTF-16 LE и BOM
+                # Windows Tasks часто требуют UTF-16 LE и BOM
                 with open(file_path, "wb") as f:
                     tree.write(f, encoding="utf-16", xml_declaration=True)
                 return True
@@ -619,7 +619,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Получаем Автозагрузку из Планировщика Задач (Универсальный метод через XML ИЛИ COM)
+        # Получаем Автозагрузку из Планировщика Задач (Универсальный метод через XML ИЛИ COM)
         def get_task_scheduler_startup():
             ARM_data = []
 
@@ -629,27 +629,27 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
                 for task in com_tasks:
                     try:
-                        #Получаем полный путь задачи
+                        # Получаем полный путь задачи
                         full_path = task.Path
                         name = os.path.basename(full_path)
                         is_enabled = task.Enabled
 
-                        #Попытка получить действие (Command)
+                        # Попытка получить действие (Command)
                         action_path = f"{l("no")} ExecAction"
                         definition = task.Definition
 
                         for action in definition.Actions:
-                            #TASK_ACTION_EXEC = 0 (константа COM)
+                            # TASK_ACTION_EXEC = 0 (константа COM)
                             if action.Type == 0:
                                 cmd = action.Path
                                 args = action.Arguments
                                 action_path = f"{cmd} {args}".strip()
                                 break
 
-                        #Получаем автора
+                        # Получаем автора
                         author = definition.RegistrationInfo.Author
 
-                        #Получаем дату создания
+                        # Получаем дату создания
                         try:
                             date_created = str(task.Definition.RegistrationInfo.Date)
                         except Exception:
@@ -659,7 +659,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                         if task.Definition.Actions.Count > 0:
                             action = task.Definition.Actions.Item(1)
                             if action.Type == 0:
-                                #Извлекаем путь к исполняемому файлу из свойства Path самого действия
+                                # Извлекаем путь к исполняемому файлу из свойства Path самого действия
                                 raw_path = getattr(action, "Path", l("unknown"))
                                 if raw_path != l("unknown"):
                                     action_path = os.path.abspath(raw_path)
@@ -698,18 +698,18 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                         file_path = Path(root) / file_name
 
                         try:
-                            #Парсим XML файл
+                            # Парсим XML файл
                             tree = ET.parse(file_path)
                             xml_root = tree.getroot()
 
-                            #Инициализируем переменные по умолчанию
+                            # Инициализируем переменные по умолчанию
                             name = file_name
-                            is_enabled = True #По умолчанию задачи включены, если тег отсутствует
+                            is_enabled = True # По умолчанию задачи включены, если тег отсутствует
                             action_path = f"{l("no")} ExecAction"
                             author = f"{l("systems")}/{l("unknown")}"
 
-                            #Проходим по дереву XML
-                            #Так как namespace может меняться, ищем локальные имена тегов
+                            # Проходим по дереву XML
+                            # Так как namespace может меняться, ищем локальные имена тегов
                             for elem in xml_root.iter():
                                 tag = strip_namespace(elem.tag)
 
@@ -717,12 +717,12 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                                     author = elem.text if elem.text else author
 
                                 elif tag == "Enabled":
-                                    #Если текст "false", то задача выключена
+                                    # Если текст "false", то задача выключена
                                     if elem.text and elem.text.lower() == "false":
                                         is_enabled = False
 
                                 elif tag == "Command":
-                                    #Ищем исполняемую команду
+                                    # Ищем исполняемую команду
                                     action_path = elem.text if elem.text else action_path
 
                                 elif tag == "Arguments":
@@ -741,19 +741,19 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
                                     if cmd_text:
                                         action_path = f"{cmd_text} {arg_text}".strip()
-                                        break #Берем первое действие
+                                        break # Берем первое действие
 
                             ARM_data.append({
                                 l("name"): name,
                                 l("state"): l("on") if is_enabled else l("off"),
                                 l("path"): action_path,
                                 l("author"): author,
-                                "TaskPath": str(file_path), #Полный путь к файлу XML
+                                "TaskPath": str(file_path), # Полный путь к файлу XML
                                 "Enabled_raw": is_enabled
                             })
 
                         except ET.ParseError:
-                            #Это не XML или файл поврежден
+                            # Это не XML или файл поврежден
                             continue
                         except:
                             logger.exception(f"ARM - {l("xml_task_error")} {file_name}")
@@ -769,7 +769,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Изменяем состояние задачи (Вкл/Выкл)
+        # Изменяем состояние задачи (Вкл/Выкл)
         def get_task_startup(task_path_str, enable, item_id, ARM_GUI_ELEMENTS):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
@@ -785,7 +785,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     messagebox.showerror(RS(), f"{l("file_not_found")}:\n{task_path}")
                     return False
                 try:
-                    #Регистрируем все пространства имен для сохранения префиксов
+                    # Регистрируем все пространства имен для сохранения префиксов
                     ET.register_namespace('', "http://schemas.microsoft.com/windows/2004/02/mit/task")
                     tree = ET.parse(task_path)
                     root = tree.getroot()
@@ -817,7 +817,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Удаляем задачу из планировщика
+        # Удаляем задачу из планировщика
         def delete_task_scheduler_task(task_path_str, task_name, item_id, ARM_GUI_ELEMENTS):
             if not run_in_recovery:
                 manager = TaskSchedulerManager()
@@ -844,7 +844,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Обработка смены вкладки
+        # Обработка смены вкладки
         def on_tab_change(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
             selected_tab = ARM_GUI_ELEMENTS["notebook"].tab(ARM_GUI_ELEMENTS["notebook"].select(), "text")
             if selected_tab != ARM_GUI_ELEMENTS["current_tab"]:
@@ -854,18 +854,18 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Функция для преобразования типов
+        # Функция для преобразования типов
         def _to_sortable_type(val):
             try:
-                #Попытка преобразовать в число
+                # Попытка преобразовать в число
                 return float(val)
             except (ValueError, TypeError):
-                #Иначе вернуть как строку в нижнем регистре
+                # Иначе вернуть как строку в нижнем регистре
                 return str(val).lower()
 
 
 
-        #Сортируем столбик по клику на заголовок
+        # Сортируем столбик по клику на заголовок
         def sort_treeview_column(ARM_GUI_ELEMENTS, col):
             tree = ARM_GUI_ELEMENTS.get("tree")
             if not tree:
@@ -903,7 +903,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Обработчик события получения фокуса Treeview
+        # Обработчик события получения фокуса Treeview
         def handle_treeview_focus_in(ARM_GUI_ELEMENTS):
             tree = ARM_GUI_ELEMENTS.get("tree")
             if not tree:
@@ -919,7 +919,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Обработчик ПКМ
+        # Обработчик ПКМ
         def handle_right_click(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
             item_id = ARM_GUI_ELEMENTS["tree"].identify_row(event.y)
             ARM_GUI_ELEMENTS["tree"].selection_set(item_id)
@@ -934,7 +934,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Установка столбиков, в зависимости от вкладки
+        # Установка столбиков, в зависимости от вкладки
         def set_treeview_columns(ARM_GUI_ELEMENTS):
             if ARM_GUI_ELEMENTS["tree"] and ARM_GUI_ELEMENTS["tree"].winfo_exists():
                 ARM_GUI_ELEMENTS["tree"].destroy()
@@ -1012,7 +1012,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Восстанавливаем фокус после обновления данных
+        # Восстанавливаем фокус после обновления данных
         def restore_focus_after_update(ARM_GUI_ELEMENTS):
             tree = ARM_GUI_ELEMENTS["tree"]
             focus_info = ARM_GUI_ELEMENTS["focus_after_update"]
@@ -1051,12 +1051,12 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Загружаем данные для активной вкладки и заполняем таблицу
+        # Загружаем данные для активной вкладки и заполняем таблицу
         def load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
             tree = ARM_GUI_ELEMENTS["tree"]
             current_tab = ARM_GUI_ELEMENTS["current_tab"]
 
-            #Очищаем Treeview перед загрузкой новых данных
+            # Очищаем Treeview перед загрузкой новых данных
             for item in tree.get_children():
                 tree.delete(item)
 
@@ -1078,12 +1078,12 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
             elif current_tab == l("scheduler"):
                 raw_tasks = get_task_scheduler_startup()
 
-                #if show_only_with_date.get():
-                #    ARM_GUI_ELEMENTS["treeview_data"] = [
-                #        t for t in raw_tasks
-                #        if t.get(f"{l("date")} {l("creation")}") and t.get(f"{l("date")} {l("creation")}") not in ["", l("error"), "01-01-1970 00:00:00"]
-                #    ]
-                #else:
+                # if show_only_with_date.get():
+                #     ARM_GUI_ELEMENTS["treeview_data"] = [
+                #         t for t in raw_tasks
+                #         if t.get(f"{l("date")} {l("creation")}") and t.get(f"{l("date")} {l("creation")}") not in ["", l("error"), "01-01-1970 00:00:00"]
+                #     ]
+                # else:
                 ARM_GUI_ELEMENTS["treeview_data"] = raw_tasks
 
                 columns = [l("name"), l("state"), l("path"), l("author")]
@@ -1100,7 +1100,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Вспомогательная функция для получения iid ближайшего элемента
+        # Вспомогательная функция для получения iid ближайшего элемента
         def get_next_item_iid(ARM_GUI_ELEMENTS, current_item_id):
             tree = ARM_GUI_ELEMENTS["tree"]
             items = list(tree.get_children(""))
@@ -1117,7 +1117,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Контекстное Меню
+        # Контекстное Меню
         def show_context_menu(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS, item_data, item_id):
             master = ARM_GUI_ELEMENTS["master"]
             current_tab = ARM_GUI_ELEMENTS["current_tab"]
@@ -1210,14 +1210,14 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Копируем текст в буфер обмена
+        # Копируем текст в буфер обмена
         def copy_to_clipboard(master, text):
             master.clipboard_clear()
             master.clipboard_append(text)
 
 
 
-        #Диалог редактирования
+        # Диалог редактирования
         def open_edit_dialog(ARM_GUI_ELEMENTS, item_data, item_id):
             master = ARM_GUI_ELEMENTS["master"]
             name = item_data[f"{l("name")} {l("parameter")}"]
@@ -1242,14 +1242,14 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Подтверждение и удаление файла
+        # Подтверждение и удаление файла
         def confirm_and_delete_file(ARM_GUI_ELEMENTS, file_path, file_name, item_id):
             if delete_file(file_path, file_name):
                 load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
-        #Подтверждение и удаление параметра реестра
+        # Подтверждение и удаление параметра реестра
         def confirm_and_delete_reg_value(ARM_GUI_ELEMENTS, item_data, item_id):
             name = item_data[f"{l("name")} {l("parameter")}"]
             path = item_data[f"{l("path")} {l("parameter")}"]
@@ -1262,7 +1262,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Диалог для создания нового параметра реестра
+        # Диалог для создания нового параметра реестра
         def prompt_for_new_reg_value(ARM_GUI_ELEMENTS, hkey_const, subkey_path, reg_type_str):
             master = ARM_GUI_ELEMENTS["master"]
             name = simpledialog.askstring(
@@ -1276,21 +1276,21 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Подтверждение и изменение состояния задачи планировщика (Выкл или Вкл)
+        # Подтверждение и изменение состояния задачи планировщика (Выкл или Вкл)
         def confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, enable, item_id):
             if get_task_startup(task_path_full, enable, item_id, ARM_GUI_ELEMENTS):
                 load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
-        #Подтверждение и удаление задачи планировщика
+        # Подтверждение и удаление задачи планировщика
         def confirm_and_delete_task(ARM_GUI_ELEMENTS, task_path_full, task_name, item_id):
             if delete_task_scheduler_task(task_path_full, task_name, item_id, ARM_GUI_ELEMENTS):
                 load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
 
 
 
-        #Вспомогательная функция для получения выбранного элемента
+        # Вспомогательная функция для получения выбранного элемента
         def get_selected_item_data(ARM_GUI_ELEMENTS):
             tree = ARM_GUI_ELEMENTS["tree"]
             item_id = tree.focus()
@@ -1305,7 +1305,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Обработчик нажатия клавиш
+        # Обработчик нажатия клавиш
         def handle_key_press(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
             item_id, item_data = get_selected_item_data(ARM_GUI_ELEMENTS)
 
@@ -1369,7 +1369,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Обработчик клавиши Menu
+        # Обработчик клавиши Menu
         def handle_menu_key(event, ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS):
             item_id, item_data = get_selected_item_data(ARM_GUI_ELEMENTS)
 
@@ -1399,7 +1399,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
 
 
-        #Обработчик закрытия окна
+        # Обработчик закрытия окна
         def on_closing():
             ARM_GUI_ELEMENTS["master"].destroy()
 
@@ -1412,7 +1412,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
         apply_global_theme(ARM_GUI, current_theme)
 
-        #show_only_with_date = tk.BooleanVar(value=False)
+        # show_only_with_date = tk.BooleanVar(value=False)
 
         ARM_GUI.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -1420,16 +1420,16 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         ARM_GUI_ELEMENTS["treeview_data"] = []
         ARM_GUI_ELEMENTS["focus_after_update"] = None
 
-        #menubar = tk.Menu(ARM_GUI)
-        #view_menu = tk.Menu(menubar, tearoff=0)
-        #view_menu.add_checkbutton(
-        #    label=l("show_date"),
-        #    variable=show_only_with_date,
-        #    command=lambda: load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
-        #)
+        # menubar = tk.Menu(ARM_GUI)
+        # view_menu = tk.Menu(menubar, tearoff=0)
+        # view_menu.add_checkbutton(
+        #     label=l("show_date"),
+        #     variable=show_only_with_date,
+        #     command=lambda: load_current_tab_data(ARM_GUI_ELEMENTS, ARM_CORE_GLOBALS)
+        # )
 
-        #Пункт "Вид" - Нерабочая фигня (сама сортировка по дате)
-        #menubar.add_cascade(label=l("view"), menu=view_menu)
+        # Пункт "Вид" - Нерабочая фигня (сама сортировка по дате)
+        # menubar.add_cascade(label=l("view"), menu=view_menu)
 
         create_menubar(ARM_GUI, run_in_recovery, debug_mode=debug_mode)
 

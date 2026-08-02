@@ -1,35 +1,35 @@
-#Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
-#Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
-#ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
-#В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
-#ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
-#Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
-#Или в файле COPYING.txt в архиве с установщиком
-#Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
-#Coded by @AnonimNEO (Telegram)
+# Данное Свободное Программное Обеспечение распространяется по лицензии GPL-3.0-only или GPL-3.0-or-later
+# Вы имеете право копировать, изменять, распространять, взимать плату за физический акт передачи копии, и вы можете по своему усмотрению предлагать гарантийную защиту в обмен на плату
+# ДЛЯ ИСПОЛЬЗОВАНИЯ ДАННОГО СВОБОДНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ, ВАМ НЕ ТРЕБУЕТСЯ ПРИНЯТИЕ ЛИЦЕНЗИИ Gnu GPL v3.0 или более поздней версии
+# В СЛУЧАЕ РАСПРОСТРАНЕНИЯ ОРИГИНАЛЬНОЙ ПРОГРАММЫ И/ИЛИ МОДЕРНИЗИРОВАННОЙ ВЕРСИИ И/ИЛИ ИСПОЛЬЗОВАНИЕ ИСХОДНИКОВ В СВОЕЙ ПРОГРАММЕ, ВЫ ОБЯЗАНЫ ЗАДОКУМЕНТИРОВАТЬ ВСЕ ИЗМЕНЕНИЯ В КОДЕ И ПРЕДОСТАВИТЬ ПОЛЬЗОВАТЕЛЯМ ВОЗМОЖНОСТЬ ПОЛУЧИТЬ ИСХОДНИКИ ВАШЕЙ КОПИИ ПРОГРАММЫ, А ТАКЖЕ УКАЗАТЬ АВТОРСТВО ДАННОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ
+# ПРИ РАСПРОСТРАНЕНИИ ПРОГРАММЫ ВЫ ОБЯЗАНЫ ПРЕДОСТАВИТЬ ВСЕ ТЕЖЕ ПРАВА ПОЛЬЗОВАТЕЛЮ ЧТО И МЫ ВАМ, А ТАКЖЕ ЛИЦЕНЗИЯ GPL v3
+# Прочитать полную версию лицензии вы можете по ссылке Фонда Свободного Программного Обеспечения - https://www.gnu.org/licenses/gpl-3.0.html
+# Или в файле COPYING.txt в архиве с установщиком
+# Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
+# Coded by @AnonimNEO (Telegram)
 
-#Интерфейс
+# Интерфейс
 from tkinter import messagebox
 from RS import RS
-#Работа с реестром и списками
+# Работа с реестром и списками
 from typing import Tuple, Any
 import winreg
 import os
-#Логирование
+# Логирование
 try:
     from OF import Logger
     logger = Logger()
 except:
     from loguru import logger
 
-#from OF2 import get_offline_reg_path, loaded_hive_names
+# from OF2 import get_offline_reg_path, loaded_hive_names
 from OF import get_offline_reg_path, loaded_hive_names
 from config import current_localization
 from languages import l
 
-unlock_all_version = "1.2.5 Beta"
+unlock_all_version = "1.2.6 Beta"
 
-#Возвращает безопасное "нулевое" значение для сброса параметра
+# Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
     if reg_type in (winreg.REG_DWORD, winreg.REG_QWORD):
         return 0, reg_type
@@ -43,7 +43,7 @@ def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
 
 
 
-#Восстанавливает шрифты в реестре на основе файлов из C:\Windows\Fonts
+# Восстанавливает шрифты в реестре на основе файлов из C:\Windows\Fonts
 def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
     try:
         fonts_dir = r"C:\Windows\Fonts"
@@ -51,12 +51,12 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
 
         logger.info(f"UA - {l("start_recovery_font")}...")
 
-        #Проверяем наличие каталога шрифтов
+        # Проверяем наличие каталога шрифтов
         if not os.path.isdir(fonts_dir):
             logger.critical(f"UA - {l("font_dir_not_found")}: {fonts_dir}")
             return False
 
-        #Получаем корректный путь в зависимости от среды
+        # Получаем корректный путь в зависимости от среды
         final_hkey, final_subkey = get_offline_reg_path(
             winreg.HKEY_LOCAL_MACHINE,
             registry_key,
@@ -66,7 +66,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
 
         key_handle = None
 
-        #Открываем ключ реестра для чтения и записи
+        # Открываем ключ реестра для чтения и записи
         key_handle = winreg.OpenKey(
             final_hkey,
             final_subkey,
@@ -74,29 +74,29 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
             winreg.KEY_SET_VALUE | winreg.KEY_QUERY_VALUE | winreg.KEY_ENUMERATE_SUB_KEYS
         )
 
-        #Получаем список файлов шрифтов из папки
+        # Получаем список файлов шрифтов из папки
         font_files = os.listdir(fonts_dir)
         supported_extensions = (".ttf", ".otf")
 
         fonts_found = 0
         fonts_restored = 0
 
-        #Обрабатываем каждый файл шрифта
+        # Обрабатываем каждый файл шрифта
         for font_file in font_files:
             if not font_file.lower().endswith(supported_extensions):
                 continue
 
             fonts_found += 1
-            #font_path = os.path.join(fonts_dir, font_file)
+            # font_path = os.path.join(fonts_dir, font_file)
 
             try:
-                #Формируем имя параметра в реестре
+                # Формируем имя параметра в реестре
                 font_name = os.path.splitext(font_file)[0]
 
-                #Проверяем, есть ли уже такой параметр
+                # Проверяем, есть ли уже такой параметр
                 try:
                     current_value = winreg.QueryValueEx(key_handle, font_name)[0]
-                    #Если значение пустое или не указывает на реальный файл, обновляем
+                    # Если значение пустое или не указывает на реальный файл, обновляем
                     if not current_value or not current_value.endswith(font_file):
                         winreg.SetValueEx(key_handle, font_name, 0, winreg.REG_SZ, font_file)
                         fonts_restored += 1
@@ -106,7 +106,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
                             logger.debug(f'UA - {l("font")} "{font_name}" {l("restored")}.')
 
                 except FileNotFoundError:
-                    #Параметра нет в реестре, добавляем его
+                    # Параметра нет в реестре, добавляем его
                     winreg.SetValueEx(key_handle, font_name, 0, winreg.REG_SZ, font_file)
                     fonts_restored += 1
                     logger.success(f'UA - {l("font")} "{font_name}" {l("add_in_registry")}.')
@@ -114,7 +114,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
             except Exception as e:
                 logger.exception(f'UA -  "{font_file}"')
 
-        #Удаляем записи о шрифтах, которых нет в каталоге
+        # Удаляем записи о шрифтах, которых нет в каталоге
         orphaned_count = 0
         try:
             i = 0
@@ -122,7 +122,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
                 try:
                     param_name, param_value, _ = winreg.EnumValue(key_handle, i)
 
-                    #Проверяем, существует ли указанный файл
+                    # Проверяем, существует ли указанный файл
                     if isinstance(param_value, str):
                         font_file_in_registry = os.path.basename(param_value)
                         full_path = os.path.join(fonts_dir, font_file_in_registry)
@@ -157,45 +157,45 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
 
 
 
-#Сбрасывает указанные параметры в разделе реестра с учетом оффлайн-режима
+# Сбрасывает указанные параметры в разделе реестра с учетом оффлайн-режима
 def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, run_in_recovery):
     key_handle = None
     hive_name = ua_globals["HKEY_MAP"].get(hkey_const, str(hkey_const))
 
-    #Получаем корректный путь в зависимости от среды
+    # Получаем корректный путь в зависимости от среды
     final_hkey, final_subkey = get_offline_reg_path(hkey_const, chapter, ua_globals, run_in_recovery)
 
-    #logger.debug(f"UA - Обработка раздела: {hive_name}\\{chapter} (Режим исключений: {is_exception})")
+    # logger.debug(f"UA - Обработка раздела: {hive_name}\\{chapter} (Режим исключений: {is_exception})")
 
     try:
-        #Открываем ключ с правами на чтение и запись
-        #KEY_QUERY_VALUE нужен для перечисления параметров, KEY_SET_VALUE для изменения
+        # Открываем ключ с правами на чтение и запись
+        # KEY_QUERY_VALUE нужен для перечисления параметров, KEY_SET_VALUE для изменения
         key_handle = winreg.OpenKey(final_hkey, final_subkey, 0, winreg.KEY_SET_VALUE | winreg.KEY_QUERY_VALUE | winreg.KEY_ENUMERATE_SUB_KEYS)
 
         targets = []
 
         if is_exception:
-            #получаем список всех параметров в разделе
+            # получаем список всех параметров в разделе
             try:
                 i = 0
                 while True:
-                    #Получаем имя параметра по индексу
+                    # Получаем имя параметра по индексу
                     param_name, _, _ = winreg.EnumValue(key_handle, i)
-                    #Если имени нет в списке исключений — добавляем в очередь на сброс
+                    # Если имени нет в списке исключений — добавляем в очередь на сброс
                     if param_name not in params:
                         targets.append(param_name)
                     i += 1
             except OSError:
-                #OSError возникает, когда параметры для перечисления закончились
+                # OSError возникает, когда параметры для перечисления закончились
                 pass
         else:
-            #работаем только с тем, что передали в списке
+            # работаем только с тем, что передали в списке
             targets = params
 
-        #Процесс сброса
+        # Процесс сброса
         for param in targets:
             try:
-                #Уточняем текущий тип параметра
+                # Уточняем текущий тип параметра
                 _, reg_type = winreg.QueryValueEx(key_handle, param)
                 new_val, r_type = get_new_value_for_type(reg_type)
 
@@ -226,11 +226,11 @@ def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, run_
 
 
 
-#Обработка файла hosts
+# Обработка файла hosts
 def process_hosts_file(fix=False, exclude_hosts=None):
-    #Проверяет файл hosts и при необходимости исправляет.
-    #:param fix: если True, удаляем блокировки
-    #:param exclude_hosts: список имен хостов, исключенных из блокировки
+    # Проверяет файл hosts и при необходимости исправляет.
+    # :param fix: если True, удаляем блокировки
+    # :param exclude_hosts: список имен хостов, исключенных из блокировки
     hosts_path = os.path.join(os.environ["SystemRoot"], "System32", "drivers", "etc", "hosts")
     try:
         with open(hosts_path, "r", encoding="utf-8") as f:
@@ -241,7 +241,7 @@ def process_hosts_file(fix=False, exclude_hosts=None):
 
         for line in lines:
             striped = line.strip()
-            if not striped or striped.startswith("#"):
+            if not striped or striped.startswith("# "):
                 new_lines.append(line)
                 continue
             parts = striped.split()
@@ -251,7 +251,7 @@ def process_hosts_file(fix=False, exclude_hosts=None):
                     blocked_hosts.append(hostname)
                     if not fix:
                         new_lines.append(line)
-                    #если fix=True, пропускаем (удаляем блокировки)
+                    # если fix=True, пропускаем (удаляем блокировки)
                 else:
                     new_lines.append(line)
             else:
@@ -260,7 +260,7 @@ def process_hosts_file(fix=False, exclude_hosts=None):
         if blocked_hosts:
             logger.warning(f"UA - {l("block_detect")} hosts: {blocked_hosts}")
             if fix:
-                #удаляем блокировки
+                # удаляем блокировки
                 with open(hosts_path, "w", encoding="utf-8") as f:
                     f.writelines(new_lines)
                 logger.info(f"UA - {l("delete_block")}: {", ".join(blocked_hosts)}")
@@ -271,16 +271,16 @@ def process_hosts_file(fix=False, exclude_hosts=None):
 
 
 
-#Обработка файла hosts с исключениями
+# Обработка файла hosts с исключениями
 def process_hosts_with_exclusions(exclude_hosts=None):
     return process_hosts_file(fix=True, exclude_hosts=exclude_hosts)
 
 
 
-#Разблокировка всего
+# Разблокировка всего
 def UA(run_in_recovery=False, debug_mode=False):
     try:
-        #system_hive = loaded_hive_names.get("SYSTEM", "Offline_SYSTEM")
+        # system_hive = loaded_hive_names.get("SYSTEM", "Offline_SYSTEM")
         software_hive = loaded_hive_names.get("SOFTWARE", "Offline_SOFTWARE")
         user_hive = loaded_hive_names.get("USER", "Offline_USER")
 
@@ -295,23 +295,23 @@ def UA(run_in_recovery=False, debug_mode=False):
             }
         }
 
-        #Список политик для сброса
-        #Мышь
+        # Список политик для сброса
+        # Мышь
         mouse_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Control Panel\Mouse", ["SwapMouseButtons"], ua_globals, False, run_in_recovery)
 
-        #Ограничения проводника
+        # Ограничения проводника
         explorer_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", [], ua_globals, True, run_in_recovery)
 
-        #Системные политики (HKCU)
+        # Системные политики (HKCU)
         user_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, run_in_recovery)
 
-        #Системные политики (HKLM)
+        # Системные политики (HKLM)
         system_restore_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, run_in_recovery)
 
-        #Восстановление шрифтов
+        # Восстановление шрифтов
         font_restore_success = restore_fonts(ua_globals, run_in_recovery, debug_mode)
 
-        #файл hosts
+        # файл hosts
         host_restore_success = process_hosts_with_exclusions()
 
         restore_success = [mouse_restore_success, explorer_restore_success, user_restore_success, system_restore_success, font_restore_success, host_restore_success]
@@ -335,14 +335,14 @@ def UA(run_in_recovery=False, debug_mode=False):
 
 
 
-#Если все параметры имеют одинаковые значения или в значениях нет .ttf .otf, восстанавливаем шрифты
+# Если все параметры имеют одинаковые значения или в значениях нет .ttf .otf, восстанавливаем шрифты
 def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
     registry_key = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
 
     logger.info(f"UA - {l("check_fonts")}...")
 
     try:
-        #Инициализируем ua_globals для получения корректного пути реестра
+        # Инициализируем ua_globals для получения корректного пути реестра
         software_hive = loaded_hive_names.get("SOFTWARE", "Offline_SOFTWARE")
         user_hive = loaded_hive_names.get("USER", "Offline_USER")
 
@@ -374,7 +374,7 @@ def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
                 winreg.KEY_QUERY_VALUE | winreg.KEY_ENUMERATE_SUB_KEYS
             )
 
-            #Получаем все параметры шрифтов
+            # Получаем все параметры шрифтов
             font_params = {}
             try:
                 i = 0
@@ -385,20 +385,20 @@ def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
             except OSError:
                 pass
 
-            #Флаги для проверки
+            # Флаги для проверки
             needs_restore = False
             all_values_same = False
             no_ttf_otf = False
 
             if font_params:
-                #Проверяем, все ли значения одинаковые
+                # Проверяем, все ли значения одинаковые
                 unique_values = set(font_params.values())
                 if len(unique_values) == 1:
                     all_values_same = True
                     logger.warning(f"UA - {l("all_fonts=")}")
                     needs_restore = True
 
-                #Проверяем наличие .ttf или .otf файлов в реестре
+                # Проверяем наличие .ttf или .otf файлов в реестре
                 has_ttf_otf = any(
                     value.lower().endswith((".ttf", ".otf"))
                     for value in font_params.values()
@@ -409,7 +409,7 @@ def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
                     logger.warning(f"UA - {l("not_ttf_or_otf")}")
                     needs_restore = True
 
-            #Если проблемы обнаружены, запускаем восстановление
+            # Если проблемы обнаружены, запускаем восстановление
             if needs_restore:
                 logger.warning(f"UA - {l("font_problem_detect")}...")
                 restore_fonts(ua_globals, run_in_recovery, debug_mode)

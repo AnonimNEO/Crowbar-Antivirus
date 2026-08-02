@@ -1,7 +1,7 @@
 from config import all_line, program_authentication_clyth, current_localization
 years_copyleft = "2024 - 2026"
 
-#Локализации
+# Локализации
 localizations = {
     "ct": {
         "": "",
@@ -33,7 +33,7 @@ localizations = {
         "SAU": "Настройки",
         "RM": "Мониторинг Реестра",
         "SIM": "Менеджер Установки",
-        #AP
+        # AP
         "version_component": "Версии Компонентов",
         "pac": "Ключ КПП",
         "general_component": "Главные Компоненты",
@@ -50,7 +50,7 @@ localizations = {
         "not_stable": "не доступен из-за нестабильности",
         "read_dir_error": "Ошибка при чтении каталога",
         "read_image_error": "Не удалось загрузить изображение",
-        #T
+        # T
         "import_error": "Ошибка импорта",
         "replacement_is_used": "Используется замена",
         "component_import_error": "Ошибка импорта Компонента",
@@ -85,7 +85,7 @@ localizations = {
         "enable_debug_mode": "Включить Тестовый режим",
         "warning_debug_mode_on": "ВНИМАНИЕ\nВключен тестовый режим!",
         "documentation": "Документация",
-        #ARM
+        # ARM
         "scheduler_error": "Не удалось подключиться к планировщику задач",
         "edit_task_error": "Ошибка изменения состояния задачи",
         "delete_task_error": "Ошибка удаления задачи",
@@ -129,7 +129,7 @@ localizations = {
         "suspend_process_for_name": "Заморозить процессы с именем",
         "kill_process_for_name": "Убить процессы с именем",
         "action_error": "ошибка при действии",
-        #B
+        # B
         "browser_called": "браузер вызван с параметрами",
         "browser_run_in_recovery": "В среде восстановления не поддерживается загрузка страниц из интернета.\nОднако просмотр офлайн страниц доступен",
         "download_start": "Начато скачивание",
@@ -142,7 +142,7 @@ localizations = {
         "html_loaded": "Загружен HTML контент",
         "file_loaded": "Загружен файл",
         "page_loaded": "Загружена страница",
-        #CASH
+        # CASH
         "script_deleted": "Скрипт удалён",
         "script_deleted_error": "Ошибка при удалении скрипта",
         "execution_completed": "Выполнение завершено",
@@ -150,12 +150,12 @@ localizations = {
         "script_config": "Конфигурация скрипта",
         "file_transferred": "Передан файл",
         "command_not_found_for_file": "Антивирус Монтировка не имеет команд для данного типа файла",
-        #Console
+        # Console
         "crowbar_console": "Консоль Разработчика Антивируса Монтировка",
         "crowbar_console_text": "В данной консоли вы оперируете копиями переменных так, что ваши действия вряд ли могут повредить программу.\nЕсли это произошло перезапустите консоль или программу.\n",
         "attempt_command": "попытка выполнить команду",
         "exit_with_console_text": "Не не Я не дам тебе обойти капчу (как минимум попытаюсь)",
-        #EC
+        # EC
         "open_process_error": "Не удалось открыть процесс",
         "error_code": "Код ошибки",
         "installed": "установлена",
@@ -170,7 +170,7 @@ localizations = {
         "changed_to": "изменено на",
         "no_changed": "не было изменено",
         "ec_critical_error": "В Компоненте EditCriticality произошла неизвестная ошибка",
-        #OF
+        # OF
         "pac_text": f"Ключ Подлинности Программы (КПП) - это ключ для подтверждения, что эта программа подлинная.\nЕсли вы видите ключ который вы указывали при компиляции, значит перед вами настоящий Антивирус Монтировка.\nЕсли ключ не совпадает с вашим - значит перед вами клон программы который маскируется под Антивирус Монтировка.\n\nКПП - {program_authentication_clyth}",
         "start_thread": "Успешно запущен поток для",
         "start_process": "Успешно запущен процесс для",
@@ -208,7 +208,7 @@ localizations = {
         "attack": "Атака",
         "start_in_ghost_mode": "Запущено в скрытом режиме",
         "start_in_ghost_mode_error": "Ошибка при запуске в cкрытом режиме",
-        #E
+        # E
         "dyrachok_test_log_text": "Проверка на дурочка не прошла",
         "dyrachok_test_text": "Вы смотрите тикток!\nПрограмма не будет закрыта.",
         "watch_tiktok?": "Смотрите ли вы тикток?",
@@ -222,7 +222,7 @@ localizations = {
         "attempting_to_exit": "Попытка выхода из программы",
         "cancel_exit": "Отмена выхода",
         "e_critical_error": "В Компоненте Exit произошла неизвестная ошибка!",
-        #GFA
+        # GFA
         "not_dir": "Путь не существует",
         "full_access_set": "Полные права установлены",
         "error": "Ошибка",
@@ -234,12 +234,12 @@ localizations = {
         "set_access_error": "Ошибка установки прав",
         "success_set_full_access": "Полные права на реестр установлены",
         "regedit_error": "Ошибка при работе с реестром",
-        #R
+        # R
         "attempt_to_reboot": "Попытка перезагрузки через",
         "r_critical_error": "В Компоненте Restart произошла неизвестная ошибка в методе",
         "next_method": "Переход к следующему способу",
         "all_method_used": "Были выполнены все возможные способы перезагрузки шindows, не один не увенчался успехом.",
-        #SP
+        # SP
         "simulation": "Симуляция",
         "removal": "Удаление",
         "create_dir": "Создан каталог",
@@ -257,7 +257,7 @@ localizations = {
         "delete_simulation_for": "Удаление симуляции для",
         "delete_completed": "Удаление завершено.",
         "sp_critical_error": f"В Компоненте ScarecrowProtection произошла неизвестная ошибка!",
-        #UA
+        # UA
         "start_recovery_font": "Начало восстановления шрифтов",
         "font_dir_not_found": "Каталог шрифтов не найден",
         "font": "Шрифт",
@@ -294,7 +294,7 @@ localizations = {
         "font_problem_detect": "Обнаружены проблемы с шрифтами, запуск восстановления",
         "restore_fonts_check_success": "Проверка целостности шрифтов завершена успешно, восстановление не требуется",
         "check_fonts_error": "Неизвестная ошибка при проверке шрифтов",
-        #UM
+        # UM
         "net_error": "Команда net завершилась с ошибкой",
         "system_command_error": "Системная ошибка при выполнении команды",
         "user_name": "Имя пользователя",
@@ -318,19 +318,19 @@ localizations = {
         "password_for_user": "Пароль для пользователя",
         "change_password_error": "Ошибка при сбросе пароля для",
         "um_critical_error": "В Компоненте UsersManager произошла неизвестная ошибка!",
-        #CC
+        # CC
         "start_clean": "Запуск Очистки",
         "from": "из",
         "delete_files_error": "Ошибка при удалении следующих файлов",
         "delete_files_success": "Успешно удалённые файлы",
         "cc_log_dir": "Лог файл был создан по пути",
         "cc_critical_error": "В Компоненте ClearCache произошла неизвестная ошибка!",
-        #CM
+        # CM
         "components": "Компоненты",
         "protect": "Защита",
         "control": "Управление",
         "cm_critical_error": "В Компоненте CrowbarMenu произошла неизвестная ошибка!",
-        #Theme
+        # Theme
         "dark": "Тёмная",
         "white": "Светлая",
         "red": "Красная",
@@ -346,7 +346,7 @@ localizations = {
         "help": "Помощь",
         "view": "Вид",
         "show_date": "Показывать только задачи с датой",
-        #FE
+        # FE
         "file": "Файл",
         "save": "Сохранить",
         "save_as": "Сохранить как",
@@ -374,7 +374,7 @@ localizations = {
         "crowbar_scripts": "Скрипты Антивируса Монтировка",
         "load_file": "при загрузке файла",
         "save_file": "при сохранении файла",
-        #FR
+        # FR
         "created": "Создан",
         "replaced": "заменено",
         "on_disc": "на диске",
@@ -396,7 +396,7 @@ localizations = {
         "what_are_replace": "Что заменяем",
         "select_preset": "Выберите пресет...",
         "replace": "Заменить",
-        #FM
+        # FM
         "skip_file": "Пропущен файл",
         "copy_path": "Скопировать путь",
         "search": "Поиск",
@@ -466,7 +466,7 @@ localizations = {
         "search_error": "Ошибка во время поиска",
         "search_completed": "Поиск завершён",
         "read_file_error": "Ошибка при чтении файла",
-        #PM
+        # PM
         "info_process_error": "Ошибка при получении информации о процессе",
         "ok": "ОК",
         "at": "при",
@@ -482,7 +482,7 @@ localizations = {
         "pm_critical_error": "В Компоненте ProcessManager произошла неизвестная ошибка!",
         "kill_delete_file_process": "Убить + удалить файл процесса",
         "process_dont_close": "не закрылся за 3 секунды",
-        #Run
+        # Run
         "standard": "Стандартные",
         "regedit": "редактор реестра",
         "taskmgr": "диспетчер задач",
@@ -499,7 +499,7 @@ localizations = {
         "professional": "профессиональный",
         "simplified": "упрощённый",
         "file2": "файла",
-        #SAU
+        # SAU
         "compilations": "Компиляции",
         "command_end_with_code": "Команда завершилась с кодом",
         "t_compilation_is_finish": "Компиляция Компонента Trey завершена!",
@@ -573,7 +573,7 @@ localizations = {
         "enter_program_name": "Введите желаемое название исполняемого файла,\nБЕЗ расширения файла!",
         "enter_log_name": "Введите название лог файла для установщика\nМожете ввести полный путь для данного лог файла\nили ничего не вводить если хотите отключить логирование",
         "sau_critical_error": f"Во время установки произошла неизвестная ошибка",
-        #GUI
+        # GUI
         "custom": "Пользовательская",
         "parameter": "параметра",
         "type": "Тип",
@@ -631,7 +631,7 @@ localizations = {
         "E": "Exit Program",
         "AP": "About Program",
         "SAU": "Settings",
-        #AP
+        # AP
         "version_component": "Component Versions",
         "pac": "Gearbox Key",
         "general_component": "Main Components",
@@ -648,7 +648,7 @@ localizations = {
         "not_stable": "Unavailable due to instability",
         "read_dir_error": "Error reading directory",
         "read_image_error": "Failed to load image",
-        #T
+        # T
         "import_error": "Import error",
         "replacement_is_used": "Replacement is in use",
         "component_import_error": "Error importing Component",
@@ -676,7 +676,7 @@ localizations = {
         "multiprocessing_error": "Critical error while multithreading",
         "restart_program": "Restart the program",
         "admin_error": "Error obtaining administrator privileges",
-        #ARM
+        # ARM
         "scheduler_error": "Failed to connect to the task scheduler",
         "edit_task_error": "Error changing task state",
         "delete_task_error": "Error deleting tasks",
@@ -717,12 +717,12 @@ localizations = {
         "arm_help_text": 'The Scheduler tab displays so many tasks because viruses could modify tasks, but this is extremely rare, so you can disable the display of tasks without the "created" column. To do this, Click the item in the top panel of the window: view->Show only tasks with date.',
         "arm_critical_error": f"An unknown error occurred in the AutoRunMaster component!",
         "reading2": "чтения",
-        #Console
+        # Console
         "crowbar_console": "Crowbar Antivirus Developer Console",
         "crowbar_console_text": "Be careful, this component may be unstable.\nAnd not understanding what you're doing can damage the program.\nIf this happens, restart the program.\n",
         "attempt_command": "attempt to execute command",
         "exit_with_console_text": "No, no, I won't let you bypass the captcha (at least I'll try)",
-        #EC
+        # EC
         "open_process_error": "Failed to open process",
         "error_code": "Error code",
         "installed": "installed",
@@ -737,7 +737,7 @@ localizations = {
         "changed_to": "changed to",
         "no_changed": "not changed",
         "ec_critical_error": "An unknown error occurred in the EditCriticality component",
-        #OF
+        # OF
         "pac_text": f"The Program Authentication Key (PAK) is a key for confirming that this program is genuine. If you see the key you specified during compilation, then you are looking at the genuine Antivirus Mount. If the key does not match yours, then you are looking at a clone of the program masquerading as Antivirus Mount. PAK - {program_authentication_clyth}",
         "start_thread": "Successfully started thread for",
         "start_process": "Successfully started process for",
@@ -757,7 +757,7 @@ localizations = {
         "with_program": "using the specified program",
         "start_error": "Error starting",
         "start_command_error": "Error executing command",
-        #E
+        # E
         "dyrachok_test_log_text": "Durachok test failed",
         "dyrachok_test_text": "You are watching TikTok!\nThe program will not close.",
         "watch_tiktok?": "Are you watching TikTok?",
@@ -771,7 +771,7 @@ localizations = {
         "attempting_to_exit": "Attempting to exit the program",
         "cancel_exit": "Canceled exit",
         "e_critical_error": "An unknown error occurred in the Exit component!",
-        #GFA
+        # GFA
         "not_dir": "Path does not exist",
         "full_access_set": "Full access set",
         "error": "Error",
@@ -783,12 +783,12 @@ localizations = {
         "set_access_error": "Error setting access rights",
         "success_set_full_access": "Full access to registry set",
         "regedit_error": "Error while working with registry",
-        #R
+        # R
         "attempt_to_reboot": "Attempt to reboot after",
         "r_critical_error": "An unknown error occurred in the method of the Restart Component",
         "next_method": "Proceeding to the next method",
         "all_method_used": "All possible methods of restarting Windows have been tried, none were successful.",
-        #SP
+        # SP
         "simulation": "Simulation",
         "removal": "Removal",
         "create_dir": "Directory created",
@@ -806,7 +806,7 @@ localizations = {
         "delete_simulation_for": "Deleting simulation for",
         "delete_completed": "Deletion complete.",
         "sp_critical_error": f"An unknown error occurred in the ScarecrowProtection component!",
-        #UA
+        # UA
         "start_recovery_font": "Starting font recovery",
         "font_dir_not_found": "Font directory not found",
         "font": "Font",
@@ -843,7 +843,7 @@ localizations = {
         "font_problem_detect": "Problems with fonts detected, starting repair",
         "restore_fonts_check_success": "Font integrity check completed successfully, no repair required",
         "check_fonts_error": "Unknown error while checking fonts",
-        #UM
+        # UM
         "net_error": "The net command failed",
         "system_command_error": "System error while executing command",
         "user_name": "User name",
@@ -867,19 +867,19 @@ localizations = {
         "password_for_user": "Password for user",
         "change_password_error": "Error resetting password for",
         "um_critical_error": "An unknown error occurred in the UsersManager component!",
-        #CC
+        # CC
         "start_clean": "Starting Cleanup",
         "from": "from",
         "delete_files_error": "Error deleting the following files",
         "delete_files_success": "Successfully deleted files",
         "cc_log_dir": "The log file was created at the path",
         "cc_critical_error": "An unknown error occurred in the ClearCache component!",
-        #CM
+        # CM
         "components": "Components",
         "protect": "Protection",
         "control": "Control",
         "cm_critical_error": "An unknown error occurred in the CrowbarMenu component!",
-        #Theme
+        # Theme
         "dark": "Dark",
         "white": "Light",
         "red": "Red",
@@ -895,7 +895,7 @@ localizations = {
         "help": "Help",
         "view": "View",
         "show_date": "Show only tasks with a date",
-        #FE
+        # FE
         "file": "File",
         "save": "Save",
         "save_as": "Save as",
@@ -920,7 +920,7 @@ localizations = {
         "next": "Next",
         "fe_critical_error": "An unknown error occurred in the FileEditor component!",
         "cuttlefish": "Sepia",
-        #FR
+        # FR
         "created": "Created",
         "replaced": "replaced",
         "on_disc": "on disk",
@@ -942,7 +942,7 @@ localizations = {
         "what_are_replace": "What to replace",
         "select_preset": "Select a preset...",
         "replace": "Replace",
-        #FM
+        # FM
         "skip_file": "Skipped file",
         "copy_path": "Copy path",
         "search": "Search",
@@ -1008,7 +1008,7 @@ localizations = {
         "search_result": "Search results",
         "fm_exit": "Are you sure you want to exit?",
         "fm_critical_error": "An unknown error occurred in FileManager!",
-        #PM
+        # PM
         "info_process_error": "Error getting process information",
         "ok": "OK",
         "at": "at",
@@ -1022,7 +1022,7 @@ localizations = {
         "cancel_search": "Stop search",
         "actions": "Actions",
         "pm_critical_error": "An unknown error occurred in the ProcessManager component!",
-        #Run
+        # Run
         "standard": "Accessories",
         "regedit": "Registry Editor",
         "taskmgr": "Task Manager",
@@ -1039,7 +1039,7 @@ localizations = {
         "professional": "professional",
         "simplified": "simplified",
         "file2": "file",
-        #SAU
+        # SAU
         "compilations": "Compilations",
         "command_end_with_code": "Command ended with code",
         "t_compilation_is_finish": "Trey Component compilation completed!",
@@ -1113,7 +1113,7 @@ localizations = {
         "enter_program_name": "Enter the desired executable file name, \nWITHOUT the file extension!",
         "enter_log_name": "Enter the name of the log file for the installer. \nYou can enter the full path to this log file, \nor leave it blank if you want to disable logging.",
         "sau_critical_error": f"An unknown error occurred during installation.",
-        #GUI
+        # GUI
         "custom": "Custom",
         "parameter": "parameter",
         "type": "Type",
@@ -1148,6 +1148,12 @@ localizations = {
     },
 }
 
-#Возвращаем нужный текст или сам ключ если нужного текста нет в текущем языке
+# Возвращаем нужный текст или сам ключ если нужного текста нет в текущем языке
 def l(key, language=current_localization):
+    """
+    Функция для получения текста из локализации
+    key - имя ключа текста/реплики/диалога
+    language - Язык на котором вернуть текст
+    return - функция возвращает текст из локализации, если такого ключа в указанной локализации нет то будет возвращён сам ключ
+    """
     return localizations.get(language, {}).get(key) or key
