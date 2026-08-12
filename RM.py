@@ -20,10 +20,10 @@ except:
 import queue
 import winreg
 
-registry_monitor = "0.2.9 Pre-Alpha"
+REGISTRY_MONITOR_VERSION = "0.2.10 Pre-Alpha"
 
 # Загрузка библиотеки
-advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)
+ADVAPI32 = ctypes.WinDLL("advapi32", use_last_error=True)
 
 # Константы
 HCU = winreg.HKEY_CURRENT_USER
@@ -55,31 +55,31 @@ REGSAM = c_ulong
 # Определение функций Windows API
 def define_functions():
     # RegOpenKeyExW
-    advapi32.RegOpenKeyExW.argtypes = [
+    ADVAPI32.RegOpenKeyExW.argtypes = [
         wintypes.HANDLE,
         wintypes.LPCWSTR,
         wintypes.DWORD,
         REGSAM,
         ctypes.POINTER(wintypes.HANDLE)
     ]
-    advapi32.RegOpenKeyExW.restype = wintypes.LONG
+    ADVAPI32.RegOpenKeyExW.restype = wintypes.LONG
 
     # RegCloseKey
-    advapi32.RegCloseKey.argtypes = [wintypes.HKEY]
-    advapi32.RegCloseKey.restype = wintypes.LONG
+    ADVAPI32.RegCloseKey.argtypes = [wintypes.HKEY]
+    ADVAPI32.RegCloseKey.restype = wintypes.LONG
 
     # RegNotifyChangeKeyValue
-    advapi32.RegNotifyChangeKeyValue.argtypes = [
+    ADVAPI32.RegNotifyChangeKeyValue.argtypes = [
         wintypes.HKEY,
         wintypes.BOOL,
         wintypes.DWORD,
         wintypes.HANDLE,
         wintypes.BOOL
     ]
-    advapi32.RegNotifyChangeKeyValue.restype = wintypes.LONG
+    ADVAPI32.RegNotifyChangeKeyValue.restype = wintypes.LONG
 
     # RegQueryValueExW
-    advapi32.RegQueryValueExW.argtypes = [
+    ADVAPI32.RegQueryValueExW.argtypes = [
         wintypes.HKEY,
         wintypes.LPCWSTR,
         wintypes.LPDWORD,
@@ -87,10 +87,10 @@ def define_functions():
         wintypes.LPBYTE,
         wintypes.LPDWORD
     ]
-    advapi32.RegQueryValueExW.restype = wintypes.LONG
+    ADVAPI32.RegQueryValueExW.restype = wintypes.LONG
 
     # RegEnumKeyExW
-    advapi32.RegEnumKeyExW.argtypes = [
+    ADVAPI32.RegEnumKeyExW.argtypes = [
         wintypes.HKEY,
         wintypes.DWORD,
         wintypes.LPWSTR,
@@ -100,10 +100,10 @@ def define_functions():
         ctypes.POINTER(wintypes.DWORD),
         ctypes.POINTER(wintypes.FILETIME)
     ]
-    advapi32.RegEnumKeyExW.restype = wintypes.LONG
+    ADVAPI32.RegEnumKeyExW.restype = wintypes.LONG
 
     # RegQueryInfoKeyW
-    advapi32.RegQueryInfoKeyW.argtypes = [
+    ADVAPI32.RegQueryInfoKeyW.argtypes = [
         wintypes.HKEY,
         wintypes.LPWSTR, wintypes.LPDWORD, # lpClass, lpcchClass
         ctypes.POINTER(wintypes.DWORD), # nSubKeys
@@ -115,7 +115,7 @@ def define_functions():
         ctypes.POINTER(wintypes.DWORD), # nSecurityDescriptor
         ctypes.POINTER(wintypes.FILETIME) # lpftLastWriteTime
     ]
-    advapi32.RegQueryInfoKeyW.restype = wintypes.LONG
+    ADVAPI32.RegQueryInfoKeyW.restype = wintypes.LONG
 
     # CreateEventW
     kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -139,13 +139,13 @@ def define_functions():
     kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
     kernel32.CloseHandle.restype = wintypes.BOOL
 
-    return kernel32, advapi32
+    return kernel32, ADVAPI32
 
 
 
 # Мониторинг ключа реестра
 class RegistryMonitor(threading.Thread):
-    def __init__(self, hive, key_path, watch_subtree=True, event_queue=None, debug_mode=False):
+    def __init__(self, hive, key_path, watch_subtree=True, event_queue=None, DEBUG_MODE=False):
         # hive: Куст реестра
         # key_path: Путь к ключу реестра
         # watch_subtree: Отслеживать ли подключи
@@ -158,7 +158,7 @@ class RegistryMonitor(threading.Thread):
         self.daemon = True
         self.event_queue = event_queue #  Сохраняем очередь
 
-        self.kernel32, self.advapi32 = define_functions()
+        self.kernel32, self.ADVAPI32 = define_functions()
 
         logger.info(f"RegistryMonitor инициализирован: {key_path}")
 
@@ -207,7 +207,7 @@ class RegistryMonitor(threading.Thread):
             last_write_time = wintypes.FILETIME()
 
             # Исправлен вызов RegQueryInfoKeyW
-            result_info = self.advapi32.RegQueryInfoKeyW(
+            result_info = self.ADVAPI32.RegQueryInfoKeyW(
                 h_key,
                 class_name_buffer,
                 ctypes.byref(class_name_size),
@@ -234,7 +234,7 @@ class RegistryMonitor(threading.Thread):
                 value_data_buffer = ctypes.create_string_buffer(max_value_len.value)
                 value_data_size = wintypes.DWORD(ctypes.sizeof(value_data_buffer))
 
-                result = self.advapi32.RegQueryValueExW(
+                result = self.ADVAPI32.RegQueryValueExW(
                     h_key,
                     value_name_buffer,
                     None, # lpReserved
@@ -258,7 +258,7 @@ class RegistryMonitor(threading.Thread):
             subkey_class_buffer = ctypes.create_unicode_buffer(max_class_len.value + 1)
             subkey_class_size = wintypes.DWORD(ctypes.sizeof(subkey_class_buffer))
 
-            result = self.advapi32.RegEnumKeyExW(
+            result = self.ADVAPI32.RegEnumKeyExW(
                 h_key,
                 i,
                 subkey_name_buffer,
@@ -274,7 +274,7 @@ class RegistryMonitor(threading.Thread):
                 full_subkey_path = f"{current_path}\\{subkey_name}" if current_path else subkey_name
 
                 h_subkey = wintypes.HKEY()
-                subkey_result = self.advapi32.RegOpenKeyExW(
+                subkey_result = self.ADVAPI32.RegOpenKeyExW(
                     h_key,
                     subkey_name,
                     0,
@@ -283,7 +283,7 @@ class RegistryMonitor(threading.Thread):
                 )
                 if subkey_result == 0:
                     snapshot[subkey_name] = self.get_full_registry_snapshot(h_subkey, full_subkey_path)
-                    self.advapi32.RegCloseKey(h_subkey)
+                    self.ADVAPI32.RegCloseKey(h_subkey)
                 else:
                     logger.warning(f"RM - Не удалось открыть под-ключ {full_subkey_path}: код {subkey_result}")
 
@@ -362,7 +362,7 @@ class RegistryMonitor(threading.Thread):
         try:
             # Открываем ключ реестра
             h_key = wintypes.HKEY()
-            result = self.advapi32.RegOpenKeyExW(
+            result = self.ADVAPI32.RegOpenKeyExW(
                 self.hive,
                 self.key_path,
                 0,
@@ -394,7 +394,7 @@ class RegistryMonitor(threading.Thread):
                         self.event_queue.put(f'Значение: "{key}" (Тип: {data.get("type")}) = {data.get("data")}')
                 self.event_queue.put("RM - Конец сканирования начального состояния")
             else:
-                if self.debug_mode:
+                if self.DEBUG_MODE:
                     self.event_queue.put(f"RM - Нет данных для отображения при инициализации ({self.key_path})")
 
             # Создаем событие для уведомлений
@@ -408,7 +408,7 @@ class RegistryMonitor(threading.Thread):
             # Основной цикл мониторинга
             while not self.stop_event.is_set():
                 # Регистрируем уведомление об изменениях
-                result = self.advapi32.RegNotifyChangeKeyValue(
+                result = self.ADVAPI32.RegNotifyChangeKeyValue(
                     h_key,
                     self.watch_subtree,
                     NOTIFY_FLAGS,
@@ -461,7 +461,7 @@ class RegistryMonitor(threading.Thread):
         finally:
             # Закрытие дескрипторов
             if h_key:
-                self.advapi32.RegCloseKey(h_key)
+                self.ADVAPI32.RegCloseKey(h_key)
                 logger.info(f"RM - Ключ закрыт: {self.key_path}")
                 if self.event_queue:
                     self.event_queue.put(f"RM - Мониторинг реестра остановлен ({self.key_path})")

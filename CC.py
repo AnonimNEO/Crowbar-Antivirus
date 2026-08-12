@@ -28,15 +28,16 @@ from RS import RS
 from config import *
 
 global log_path, clear_temp_log
-clear_cache_version = "0.7.5 Beta"
+CLEAR_CACHE_VERSION = "0.7.6 Beta"
 
 # @logger.catch
-def CC(run_in_recovery):
+def CC(RUN_IN_RECOVERY):
+    """Очистка кэша (%Temp%)"""
     try:
         logger.info(f"CC - {l("start_clean")}...")
         # Получаем имя пользователя
         username = get_user_name()
-        if run_in_recovery:
+        if RUN_IN_RECOVERY:
             current_disc = get_current_disc()
         else:
             current_disc = "C:\\"

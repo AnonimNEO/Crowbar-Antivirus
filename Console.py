@@ -19,16 +19,17 @@ except:
 import random
 import sys
 
-from config import program_authentication_clyth, current_localization
+from config import PROGRAM_AUTHENTICATION_CLYTH
 from OF import create_menubar
 from languages import l
 from RS import RS
 import config
 
-crowbar_console_version = "0.1.7 Pre-Alpha"
+CROWBAR_CONSOLE_VERSION = "0.1.8 Pre-Alpha"
 
 class CrowbarConsole:
-    def __init__(self, globals_dict=None, debug_mode=False):
+    """Консоль разработчика (python консоль вместе с доступом к функциям программы)"""
+    def __init__(self, globals_dict=None, DEBUG_MODE=False):
         self.globals_dict = globals_dict if globals_dict else {}
         self.CC_GUI = None
         self.output_text = None
@@ -50,7 +51,7 @@ class CrowbarConsole:
         )
         self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         self.output_text.insert(tk.END, f"=== {l("crowbar_console")} {crowbar_console_version} ===\n")
-        self.output_text.insert(tk.END, f"{l("pac")} - {program_authentication_clyth}\n")
+        self.output_text.insert(tk.END, f"{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}\n")
         self.output_text.insert(tk.END, l("crowbar_console_text"))
 
         self.output_text.config(state=tk.DISABLED)
@@ -72,7 +73,7 @@ class CrowbarConsole:
         self.input_entry.bind("<Return>", self.execute_command)
         self.input_entry.focus()
 
-        create_menubar(self.CC_GUI, False, None, debug_mode=debug_mode)
+        create_menubar(self.CC_GUI, False, None, DEBUG_MODE=DEBUG_MODE)
 
         self.CC_GUI.mainloop()
 
@@ -136,7 +137,8 @@ class CrowbarConsole:
         self.output_text.see(tk.END)
         self.output_text.config(state=tk.DISABLED)
 
-def open_console(globals_dict=None, debug_mode=False):
+def open_console(globals_dict=None, DEBUG_MODE=False):
+    """Запуск консоли разработчика через капчу"""
     n = random.randint(128, 2048)
     captcha_input = tk.simpledialog.askinteger(RS(), f"{l("enter_number")}: {n}")
 
@@ -145,5 +147,5 @@ def open_console(globals_dict=None, debug_mode=False):
     else:
         messagebox.showerror(RS(), l("bad_password_for_console"))
         return
-    console = CrowbarConsole(globals_dict, debug_mode=debug_mode)
+    console = CrowbarConsole(globals_dict, DEBUG_MODE=DEBUG_MODE)
     console.create_console()

@@ -1,4 +1,4 @@
-from config import all_line, program_authentication_clyth, current_localization
+from config import ALL_LINE, PROGRAM_AUTHENTICATION_CLYTH, CURRENT_LOCALIZATION
 years_copyleft = "2024 - 2026"
 
 # Локализации
@@ -45,7 +45,7 @@ localizations = {
         "donation_alerts_text": "Поддержать нас через DonationAlerts или Steam",
         "license": "Лицензия",
         "website_neo_organization": "Веб-Сайт NEO Organization",
-        "about_program_text": f"Антивирус Монтировка!\nВытащит любой гвоздь из крышки гроба вашего ПК!\n(как минимум попытается, а если не смог - поставь Linux)\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO, Всего строчек кода : {all_line}\nПрограммисты/Задумщики/Художники/Тестировщики : @AnonimNEO\nЛицензия: GPL v3.0 Copyleft 🄯 {years_copyleft}\n",
+        "about_program_text": f"Антивирус Монтировка!\nВытащит любой гвоздь из крышки гроба вашего ПК!\n(как минимум попытается, а если не смог - поставь Linux)\nCreated by NEO Organization\nPowered by Departament K\nCoded by @AnonimNEO, Всего строчек кода : {ALL_LINE}\nПрограммисты/Задумщики/Художники/Тестировщики : @AnonimNEO\nЛицензия: GPL v3.0 Copyleft 🄯 {years_copyleft}\n",
         "ap_exception_text": "В Компоненте AboutProgram произошла неизвестная ошибка!",
         "not_stable": "не доступен из-за нестабильности",
         "read_dir_error": "Ошибка при чтении каталога",
@@ -60,7 +60,7 @@ localizations = {
         "library": "Библиотека",
         "critical_fail_detect": "Обнаружены критические повреждения программы! Ядро программы не может быть запущено",
         "damage": "Повреждения",
-        "run_in_recovery": "Запуск в среде восстановления Шindows",
+        "RUN_IN_RECOVERY": "Запуск в среде восстановления Шindows",
         "run_in_normal": "Запуск в стандартной среде Шindows",
         "environment_error": "Ошибка при определении среды",
         "load_bush": "Загрузка кустов реестра с диска",
@@ -85,6 +85,8 @@ localizations = {
         "enable_debug_mode": "Включить Тестовый режим",
         "warning_debug_mode_on": "ВНИМАНИЕ\nВключен тестовый режим!",
         "documentation": "Документация",
+        "fatal_error": "Фатальная ошибка",
+        "in_start_crowbar": "при запуске Антивируса Монтировка, запуск не возможен. Отсутствует графическая библиотека tkinter, подробнее в логах.",
         # ARM
         "scheduler_error": "Не удалось подключиться к планировщику задач",
         "edit_task_error": "Ошибка изменения состояния задачи",
@@ -171,7 +173,7 @@ localizations = {
         "no_changed": "не было изменено",
         "ec_critical_error": "В Компоненте EditCriticality произошла неизвестная ошибка",
         # OF
-        "pac_text": f"Ключ Подлинности Программы (КПП) - это ключ для подтверждения, что эта программа подлинная.\nЕсли вы видите ключ который вы указывали при компиляции, значит перед вами настоящий Антивирус Монтировка.\nЕсли ключ не совпадает с вашим - значит перед вами клон программы который маскируется под Антивирус Монтировка.\n\nКПП - {program_authentication_clyth}",
+        "pac_text": f"Ключ Подлинности Программы (КПП) - это ключ для подтверждения, что эта программа подлинная.\nЕсли вы видите ключ который вы указывали при компиляции, значит перед вами настоящий Антивирус Монтировка.\nЕсли ключ не совпадает с вашим - значит перед вами клон программы который маскируется под Антивирус Монтировка.\n\nКПП - {PROGRAM_AUTHENTICATION_CLYTH}",
         "start_thread": "Успешно запущен поток для",
         "start_process": "Успешно запущен процесс для",
         "start_theard_error": "Ошибка при запуске потока для процесса",
@@ -643,7 +645,7 @@ localizations = {
         "donation_alerts_text": "Support us via DonationAlerts or Steam",
         "license": "License",
         "website_neo_organization": "NEO Organization Website",
-        "about_program_text": f"Antivirus A crowbar!\nIt will pull any nail out of your PC's coffin!\n(It will at least try, and if it can't, install Linux)\nCreated by NEO Organization\nPowered by Department K\nCoded by @AnonimNEO, Total lines of code: {all_line}\nProgrammers/Imaginers/Artists/Testers: @AnonimNEO\nLicense: GPL v3.0 Copyleft 🄯 {years_copyleft}\n",
+        "about_program_text": f"Antivirus A crowbar!\nIt will pull any nail out of your PC's coffin!\n(It will at least try, and if it can't, install Linux)\nCreated by NEO Organization\nPowered by Department K\nCoded by @AnonimNEO, Total lines of code: {ALL_LINE}\nProgrammers/Imaginers/Artists/Testers: @AnonimNEO\nLicense: GPL v3.0 Copyleft 🄯 {years_copyleft}\n",
         "ap_exception_text": "An unknown error occurred in the AboutProgram component!",
         "not_stable": "Unavailable due to instability",
         "read_dir_error": "Error reading directory",
@@ -658,7 +660,7 @@ localizations = {
         "library": "Library",
         "critical_fail_detect": "Critical program corruption detected! The program core cannot be started",
         "damage": "Damage",
-        "run_in_recovery": "Running in the Windows recovery environment",
+        "RUN_IN_RECOVERY": "Running in the Windows recovery environment",
         "run_in_normal": "Running in the standard Windows environment",
         "environment_error": "Error detecting environment",
         "load_bush": "Loading registry hives from disk",
@@ -738,7 +740,7 @@ localizations = {
         "no_changed": "not changed",
         "ec_critical_error": "An unknown error occurred in the EditCriticality component",
         # OF
-        "pac_text": f"The Program Authentication Key (PAK) is a key for confirming that this program is genuine. If you see the key you specified during compilation, then you are looking at the genuine Antivirus Mount. If the key does not match yours, then you are looking at a clone of the program masquerading as Antivirus Mount. PAK - {program_authentication_clyth}",
+        "pac_text": f"The Program Authentication Key (PAK) is a key for confirming that this program is genuine. If you see the key you specified during compilation, then you are looking at the genuine Antivirus Mount. If the key does not match yours, then you are looking at a clone of the program masquerading as Antivirus Mount. PAK - {PROGRAM_AUTHENTICATION_CLYTH}",
         "start_thread": "Successfully started thread for",
         "start_process": "Successfully started process for",
         "start_theard_error": "Error starting thread for process",
@@ -1149,7 +1151,7 @@ localizations = {
 }
 
 # Возвращаем нужный текст или сам ключ если нужного текста нет в текущем языке
-def l(key, language=current_localization):
+def l(key, language=CURRENT_LOCALIZATION):
     """
     Функция для получения текста из локализации
     key - имя ключа текста/реплики/диалога

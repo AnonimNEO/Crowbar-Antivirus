@@ -8,6 +8,12 @@
 # Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 # Coded by @AnonimNEO (Telegram)
 
+
+
+# ДАННЫЙ КОМПОНЕНТ НЕ ДОДЕЛАН, НЕ ГАРАНТИРОВАН ДАЖЕ ЗАПУСК
+
+
+
 from tkinter import messagebox
 from RS import RS
 from loguru import logger
@@ -17,7 +23,7 @@ import psutil
 def get_process_critical_status(a=None,b=None,c=None):
     pass
 
-real_time_protect_version = "0.1.3 Pre-Alpha"
+REAL_TIME_PROTECT_VERSION = "0.1.4 Pre-Alpha"
 
 # Действие с процессами
 def action_process(action, process_ids):
@@ -50,7 +56,7 @@ def get_process_name(process_id):
     return process.name()
 
 # Получаем информацию о процессе
-def get_process_info(proc, run_in_recovery):
+def get_process_info(proc, RUN_IN_RECOVERY):
     try:
         status = "Заморожен" if proc.status() == psutil.STATUS_STOPPED else "Запущен"
 
@@ -62,7 +68,7 @@ def get_process_info(proc, run_in_recovery):
             "Имя Процесса": proc.name(),
             "Путь к файлу": proc.exe() if proc.exe() else "Н/Д",
             "Пользователь": proc.username() if proc.username() else "Н/Д",
-            "Критичность": get_process_critical_status(proc.pid, run_in_recovery),
+            "Критичность": get_process_critical_status(proc.pid, RUN_IN_RECOVERY),
             "Статус": status,
             "Администратор": is_elevated,
         }
@@ -74,10 +80,10 @@ def get_process_info(proc, run_in_recovery):
         return None
 
 # Получаем список процессов
-def get_process_list(list_type, run_in_recovery):
+def get_process_list(list_type, RUN_IN_RECOVERY):
     all_processes = []
     for proc in psutil.process_iter(["pid", "name", "exe", "username", "status"]):
-        info = get_process_info(proc, run_in_recovery)
+        info = get_process_info(proc, RUN_IN_RECOVERY)
         if info:
             all_processes.append(info)
 
@@ -89,7 +95,7 @@ def get_process_list(list_type, run_in_recovery):
         return [p for p in all_processes if p["Статус"] == "Заморожен"]
     return []
 
-def RLP(run_in_recovery=False):
+def RLP(RUN_IN_RECOVERY=False):
     SUSPEND_PROCESS = []
     system_name_process = (
         ("cmd.exe", r"C:\Windows\System32\cmd.exe"),
@@ -103,7 +109,7 @@ def RLP(run_in_recovery=False):
     )
     system_exception = [r"C:\Users\Adminus\Desktop\calc.exe"]
 
-    if run_in_recovery:
+    if RUN_IN_RECOVERY:
         messagebox.showwarning(RS(), "RealTimeProtect невозможно запустить в среде восстановления")
 
     def warning_dialog(cause, p):
@@ -135,11 +141,11 @@ def RLP(run_in_recovery=False):
         return PROCESS_LIST
 
     while True:
-        PROCESS_LIST = get_process_list("all_list", run_in_recovery)
+        PROCESS_LIST = get_process_list("all_list", RUN_IN_RECOVERY)
 
         PROCESS_LIST = filter_process_for_exception(PROCESS_LIST)
 
         check_system_process(PROCESS_LIST)
 
 if __name__ == "__main__":
-    RLP(run_in_recovery=False)
+    RLP(RUN_IN_RECOVERY=False)

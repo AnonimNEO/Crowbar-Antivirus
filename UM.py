@@ -22,13 +22,11 @@ try:
 except:
     from loguru import logger
 
-from config import current_localization
 from languages import l
 from OF import pac, apply_global_theme, create_menubar
 from RS import RS
-from config import theme, default_theme
 
-users_manager_version = "0.3.8 Beta"
+USER_MANAGER_VERSION = "0.3.10 Beta"
 
 class UserManager:
     def run_net_command(self, args):
@@ -229,11 +227,11 @@ class UserManager:
 
 
 
-def UM(current_theme=False, debug_mode=False):
+def UM(current_theme=False, DEBUG_MODE=False):
     try:
         UM_GUI = tk.Tk()
 
-        create_menubar(UM_GUI, False, debug_mode=debug_mode)
+        create_menubar(UM_GUI, False, DEBUG_MODE=DEBUG_MODE)
 
         apply_global_theme(UM_GUI, current_theme)
 
@@ -243,5 +241,6 @@ def UM(current_theme=False, debug_mode=False):
         logger.exception(l("um_critical_error"))
 
 if __name__ == "__main__":
-    current_theme = theme[default_theme]
+    from config import THEME, DEFAULT_THEME
+    current_theme = THEME[DEFAULT_THEME]
     UM(current_theme)

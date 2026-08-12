@@ -24,10 +24,9 @@ except:
 
 # from OF2 import get_offline_reg_path, loaded_hive_names
 from OF import get_offline_reg_path, loaded_hive_names
-from config import current_localization
 from languages import l
 
-unlock_all_version = "1.2.6 Beta"
+UNLOCK_ALL_VERSION = "1.2.8 Beta"
 
 # Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
@@ -44,7 +43,7 @@ def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
 
 
 # Восстанавливает шрифты в реестре на основе файлов из C:\Windows\Fonts
-def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
+def restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE=False):
     try:
         fonts_dir = r"C:\Windows\Fonts"
         registry_key = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
@@ -61,7 +60,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
             winreg.HKEY_LOCAL_MACHINE,
             registry_key,
             ua_globals,
-            run_in_recovery
+            RUN_IN_RECOVERY
         )
 
         key_handle = None
@@ -102,7 +101,7 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
                         fonts_restored += 1
                         logger.success(f'UA - {l("font")} "{font_name}" {l("restored")}.')
                     else:
-                        if debug_mode:
+                        if DEBUG_MODE:
                             logger.debug(f'UA - {l("font")} "{font_name}" {l("restored")}.')
 
                 except FileNotFoundError:
@@ -158,12 +157,12 @@ def restore_fonts(ua_globals, run_in_recovery, debug_mode=False):
 
 
 # Сбрасывает указанные параметры в разделе реестра с учетом оффлайн-режима
-def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, run_in_recovery):
+def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, RUN_IN_RECOVERY):
     key_handle = None
     hive_name = ua_globals["HKEY_MAP"].get(hkey_const, str(hkey_const))
 
     # Получаем корректный путь в зависимости от среды
-    final_hkey, final_subkey = get_offline_reg_path(hkey_const, chapter, ua_globals, run_in_recovery)
+    final_hkey, final_subkey = get_offline_reg_path(hkey_const, chapter, ua_globals, RUN_IN_RECOVERY)
 
     # logger.debug(f"UA - Обработка раздела: {hive_name}\\{chapter} (Режим исключений: {is_exception})")
 
@@ -278,7 +277,8 @@ def process_hosts_with_exclusions(exclude_hosts=None):
 
 
 # Разблокировка всего
-def UA(run_in_recovery=False, debug_mode=False):
+def UA(RUN_IN_RECOVERY=False, DEBUG_MODE=False):
+    """Разблокируем ограничения, главная функция Компонента Разблокировки Всего (точка входа)"""
     try:
         # system_hive = loaded_hive_names.get("SYSTEM", "Offline_SYSTEM")
         software_hive = loaded_hive_names.get("SOFTWARE", "Offline_SOFTWARE")
@@ -297,19 +297,19 @@ def UA(run_in_recovery=False, debug_mode=False):
 
         # Список политик для сброса
         # Мышь
-        mouse_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Control Panel\Mouse", ["SwapMouseButtons"], ua_globals, False, run_in_recovery)
+        mouse_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Control Panel\Mouse", ["SwapMouseButtons"], ua_globals, False, RUN_IN_RECOVERY)
 
         # Ограничения проводника
-        explorer_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", [], ua_globals, True, run_in_recovery)
+        explorer_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", [], ua_globals, True, RUN_IN_RECOVERY)
 
         # Системные политики (HKCU)
-        user_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, run_in_recovery)
+        user_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, RUN_IN_RECOVERY)
 
         # Системные политики (HKLM)
-        system_restore_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, run_in_recovery)
+        system_restore_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, RUN_IN_RECOVERY)
 
         # Восстановление шрифтов
-        font_restore_success = restore_fonts(ua_globals, run_in_recovery, debug_mode)
+        font_restore_success = restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE)
 
         # файл hosts
         host_restore_success = process_hosts_with_exclusions()
@@ -336,7 +336,8 @@ def UA(run_in_recovery=False, debug_mode=False):
 
 
 # Если все параметры имеют одинаковые значения или в значениях нет .ttf .otf, восстанавливаем шрифты
-def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
+def check_and_restore_fonts_if_needed(RUN_IN_RECOVERY, DEBUG_MODE=False):
+    """Проверяем есть ли закономерность в шрифтах - если да то восстанавливаем шрифты"""
     registry_key = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
 
     logger.info(f"UA - {l("check_fonts")}...")
@@ -361,7 +362,7 @@ def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
             winreg.HKEY_LOCAL_MACHINE, 
             registry_key, 
             ua_globals, 
-            run_in_recovery
+            RUN_IN_RECOVERY
         )
 
         key_handle = None
@@ -412,10 +413,10 @@ def check_and_restore_fonts_if_needed(run_in_recovery, debug_mode=False):
             # Если проблемы обнаружены, запускаем восстановление
             if needs_restore:
                 logger.warning(f"UA - {l("font_problem_detect")}...")
-                restore_fonts(ua_globals, run_in_recovery, debug_mode)
+                restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE)
                 return True
             else:
-                if debug_mode:
+                if DEBUG_MODE:
                     logger.debug(f"UA - {l("restore_fonts_check_success")}")
                 return False
 

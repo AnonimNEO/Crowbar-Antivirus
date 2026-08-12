@@ -29,36 +29,37 @@ from config import *
 from languages import l
 from RS import RS
 
-global about_program_version
-about_program_version = "0.3.7 Beta"
+#global about_program_version
+ABOUT_PROGRAM_VERSION = "0.3.8 Beta"
 image_references = {}
 er = l("error")
 
-def AP(autorun_master_version=er,
-       crowbar_antivirus_scripts_handler_version=er,
-       clear_cache_version=er,
-       crowbar_menu_version=er,
-       crowbar_console_version=er,
-       exit_version=er,
-       edit_criticality_version=er,
+def AP(AUTORUN_MASTER_VERSION=er,
+       CROWBAR_ANTIVIRUS_SCRIPTS_HANDLER_VERSION=er,
+       CLEAR_CACHE_VERSION=er,
+       CROWBAR_MENU_VERSION=er,
+       CROWBAR_CONSOLE_VERSION=er,
+       EXIT_VERSION=er,
+       EDIT_CRITICALITY_VERSION=er,
        file_editor_version=er,
        file_manager_version=er,
-       file_replacer_version=er,
-       get_full_access_version=er,
-       on_board_pc_version=er,
-       other_function_version=er,
-       process_manager_version=er,
-       restart_version=er,
-       real_time_protect_version=er,
-       registry_monitor=er,
-       random_string_version=er,
-       run_version=er,
-       settings_and_update_version=er,
-       software_installation_manager=er,
-       scarecrow_protection_version=er,
-       trey_version=er,
-       unlock_all_version=er,
-       users_manager_version=er):
+       FILE_REPLACER_VERSION=er,
+       GET_FULL_ACCESS_VERSION=er,
+       ON_BOARD_PC_VERSION=er,
+       OTHER_FUNCTION_VERSION=er,
+       PROCESS_MANAGER_VERSION=er,
+       RESTART_VERSION=er,
+       REAL_TIME_PROTECT_VERSION=er,
+       REGISTRY_MONITOR_VERSION=er,
+       RANDOM_STRING_VERSION=er,
+       RUN_VERSION=er,
+       SETTINGS_AND_UPDATE_VERSION=er,
+       SOFTWARE_INSTALLATION_MANAGER=er,
+       SCARECROW_PROTECTION_VERSION=er,
+       TREY_VERSION=er,
+       UNLOCK_ALL_VERSION=er,
+       USER_MANAGER=er):
+    """Показ данных об программе, принимает в качестве аргументов версии Компонентов"""
     try:
         # Загрузка изображений
         def load_images(master):
@@ -112,38 +113,37 @@ def AP(autorun_master_version=er,
         def show_component_versions(event):
             version_component_text = (
                 f"{l("version_component")}:\n"
-                f"{l("pac")}: {program_authentication_clyth}\n"
+                f"{l("pac")}: {PROGRAM_AUTHENTICATION_CLYTH}\n"
                 f"---{l("general_component")}---\n"
-                f"{l("program_kernel")}: {trey_version}\n"
-                f"{l("RLP")}: {real_time_protect_version}\n"
-                f"{l("ARM")}: {autorun_master_version}\n"
-                f"{l("PM")}: {process_manager_version}\n"
+                f"{l("program_kernel")}: {TREY_VERSION}\n"
+                f"{l("ARM")}: {AUTORUN_MASTER_VERSION}\n"
+                f"{l("PM")}: {PROCESS_MANAGER_VERSION}\n"
                 f"{l("FM")}: {file_manager_version}\n"
-                f"{l("UA")}: {unlock_all_version}\n"
+                f"{l("UA")}: {UNLOCK_ALL_VERSION}\n"
                 f"{l("FE")}: {file_editor_version}\n"
                 f"{l("RLP")}: {real_time_protect_version}\n"
-                f"{l("SIM")}: {software_installation_manager}\n"
-                f"{l("RM")}: {real_time_protect_version}\n"
+                f"{l("SIM")}: {SOFTWARE_INSTALLATION_MANAGER}\n"
+                f"{l("RM")}: {REGISTRY_MONITOR_VERSION}\n"
                 f"---{l("mini_component")}---\n"
-                f"{l("CM")}: {crowbar_menu_version}\n"
-                f"{l("UM")}: {users_manager_version}\n"
-                f"{l("FR")}: {file_replacer_version}\n"
-                f"{l("SP")}: {scarecrow_protection_version}\n"
-                f"{l("CC")}: {clear_cache_version}\n"
-                f"{l("R")}: {restart_version}\n"
-                f"{l("Run")}: {run_version}\n"
-                f"{l("OBPC")}: {on_board_pc_version}\n"
+                f"{l("CM")}: {CROWBAR_MENU_VERSION}\n"
+                f"{l("UM")}: {USER_MANAGER_VERSION}\n"
+                f"{l("FR")}: {FILE_REPLACER_VERSION}\n"
+                f"{l("SP")}: {SCARECROW_PROTECTION_VERSION}\n"
+                f"{l("CC")}: {CLEAR_CACHE_VERSION}\n"
+                f"{l("R")}: {RESTART_VERSION}\n"
+                f"{l("Run")}: {RUN_VERSION}\n"
+                f"{l("OBPC")}: {ON_BOARD_PC_VERSION}\n"
                 f"---{l("system_component")}---\n"
                 f"{l("encryption")}: AES\n"
-                f"{l("CASH")}: {crowbar_antivirus_scripts_handler_version}\n"
-                f"{l("EC")}: {edit_criticality_version}\n"
-                f"{l("GFA")}: {get_full_access_version}\n"
-                f"{l("OF")}: {other_function_version}\n"
-                f"{l("Console")}: {crowbar_console_version}\n"
-                f"{l("RS")}: {random_string_version}\n"
-                f"{l("AP")}: {about_program_version}\n"
-                f"{l("SAU")}: {settings_and_update_version}"
-                f"{l("E")}: {exit_version}\n"
+                f"{l("CASH")}: {CROWBAR_ANTIVIRUS_SCRIPTS_HANDLER_VERSION}\n"
+                f"{l("EC")}: {EDIT_CRITICALITY_VERSION}\n"
+                f"{l("GFA")}: {GET_FULL_ACCESS_VERSION}\n"
+                f"{l("OF")}: {OTHER_FUNCTION_VERSION}\n"
+                f"{l("Console")}: {CROWBAR_CONSOLE_VERSION}\n"
+                f"{l("RS")}: {RANDOM_STRING_VERSION}\n"
+                f"{l("AP")}: {ABOUT_PROGRAM_VERSION}\n"
+                f"{l("SAU")}: {SETTINGS_AND_UPDATE_VERSION}"
+                f"{l("E")}: {EXIT_VERSION}\n"
             )
             messagebox.showinfo(RS(), version_component_text)
 

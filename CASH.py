@@ -174,12 +174,13 @@ except:
     def UM(a=None, b=None):
         pass
 
-crowbar_antivirus_scripts_handler_version = "0.4.7 Beta"
+CROWBAR_ANTIVIRUS_SCRIPTS_HANDLER_VERSION = "0.4.9 Beta"
 
-current_theme = theme[default_theme]
+current_theme = THEME[DEFAULT_THEME]
 
 # Получаем настройки скрипта
 def get_script_config(code):
+    """Получаем конфигурацию скрипта (опции запуска)"""
     config = {
         "delete_script_after_exec": False,
         "launch_when_program_starts": False,
@@ -224,12 +225,13 @@ def get_script_config(code):
 
 
 
-def CASH(run_in_recovery, debug_mode=False):
+def CASH(RUN_IN_RECOVERY, DEBUG_MODE=False):
+    """Обработчик скриптов"""
     while True:
         if len(sys.argv) > 1:
             # Был передан файл
             file_path = sys.argv[1]
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"CASH - {l("file_transferred")}: {file_path}")
             # Получаем расширение файла
             _, file_extension = os.path.splitext(file_path)
@@ -254,7 +256,7 @@ def CASH(run_in_recovery, debug_mode=False):
 
                 config = get_script_config(code)
 
-                if debug_mode:
+                if DEBUG_MODE:
                     logger.debug(f"CASH - {l("script_config")}: {config}")
 
                 # Создаём контекст выполнения с доступными функциями программы
@@ -264,10 +266,10 @@ def CASH(run_in_recovery, debug_mode=False):
                     "sys": sys,
                     "os": os,
                     "messagebox": messagebox,
-                    "run_in_recovery": run_in_recovery,
+                    "RUN_IN_RECOVERY": RUN_IN_RECOVERY,
                     "run_component": run_component,
                     "run_component_process": run_component_process,
-                    "run_in_recovery": run_in_recovery,
+                    "RUN_IN_RECOVERY": RUN_IN_RECOVERY,
                     "current_theme": current_theme,
                     "AP": AP,
                     "ARM": ARM,
@@ -316,7 +318,7 @@ def CASH(run_in_recovery, debug_mode=False):
                 if delete_script_after_exec:
                     try:
                         os.remove(file_path)
-                        if debug_mode:
+                        if DEBUG_MODE:
                             logger.debug(f"CASH - {l("script_deleted")}: {file_path}")
                     except:
                         logger.exception(f"CASH - {l("script_deleted_error")}: {file_path}")

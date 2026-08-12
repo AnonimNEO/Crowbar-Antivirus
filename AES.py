@@ -32,7 +32,7 @@ def AES(text, password, decrypt=False):
             # Декодируем base64
             text = text.strip()
             encrypted_data = base64.b64decode(text)
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"AES - Декодировано из base64: {len(encrypted_data)} байт")
 
             # Извлекаем компоненты
@@ -85,7 +85,7 @@ def AES(text, password, decrypt=False):
             # Объединяем и кодируем в base64
             encrypted_data = salt + iv + ciphertext
             result = base64.b64encode(encrypted_data).decode("utf-8")
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"AES - Зашифровано успешно: {len(result)} символов (base64)")
             return result
 

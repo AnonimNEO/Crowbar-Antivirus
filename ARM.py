@@ -30,13 +30,12 @@ import os
 
 from FE import FE
 from GFA import GFA
-from config import *
 from RS import RS
 from languages import l
 from PM import action_process_by_name
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-autorun_master_version = "3.7.17 Beta"
+AUTORUN_MASTER_VERSION = "3.7.19 Beta"
 
 # Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -127,7 +126,8 @@ class TaskSchedulerManager:
 
 
 
-def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
+def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
+    """Главная функция Компонента Мастера Автозагрузки (точка входа)"""
     REG_TYPE_MAP = {
         winreg.REG_SZ: "REG_SZ",
         winreg.REG_EXPAND_SZ: "REG_EXPAND_SZ",
@@ -156,8 +156,8 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     }
 
     # Путь к каталогу автозагрузки пользователя
-    if run_in_recovery:
-        current_disc, found_disc = get_current_disc(run_in_recovery)
+    if RUN_IN_RECOVERY:
+        current_disc, found_disc = get_current_disc(RUN_IN_RECOVERY)
         if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
             user_name = simpledialog.askstring(title=RS(), prompt=f"{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}: ")
         else:
@@ -283,8 +283,8 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
             hkey_map = ARM_CORE_GLOBALS["HKEY_MAP"]
             ARM_data = []
 
-            if run_in_recovery:
-                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
+            if RUN_IN_RECOVERY:
+                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY)
             else:
                 final_hkey = hkey_const
                 final_subkey = subkey_path
@@ -450,7 +450,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         def create_reg_value(hkey_const, subkey_path, name, reg_type_str, ARM_GUI_ELEMENTS):
             reg_type = REG_TYPE_MAP_REV.get(reg_type_str)
             if reg_type is None:
-                if debug_mode:
+                if DEBUG_MODE:
                     logger.error(f"ARM - Неизвестный тип реестра: {reg_type_str}")
                 return False
 
@@ -463,8 +463,8 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
             else:
                 initial_value = ""
 
-            if run_in_recovery:
-                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
+            if RUN_IN_RECOVERY:
+                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY)
             else:
                 final_hkey = hkey_const
                 final_subkey = subkey_path
@@ -487,8 +487,8 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
         # Обновляем существующий параметр реестра
         def update_reg_value(hkey_const, subkey_path, name, new_value, reg_type, item_id, ARM_GUI_ELEMENTS):
-            if run_in_recovery:
-                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
+            if RUN_IN_RECOVERY:
+                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY)
             else:
                 final_hkey = hkey_const
                 final_subkey = subkey_path
@@ -541,8 +541,8 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
         # Удаляем параметр реестра
         def delete_reg_value(hkey_const, subkey_path, name, item_id, ARM_GUI_ELEMENTS):
-            if run_in_recovery:
-                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery)
+            if RUN_IN_RECOVERY:
+                final_hkey, final_subkey = get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY)
             else:
                 final_hkey = hkey_const
                 final_subkey = subkey_path
@@ -591,7 +591,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         # Вспомогательная функция для получения пути к папке задач
         def get_tasks_directory():
             # Если режим восстановления - используем букву вмонтированного диска
-            if run_in_recovery:
+            if RUN_IN_RECOVERY:
                 return Path(f"{current_disc}Windows\\System32\\Tasks")
             # Если обычная система - берем системный путь через переменную окружения
             return Path(os.environ.get("SystemRoot", "C:\\Windows")) / "System32" / "Tasks"
@@ -623,7 +623,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         def get_task_scheduler_startup():
             ARM_data = []
 
-            if not run_in_recovery:
+            if not RUN_IN_RECOVERY:
                 manager = TaskSchedulerManager()
                 com_tasks = manager.get_all_tasks()
 
@@ -771,7 +771,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
         # Изменяем состояние задачи (Вкл/Выкл)
         def get_task_startup(task_path_str, enable, item_id, ARM_GUI_ELEMENTS):
-            if not run_in_recovery:
+            if not RUN_IN_RECOVERY:
                 manager = TaskSchedulerManager()
                 if manager.set_task_state_com(task_path_str, enable):
                     state = l("on") if enable else l("off")
@@ -819,7 +819,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
 
         # Удаляем задачу из планировщика
         def delete_task_scheduler_task(task_path_str, task_name, item_id, ARM_GUI_ELEMENTS):
-            if not run_in_recovery:
+            if not RUN_IN_RECOVERY:
                 manager = TaskSchedulerManager()
                 if manager.delete_task_com(task_path_str):
                     logger.success(f'ARM - {l("task")} "{task_path_str}" {l("delete_task_com")}.')
@@ -1151,8 +1151,8 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     menu.add_command(label=f"{l("copy_path")} (Ctrl+C)", command=lambda: copy_to_clipboard(master, file_path))
                     menu.add_command(label=f"{l("copy")} {l("name")} (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, file_name))
                     menu.add_separator()
-                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend", debug_mode))
-                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill", debug_mode))
+                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend", DEBUG_MODE))
+                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill", DEBUG_MODE))
                     menu.add_separator()
                     menu.add_command(label=f"{l("delete")} {l("file")} (Delete)", command=lambda: confirm_and_delete_file(ARM_GUI_ELEMENTS, file_path, file_name, item_id))
 
@@ -1164,12 +1164,12 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     file_name = extract_filename_from_path(reg_value)
                     file_path_without_args = extract_filename_from_path(reg_value, True)
 
-                    menu.add_command(label=l("get_full_access"), command=lambda:GFA(reg_path, run_in_recovery))
+                    menu.add_command(label=l("get_full_access"), command=lambda:GFA(reg_path, RUN_IN_RECOVERY))
                     menu.add_command(label=f"{l("copy_path")} (Ctrl+C)", command=lambda: copy_to_clipboard(master, reg_path))
                     menu.add_command(label=f"{l("copy")} {l("name")} {l("parameter")} (Ctrl+Shift+C)", command=lambda: copy_to_clipboard(master, reg_name))
                     menu.add_separator()
-                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend", debug_mode))
-                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill", debug_mode))
+                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend", DEBUG_MODE))
+                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill", DEBUG_MODE))
                     menu.add_separator()
                     menu.add_command(label=f"{l("delete")} {l("file")} {file_name}", command=lambda:confirm_and_delete_file(ARM_GUI_ELEMENTS, file_patg_without_args, file_name, item_id))
                     menu.add_separator()
@@ -1196,8 +1196,8 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                         menu.add_command(label=f"{l("turn_off")} (O)", state=tk.DISABLED)
                         menu.add_command(label=f"{l("turn_on")} (O)", command=lambda: confirm_and_set_task_state(ARM_GUI_ELEMENTS, task_path_full, task_name, True, item_id))
                     menu.add_separator()
-                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend", debug_mode))
-                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill", debug_mode))
+                    menu.add_command(label=f"{l("suspend_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "suspend", DEBUG_MODE))
+                    menu.add_command(label=f"{l("kill_process_for_name")} {file_name}", command=lambda:action_process_by_name(file_name, "kill", DEBUG_MODE))
                     menu.add_separator()
                     menu.add_command(label=f"{l("delete")} {l("file")} {file_name}", command=lambda: confirm_and_delete_file(ARM_GUI_ELEMENTS, task_action_path, file_name, item_id))
                     menu.add_separator()
@@ -1431,7 +1431,7 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         # Пункт "Вид" - Нерабочая фигня (сама сортировка по дате)
         # menubar.add_cascade(label=l("view"), menu=view_menu)
 
-        create_menubar(ARM_GUI, run_in_recovery, debug_mode=debug_mode)
+        create_menubar(ARM_GUI, RUN_IN_RECOVERY, DEBUG_MODE=DEBUG_MODE)
 
         ARM_GUI_ELEMENTS["notebook"] = ttk.Notebook(ARM_GUI)
         ARM_GUI_ELEMENTS["notebook"].pack(pady=10, padx=10, fill="both", expand=True)
@@ -1461,5 +1461,6 @@ def ARM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         messagebox.showerror(RS(), f"{l("arm_critical_error")}\n{e}")
 
 if __name__ == "__main__":
-    current_theme = theme[default_theme]
+    from config import THEME, DEFAULT_THEME
+    current_theme = THEME[DEFAULT_THEME]
     ARM(False, current_theme)

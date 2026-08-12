@@ -18,12 +18,12 @@ except:
 import os
 
 from languages import l
-from config import program_authentication_clyth, current_localization, clyth, theme
+from config import CLYTH
 from RS import RS
 from AES import AES
 from OF import pac, extract_filename_from_path, apply_global_theme, create_menubar
 
-file_editor_version = "0.3.10 Beta"
+FILE_EDITOR_VERSION = "0.3.11 Beta"
 
 class FileEditor:
     def __init__(self, FE_GUI):
@@ -199,7 +199,7 @@ class FileEditor:
 
             file_name = extract_filename_from_path(file_path)
             if file_name[-4:] == ".cas":
-                content = AES(content, clyth, True)
+                content = AES(content, CLYTH, True)
 
             self.text_widget.delete(1.0, tk.END)
             self.text_widget.insert(1.0, content)
@@ -221,7 +221,7 @@ class FileEditor:
             content = self.text_widget.get(1.0, tk.END)
             file_name = extract_filename_from_path(self.current_file)
             if file_name[-4:] == ".cas":
-                content = AES(content, clyth)
+                content = AES(content, CLYTH)
             with open(self.current_file, "w", encoding="utf-8") as file:
                 file.write(content)
             self.is_modified = False
@@ -242,7 +242,7 @@ class FileEditor:
         if file_path:
             try:
                 content = self.text_widget.get(1.0, tk.END)
-                content = AES(content, clyth)
+                content = AES(content, CLYTH)
                 with open(file_path, "w", encoding="utf-8") as file:
                     file.write(content)
                 self.current_file = file_path
@@ -440,8 +440,8 @@ class FileEditor:
 def FE(file_path=None, current_theme=False):
     try:
         if not current_theme:
-            from config import theme, default_theme
-            current_theme = theme[default_theme]
+            from config import THEME, DEFAULT_THEME
+            current_theme = THEME[DEFAULT_THEME]
         FE_GUI = tk.Tk()
         apply_global_theme(FE_GUI, current_theme)
         editor = FileEditor(FE_GUI)

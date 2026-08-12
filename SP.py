@@ -8,9 +8,9 @@
 # Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 # Coded by @AnonimNEO (Telegram)
 
-scarecrow_protection_version = "0.3.17 Beta"
+SCARECROW_PROTECTION_VERSION = "0.3.18 Beta"
 
-def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_mode=False):
+def SP(RUN_IN_RECOVERY=False, current_disc_r=False, current_theme=False, DEBUG_MODE=False):
     # Интерфейс
     from tkinter import ttk, messagebox, Menu
     import tkinter as tk
@@ -29,10 +29,9 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
     from RS import RS
     from OF import pac, apply_global_theme, get_user_name, create_menubar
     from languages import l
-    from config import theme, default_theme, program_authentication_clyth, current_localization
 
     try:
-        if run_in_recovery:
+        if RUN_IN_RECOVERY:
             current_disc = current_disc_r
         else:
             current_disc = "C:\\"
@@ -400,7 +399,7 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
                 if messagebox.askyesno(RS(), l("sp_confirmation")):
                     for program, info in PROGRAM_INFO.items():
                         if self.checkbox_vars[program].get():
-                            if debug_mode:
+                            if DEBUG_MODE:
                                 logger.info(f"SP - {l("delete_simulation")} {program}")
                             if "path" in info:
                                 for path in info["path"]:
@@ -420,13 +419,13 @@ def SP(run_in_recovery=False, current_disc_r=False, current_theme=False, debug_m
         # GUI_SP = SP(SP_GUI)
         SPI(SP_GUI)
 
-        create_menubar(SP_GUI, run_in_recovery, debug_mode=debug_mode)
+        create_menubar(SP_GUI, RUN_IN_RECOVERY, DEBUG_MODE=DEBUG_MODE)
 
         SP_GUI.mainloop()
     except Exception as e:
         logger.exception(l("sp_critical_error"))
 
 if __name__ == "__main__":
-    from config import theme, default_theme
-    current_theme = theme[default_theme]
+    from config import THEME, DEFAULT_THEME
+    current_theme = THEME[DEFAULT_THEME]
     SP(False, "C:\\", current_theme)

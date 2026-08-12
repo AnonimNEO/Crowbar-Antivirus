@@ -8,10 +8,10 @@
 # Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 # Coded by @AnonimNEO (Telegram)
 
-# Глобальная переменная версии
-file_manager_version = "4.11.11 Beta"
+FILE_MANAGER_VERSION = "4.11.13 Beta"
 
-def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
+def FM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
+    """Главгая функция Компонента ФайловогоМенеджера (точка входа)"""
     # Интерфейс
     from tkinter import ttk, messagebox, Menu, simpledialog
     import tkinter as tk
@@ -42,14 +42,6 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
     from FE import FE
 
     try:
-        # Перезапуск для применения темы
-        def restart_fm(user_theme):
-            global current_theme
-            current_theme = theme[user_theme]
-            apply_global_theme(FM_GUI, current_theme)
-
-
-
         # Получение информации о файлах и каталогах
         def get_files_info(path):
             files_info = []
@@ -185,7 +177,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
 
                 # Создание Меню
-                create_menubar(FM_GUI, run_in_recovery, "FM", self.open_search_dialog, debug_mode=debug_mode)
+                create_menubar(FM_GUI, RUN_IN_RECOVERY, "FM", self.open_search_dialog, DEBUG_MODE=DEBUG_MODE)
 
                 # Добавление первой вкладки
                 # При запуске предложить выбрать путь
@@ -358,8 +350,8 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     path = tab_data.get("path")
 
                     # Если пути всё еще нет (первый запуск), запрашиваем его
-                    if run_in_recovery:
-                        default_path = get_current_disc(run_in_recovery)
+                    if RUN_IN_RECOVERY:
+                        default_path = get_current_disc(RUN_IN_RECOVERY)
                         
                         # Если функция вернула кортеж, берем первый элемент
                         if isinstance(default_path, tuple) and len(default_path) > 0:
@@ -822,7 +814,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 for path in paths_to_delete:
                     try:
                         try:
-                            GFA(path, run_in_recovery)
+                            GFA(path, RUN_IN_RECOVERY)
                             print(2)
                         except:
                             print(1)
@@ -850,7 +842,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 if not paths: return
                 
                 self.clipboard_data = {"paths": paths, "action": "copy"}
-                if debug_mode:
+                if DEBUG_MODE:
                     logger.info(f"FM - {l("elements_copy")}: {len(paths)}")
 
 
@@ -861,7 +853,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 if not paths: return
 
                 self.clipboard_data = {"paths": paths, "action": "cut"}
-                if debug_mode:
+                if DEBUG_MODE:
                     logger.info(f"FM - Вырезано элементов: {len(paths)}")
 
 
@@ -1266,7 +1258,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                     menu.add_separator()
 
                     # Полные права и редактор
-                    menu.add_command(label=l("get_full_access"), command=lambda:GFA(self.get_focused_item_path(), run_in_recovery))
+                    menu.add_command(label=l("get_full_access"), command=lambda:GFA(self.get_focused_item_path(), RUN_IN_RECOVERY))
                     menu.add_command(label=l("edit_file"), command=lambda:FE(self.get_focused_item_path()))
 
                     # Создать
@@ -1395,7 +1387,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 if not item_path or item_path.endswith(".."):
                     return
                 self.clipboard_data = {"path": item_path, "action": "copy"}
-                if debug_mode:
+                if DEBUG_MODE:
                     logger.info(f"FM - Скопировано: {item_path}")
 
 
@@ -1406,7 +1398,7 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
                 if not item_path or item_path.endswith(".."):
                     return
                 self.clipboard_data = {"path": item_path, "action": "cut"}
-                if debug_mode:
+                if DEBUG_MODE:
                     logger.info(f"FM - Вырезано: {item_path}")
 
 
@@ -1916,5 +1908,5 @@ def FM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         messagebox.showerror(RS(), f"{l("fm_critical_error")}\n{e}")
 
 if __name__ == "__main__":
-    from config import theme, default_theme
-    FM(False, theme[default_theme])
+    from config import THEME, DEFAULT_THEME
+    FM(False, THEME[DEFAULT_THEME])

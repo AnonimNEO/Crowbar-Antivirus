@@ -21,18 +21,18 @@ import subprocess
 import os
 
 from languages import l
-from config import *
+from config import RESTART_WINDOWS, RESTART_WINDOWS_BAT
 
-global restart_windows_bat
-restart_version = "0.9.5 Beta"
+#global restart_windows_bat
+RESTART_VERSION = "0.9.5 Beta"
 
 # @logger.catch
 def R():
-    global error
+    #global error
     error = 0
-    global restart_windows
+    #global restart_windows
     try:
-        if restart_windows == "win32com":
+        if RESTART_WINDOWS == "win32com":
             logger.info(f"R - {l("attempt_to_reboot")} WMI (win32com)")
 
             # Получаем объект WMI для управления операционной системой
@@ -45,31 +45,31 @@ def R():
             # В отличие от InitiateSystemShutdown, этот метод не принимает таймаут напрямую,
             # но это более надёжный способ для win32com/WMI.
             os_instance.Reboot()
-        elif restart_windows == "os":
+        elif RESTART_WINDOWS == "os":
             logger.info(f"R - {l("attempt_to_reboot")} os.system('shutdown /r /t {time_to_restart}')")
             os.system(f"shutdown /r /t {time_to_restart}")
-        elif restart_windows == "subprocess":
+        elif RESTART_WINDOWS == "subprocess":
             logger.info(f"R - {l("attempt_to_reboot")} subprocess.call (shutdown /r /t {time_to_restart})")
             subprocess.call(["shutdown", "/r", "/t", f"{time_to_restart}"])
-        elif restart_windows == "bat":
+        elif RESTART_WINDOWS == "bat":
             logger.info(f"R - {l("attempt_to_reboot")} bat-{l("file")}")
-            with open(restart_windows_bat, "w") as bat_file:
+            with open(RESTART_WINDOWS_BAT, "w") as bat_file:
                 bat_file.write(f"shutdown /r /t {time_to_restart}")
-            os.startfile(restart_windows_bat)
+            os.startfile(RESTART_WINDOWS_BAT)
     except:
-        logger.exception(f'R - {l("r_critical_error")} "{restart_windows}"')
+        logger.exception(f'R - {l("r_critical_error")} "{RESTART_WINDOWS}"')
         error += 1
         if error == 1:
             logger.info(f"R - {l("next_method")}: os")
-            restart_windows = "os"
+            RESTART_WINDOWS = "os"
             R()
         if error == 2:
             logger.info(f"R - {l("next_method")}: subprocess")
-            restart_windows = "subprocess"
+            RESTART_WINDOWS = "subprocess"
             R()
         if error == 3:
             logger.info(f"R - {l("next_method")}: bat")
-            restart_windows = "bat"
+            RESTART_WINDOWS = "bat"
             R()
         if error < 5:
             logger.error(f"R - {l("all_method_used")}")

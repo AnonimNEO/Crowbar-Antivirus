@@ -34,14 +34,14 @@ import threading
 
 # Чтение конфига
 import config
-from config import theme, default_theme, program_authentication_clyth, current_localization
+from config import THEME, DEFAULT_THEME, PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 # Запуск команд
 from OF import run_command, apply_global_theme
 # Случайные заголовки
 from RS import RS
 
-settings_and_update_version = "1.2.5 Beta"
+SETTINGS_AND_UPDATE_VERSION = "1.2.6 Beta"
 
 def compiling_crowbar():
     global COMPILING_COMMAND
@@ -509,7 +509,7 @@ def crowbar_settings(current_theme):
 
     # Создаем вкладки
     general_tab = ttk.Frame(notebook)
-    notebook.add(general_tab, text=f"{l("pac")} - {program_authentication_clyth}")
+    notebook.add(general_tab, text=f"{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}")
 
     # Раздел для общих настроек
     general_frame = ttk.Frame(general_tab)
@@ -851,7 +851,7 @@ if __name__ == "__main__":
     config_log_path = simpledialog.askstring(title=RS(), prompt=l("enter_log_name"))
     if config_log_path:
         logger.add(config_log_path, format="{time} {level} {message}", rotation="10 MB", compression="zip")
-    current_theme = theme[default_theme]
+    current_theme = THEME[DEFAULT_THEME]
     from elevate import elevate
     elevate()
     SAU(current_theme)

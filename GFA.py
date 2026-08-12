@@ -19,9 +19,8 @@ import os
 
 # from RS import RS
 from languages import l
-from config import current_localization
 
-get_full_access_version = "0.4.7 Alpha"
+GET_FULL_ACCESS_VERSION = "0.4.8 Alpha"
 
 # Проверяем, является ли путь ключом реестра
 def is_registry_path(path):
@@ -190,14 +189,14 @@ def normalize_registry_path(path):
 
 
 # Получаем полные права на файл, каталог или ключ реестра
-def GFA(path, run_in_recovery=False):
+def GFA(path, RUN_IN_RECOVERY=False):
     """
     Универсальная функция для получения полных прав на каталог, файл или ключ реестра
     path - путь к каталогу, файлу или ключ реестра
-    run_in_recovery - Код работает в среде восстановления? Тогда True
+    RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
     return - False при ошибке, True при удачном завершении операции
     """
-    # if run_in_recovery:
+    # if RUN_IN_RECOVERY:
     #     messagebox.showwarning(RS(), "Невозможно получить права в среде восстановления.")
     #     return False
 

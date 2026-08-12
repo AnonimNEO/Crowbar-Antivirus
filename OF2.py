@@ -16,7 +16,7 @@ from loguru import logger
 import winreg
 
 global load_bush
-other_komponents_version = "0.6.4 Beta"
+OTHER_FUNCTION2_VERSION = "0.6.5 Beta"
 
 # Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -59,13 +59,13 @@ class Psutil:
 
 # Получаем оффлайн-пути реестра
 # @logger.catch()
-def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery):
-    if run_in_recovery:
+def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY):
+    if RUN_IN_RECOVERY:
         psutil = Psutil()
-    elif not run_in_recovery:
+    elif not RUN_IN_RECOVERY:
         import psutil
 
-    if not run_in_recovery:
+    if not RUN_IN_RECOVERY:
         # В онлайн-режиме возвращаем исходные константы
         return hkey_const, subkey_path
 

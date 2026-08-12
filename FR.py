@@ -8,9 +8,9 @@
 # Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 # Coded by @AnonimNEO (Telegram)
 
-file_replacer_version = "0.4.8 Beta"
+FILE_REPLACER_VERSION = "0.4.9 Beta"
 
-def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
+def FR(RUN_IN_RECOVERY=False, current_theme=False, DEBUG_MODE=False):
     # Интерфейс
     from tkinter import filedialog, messagebox, ttk, Menu
     import tkinter as tk
@@ -29,7 +29,6 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
     from RS import RS
     from OF import pac, apply_global_theme, get_current_disc, create_menubar
     from languages import l
-    from config import theme, default_theme, program_authentication_clyth, current_localization
 
     def browse_source(source_var):
         path = filedialog.askopenfilename(title=RS())
@@ -49,14 +48,14 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
 
     def replace_file(source_var, target_var):
         try:
-            GFA(source_var, run_in_recovery)
-            GFA(target_var, run_in_recovery)
+            GFA(source_var, RUN_IN_RECOVERY)
+            GFA(target_var, RUN_IN_RECOVERY)
         except:
             pass
         final_src = source_var.get()
         raw_target = target_var.get()
 
-        current_disc, found_disc = get_current_disc(run_in_recovery)
+        current_disc, found_disc = get_current_disc(RUN_IN_RECOVERY)
 
         if not found_disc:
             current_disc = "C:\\"
@@ -96,7 +95,7 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
 
     def restore_file(target_var):
         final_tgt = target_var.get()
-        current_disc, found_disc = get_current_disc(run_in_recovery)
+        current_disc, found_disc = get_current_disc(RUN_IN_RECOVERY)
         if not found_disc:
             current_disc = "C:\\"
         final_tgt = final_tgt.replace("C:", f"{current_disc}")
@@ -171,11 +170,11 @@ def FR(run_in_recovery=False, current_theme=False, debug_mode=False):
               command=lambda: restore_file(target_path), 
               width=15).pack(side="left", padx=10)
 
-    create_menubar(FR_GUI, run_in_recovery, debug_mode=debug_mode)
+    create_menubar(FR_GUI, RUN_IN_RECOVERY, DEBUG_MODE=DEBUG_MODE)
 
     FR_GUI.mainloop()
 
 if __name__ == "__main__":
-    from config import theme, default_theme
-    current_theme = theme[default_theme]
+    from config import THEME, DEFAULT_THEME
+    current_theme = THEME[DEFAULT_THEME]
     FR(False, current_theme)

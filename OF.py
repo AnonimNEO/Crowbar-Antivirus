@@ -32,10 +32,10 @@ import webbrowser
 from AES import AES
 from RS import RS
 from languages import l
-from config import *
+from config import ENCRYPT_LOGS, PROGRAM_AUTHENTICATION_CLYTH, LOG_PATH, T_LOG_TXT
 
 global load_bush
-other_function_version = "0.14.3 Beta"
+OTHER_FUNCTION_VERSION = "0.14.5 Beta"
 
 # Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -50,7 +50,7 @@ active_loaded_hives = []
 from loguru import logger as l_logger
 
 # Логирование с шифрованием
-if encrypt_logs:
+if ENCRYPT_LOGS:
     class Logger:
         def debug(self, message):
             l_logger.debug(AES(message, clyth))
@@ -77,7 +77,7 @@ if encrypt_logs:
             pass
 
         def add(self, *args, **kwargs):
-            l_logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
+            l_logger.add(f"{LOG_PATH}\\{T_LOH_TXT}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
 else:
     #  Создаём класс-обёртку для l_logger, чтобы он был вызываемым
     class Logger:
@@ -109,7 +109,7 @@ else:
             pass
 
         def add(self, *args, **kwargs):
-            self._logger.add(f"{log_path}\\{T_log_txt}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
+            self._logger.add(f"{LOG_PATH}\\{T_LOG_TXT}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
 
 try:
     if encrypt_logs:
@@ -123,7 +123,7 @@ except:
 class Psutil:
     """
     Заглушка библиотеки psutil которая всегда возвращает False/None
-    используйте её когда run_in_recovery = True
+    используйте её когда RUN_IN_RECOVERY = True
     """
     def cpu_percent(self, *args, **kwargs):
         return 0.0
@@ -215,11 +215,11 @@ def restart_ca():
 
 
 
-# def run_obpc(run_in_recovery):
+# def run_obpc(RUN_IN_RECOVERY):
 #     fail_start_obpc = 0
 #     if not start_obpc:
 #         try:
-#             thread_obpc = threading.Thread(target=lambda: OBPC(run_in_recovery))
+#             thread_obpc = threading.Thread(target=lambda: OBPC(RUN_IN_RECOVERY))
 #             thread_obpc.daemon = True
 #             thread_obpc.start()
 #         except Exception as e:
@@ -229,7 +229,7 @@ def restart_ca():
 #                 messagebox.showerror(RS(), "Произошла фатальная ошибка при работе с потоком Компонента OnBoardPC!\nПодробнее в лог-файле")
 #                 return
 #             logger.info(f"OF/run_obpc - Перезапуск OnBoardPC, попытка №{fail_start_obpc}...")
-#             run_lp(run_in_recovery)
+#             run_lp(RUN_IN_RECOVERY)
 #     else:
 #         messagebox.showwarning(RS(), "Компонент Голосовое Управление был запущен при запуске программы.")
 
@@ -342,12 +342,12 @@ def apply_global_theme(window, current_theme):
 
 
 # Защищаем окно от подозрительно частого или резкого перемещения
-def protect_window_from_moving(GUI, enable=True, debug_mode=False, MAX_MOVES_PER_SECOND=15, MAX_PIXEL_JUMP=250, DETECTION_WINDOW=1.5, LOCK_DURATION=0.6):
+def protect_window_from_moving(GUI, enable=True, DEBUG_MODE=False, MAX_MOVES_PER_SECOND=15, MAX_PIXEL_JUMP=250, DETECTION_WINDOW=1.5, LOCK_DURATION=0.6):
     """
     Главная функция AutoRunMaster
-    run_in_recovery - Код работает в среде восстановления? Тогда True
+    RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
     current_theme - Текущая тема для интерфейса (не сам кортеж, а название кортежа)
-    debug_mode - включить режим отладки (если True будет больше логов)
+    DEBUG_MODE - включить режим отладки (если True будет больше логов)
     ОПЦИОНАЛЬНО:
         MAX_MOVES_PER_SECOND - Максимум перемещений в секунду
         MAX_PIXEL_JUMP - Максимальный скачок в пикселях
@@ -422,7 +422,7 @@ def protect_window_from_moving(GUI, enable=True, debug_mode=False, MAX_MOVES_PER
             # Возвращаем окно в безопасную позицию
             GUI.geometry(f"+{state["safe_x"]}+{state["safe_y"]}")
 
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"protect_window_from_moving - {l("attack")} # {state["attack_count"]}: {attack_reason}")
                 logger.debug(f"protect_window_from_moving - {l("window_block")} {LOCK_DURATION} {l("second")}")
 
@@ -468,16 +468,16 @@ def restart_gui_for_theme(GUI, user_theme):
 
 
 # Создаём пункты в панели
-def create_menubar(GUI, run_in_recovery, component=None, component_func=None, component_func2=None, elements=None, debug_mode=False, component_func3=None, component_func4=None, component_func5=None, component_func6=None):
+def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, component_func2=None, elements=None, DEBUG_MODE=False, component_func3=None, component_func4=None, component_func5=None, component_func6=None):
     """
     Функция для создания стандартной верхней панели
     GUI - окно tkinter
-    run_in_recovery - Код работает в среде восстановления? Тогда True
+    RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
     component (str) - Название Компонента (Абривиатура)
     component_func - 1 Функция компонента которая будет вызываться из панели.
     component_func2 - 2 Функция компонента которая будет вызываться из панели.
     elements - аргументы для 1 и 2 функции.
-    debug_mode - включить режим отладки (если True будет больше логов).
+    DEBUG_MODE - включить режим отладки (если True будет больше логов).
     component_func3 - 3 Функция компонента которая будет вызываться из панели.
     component_func4 - 4 Функция компонента которая будет вызываться из панели.
     component_func5 - 5 Функция компонента которая будет вызываться из панели.
@@ -533,8 +533,8 @@ def create_menubar(GUI, run_in_recovery, component=None, component_func=None, co
     menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
     # Переменные состояния
-    higher = tk.BooleanVar(value=not run_in_recovery)
-    protect = tk.BooleanVar(value=not run_in_recovery)
+    higher = tk.BooleanVar(value=not RUN_IN_RECOVERY)
+    protect = tk.BooleanVar(value=not RUN_IN_RECOVERY)
 
     # Сохраняем индексы с учётом смещения
     topmost_index = (menubar.index("end") + 1 if menubar.index("end") else 1) + custom
@@ -544,7 +544,7 @@ def create_menubar(GUI, run_in_recovery, component=None, component_func=None, co
     menubar.add_command(label=f"Защита окна: {l("on2")}")
 
     pac_index = (menubar.index("end") + 1) + custom
-    menubar.add_command(label=f"{l("pac")} - {program_authentication_clyth}")
+    menubar.add_command(label=f"{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}")
 
     # Функции переключения
     def toggle_topmost():
@@ -555,7 +555,7 @@ def create_menubar(GUI, run_in_recovery, component=None, component_func=None, co
 
     def toggle_protect():
         protect.set(not protect.get())
-        protect_window_from_moving(GUI, protect.get(), debug_mode)
+        protect_window_from_moving(GUI, protect.get(), DEBUG_MODE)
         status = l("on2") if protect.get() else l("off2")
         menubar.entryconfig(protect_index, label=f"Защита окна: {status}")
 
@@ -567,21 +567,21 @@ def create_menubar(GUI, run_in_recovery, component=None, component_func=None, co
     GUI.config(menu=menubar)
 
     # Активируем защиту в обычной среде
-    if not run_in_recovery:
+    if not RUN_IN_RECOVERY:
         GUI.attributes("-topmost", True)
-        GUI.after(100, lambda: protect_window_from_moving(GUI, True, debug_mode))
+        GUI.after(100, lambda: protect_window_from_moving(GUI, True, DEBUG_MODE))
 
 
 
 # Получаем оффлайн-пути реестра
 # @logger.catch()
-def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recovery):
-    if run_in_recovery:
+def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY):
+    if RUN_IN_RECOVERY:
         psutil = Psutil()
-    elif not run_in_recovery:
+    elif not RUN_IN_RECOVERY:
         import psutil
 
-    if not run_in_recovery:
+    if not RUN_IN_RECOVERY:
         # В онлайн-режиме возвращаем исходные константы
         return hkey_const, subkey_path
 
@@ -610,14 +610,14 @@ def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, run_in_recov
 
 # Получаем диск с установленной шиндовс
 # @logger.catch()
-def get_current_disc(run_in_recovery=False):
+def get_current_disc(RUN_IN_RECOVERY=False):
     """
     Функция для получения диска с установленной шиндовс
-    run_in_recovery - Код работает в среде восстановления? Тогда True
+    RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
     return - "[Буква_диска]:\\"
     """
     try:
-        if run_in_recovery:
+        if RUN_IN_RECOVERY:
             # В WinPE ищем диск с каталогом Windows, отличный от X:
             drives = [f"{d}:\\" for d in "ABCDEFGHIJKLMNOPQRSTUVWYZ"]
             for drive in drives:
@@ -974,12 +974,12 @@ def open_with():
 def enable_debug_mode():
     """
     Функция для включения тестового режима (режима отладки)
-    Если её выполнить то все Компоненты будут запускаться с debug_mode=True
+    Если её выполнить то все Компоненты будут запускаться с DEBUG_MODE=True
     Что приведёт к увелечиному числу логов, с большим количеством информации
     Также будут разблокированы тестовый Компоненты (эксперементальные)
-    Важно: Для уже запущенных компонентов debug_mode - не поменяется на True - для этого потребуется перезапуск Компонента
+    Важно: Для уже запущенных компонентов DEBUG_MODE - не поменяется на True - для этого потребуется перезапуск Компонента
     Тоже самое касается и меню в иконке из-за чего новые пункты появятся только в Главном меню
-    Важно2: После перезапуска программы debug_mode вновь будет раен False
+    Важно2: После перезапуска программы DEBUG_MODE вновь будет раен False
     return - функция ничего не возвращает!
     """
     if askyesno(RS(), l("enable_debug_mode_text")):

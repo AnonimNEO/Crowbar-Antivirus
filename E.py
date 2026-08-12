@@ -22,17 +22,17 @@ import random
 import os
 
 from RS import RS
-from OF import theme, run_component
-from config import program_authentication_clyth, current_localization
+from OF import apply_global_theme, run_component
+from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-exit_version = "1.1.6 Beta"
-dyrachok_path = r"C:\ProgramData\dyrachok.txt"
+EXIT_VERSION = "1.1.8 Beta"
+DYRACHOK_PATH = r"C:\ProgramData\dyrachok.txt"
 
 # @logger.catch
 def check_access_file():
     try:
-        with open(dyrachok_path, "r") as f:
+        with open(DYRACHOK_PATH, "r") as f:
             content = f.read()
         if "debil" in content:
             logger.critical(f"E - {l("dyrachok_test_log_text")}.")
@@ -50,7 +50,7 @@ def check_access_file():
 def tiktok_question():
     if messagebox.askyesno(RS(), l("watch_tiktok?")):
         try:
-            with open(dyrachok_path, "w") as f:
+            with open(DYRACHOK_PATH, "w") as f:
                 f.write("debil")
             messagebox.showinfo(RS(), l("dyrachok_test_text"))
         except Exception as e:
@@ -96,6 +96,7 @@ def captcha_window():
 
 
 def E():
+    """Выход из программы через несколько капч"""
     try:
         # Это костыль, чтобы тема применялась к диалоговым окнам
         root = tk.Tk()

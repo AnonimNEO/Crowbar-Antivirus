@@ -11,7 +11,7 @@
 import random
 import string
 
-random_string_version = "1.0.4"
+RANDOM_STRING_VERSION = "1.0.5"
 
 def RS(type=None, dir=None):
     """

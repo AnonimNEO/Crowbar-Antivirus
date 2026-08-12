@@ -111,10 +111,10 @@ class CustomWebEnginePage(QWebEnginePage):
 
 
 class BrowserWindow(QMainWindow):
-    def __init__(self, debug_mode=False, url="https://duckduckgo.com", file=False, html=False):
+    def __init__(self, DEBUG_MODE=False, url="https://duckduckgo.com", file=False, html=False):
         super().__init__()
 
-        self.debug_mode = debug_mode
+        self.DEBUG_MODE = DEBUG_MODE
         self.current_theme = default_theme
         self.tabs = []
 
@@ -198,15 +198,15 @@ class BrowserWindow(QMainWindow):
         current_browser = self.get_current_browser()
         if html:
             self.load_html(html)
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"B - {l("html_loaded")}")
         elif file:
             self.load_file(url)
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"B - {l("file_loaded")}: {url}")
         else:
             self.load_url(url)
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"B - {l("page_loaded")}: {url}")
 
         current_browser.urlChanged.connect(self.on_url_changed)
@@ -299,10 +299,10 @@ class BrowserWindow(QMainWindow):
             browser = self.get_current_browser()
             if browser:
                 browser.setUrl(file_url)
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.debug(f"B - {l("file_loaded")}: {file_path}")
         else:
-            if debug_mode:
+            if DEBUG_MODE:
                 logger.error(f"B - {l("file_not_found")}: {file_path}")
             QMessageBox.critical(self, RS(), f"{l("file_not_found")}:\n{file_path}")
 
@@ -400,11 +400,11 @@ class BrowserWindow(QMainWindow):
 
 # Если file=True, url рассматривается как путь к файлу
 # html - HTML код для отображения в строковой переменной
-def B(url="https://duckduckgo.com", file=False, html=False, run_in_recovery=False, debug_mode=False):
-    if debug_mode:
-        logger.debug(f"B -{l("browser_called")} : url={url}, file={file}, html={html}, run_in_recovery={run_in_recovery}")
+def B(url="https://duckduckgo.com", file=False, html=False, RUN_IN_RECOVERY=False, DEBUG_MODE=False):
+    if DEBUG_MODE:
+        logger.debug(f"B -{l("browser_called")} : url={url}, file={file}, html={html}, RUN_IN_RECOVERY={RUN_IN_RECOVERY}")
 
-    if run_in_recovery:
+    if RUN_IN_RECOVERY:
         QMessageBox.warning(None, RS(), l("browser_run_in_recovery"))
 
     app = QApplication.instance()
@@ -412,7 +412,7 @@ def B(url="https://duckduckgo.com", file=False, html=False, run_in_recovery=Fals
         app = QApplication(sys.argv)
 
     browser_window = BrowserWindow(
-        debug_mode=debug_mode,
+        DEBUG_MODE=DEBUG_MODE,
         url=url,
         file=file,
         html=html

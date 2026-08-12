@@ -29,11 +29,11 @@ not_signal = False
 try:
     # Логирование Ошибок
     try:
-        from config import log_path
+        from config import LOG_PATH
     except:
-        log_path = ""
-    if not os.path.exists(log_path):
-        os.makedirs(log_path)
+        LOG_PATH = ""
+    if not os.path.exists(LOG_PATH):
+        os.makedirs(LOG_PATH)
     from OF import Logger
     logger = Logger()
     logger.add()
@@ -96,6 +96,9 @@ try:
 except:
     not_tkinter = True
     logger.exception(f"T - {l("import_error")} tkinter")
+    with open("fatal_error.txt", "w") as f:
+        f.write(f"{l("fatal_error")} {l("in_start_crowbar")}")
+    os.startfile("fatal_error.txt")
 
 try:
     # Рисование иконки в трее и вставка картинок
@@ -117,7 +120,7 @@ try:
     import pystray
 except:
     not_pystray = True
-    logger.exception(f"T - {l("import_error")} pystray", e)
+    logger.exception(f"T - {l("import_error")} pystray")
 
 # Работа с потоками
 try:
@@ -187,13 +190,13 @@ except:
     logger.exception(f"T - {l("component_import_error")} AboutImage")
 
 try:
-    from ARM import ARM, autorun_master_version
+    from ARM import ARM, AUTORUN_MASTER_VERSION
 except:
     not_arm = True
     logger.exception(f"T - {l("component_import_error")} AutoRunMaster")
 
 try:
-    from RS import RS, random_string_version
+    from RS import RS, RANDOM_STRING_VERSION
 except:
     def RS(a=None):
         return "error"
@@ -209,20 +212,20 @@ except:
 #     logger.exception(f"T - {l("component_import_error")} Browser")
 
 try:
-    from CC import CC, clear_cache_version
+    from CC import CC, CLEAR_CACHE_VERSION
 except:
     not_cc = True
     logger.exception(f"T - {l("component_import_error")} ClearCache")
 
 try:
-    from config import log_path, T_log_txt, theme, default_theme, program_authentication_clyth, start_interface, start_cash, start_lp, documentation_html
+    from config import LOG_PATH, T_LOG_TXT, THEME, DEFAULT_THEME, PROGRAM_AUTHENTICATION_CLYTH, START_INTERFACE, START_CASH, START_LP, DOCUMENTATION_HTML
     import config
 except:
     not_config = True
     logger.exception(f"T - {l("import_error")} config!")
 
 try:
-    from E import E, exit_version
+    from E import E, EXIT_VERSION
 except:
     not_e = True
     def E():
@@ -230,7 +233,7 @@ except:
     logger.exception(f"T - {l("component_import_error")} Exit")
 
 try:
-    from EC import EC, edit_criticality_version
+    from EC import EC, EDIT_CRITICALITY_VERSION
 except:
     not_ec = True
     def EC():
@@ -238,38 +241,38 @@ except:
     logger.exception(f"T - {l("component_import_error")} EditCritical")
 
 try:
-    from FE import FE, file_editor_version
+    from FE import FE, FILE_EDITOR_VERSION
 except:
     not_fe = True
     logger.exception(f"T - {l("component_import_error")} FileEditor")
 
 try:
-    from FM import FM, file_manager_version
+    from FM import FM, FILE_MANAGER_VERSION
 except:
     not_fm = True
     logger.critical(f"T - {l("component_import_error")} FileManager")
 
 try:
-    from FR import FR, file_replacer_version
+    from FR import FR, FILE_REPLACER_VERSION
 except:
     not_fr = True
     logger.exception(f"T - {l("component_import_error")} FileReplacer")
 
 try:
-    from GFA import GFA, get_full_access_version
+    from GFA import GFA, GET_FULL_ACCESS_VERSION
 except:
     def GFA():
         pass
     logger.exception(f"T - {l("component_import_error")} GetFullAccess")
 
 try:
-    from RLP import RLP, real_time_protect_version
+    from RLP import RLP, REAL_TIME_PROTECT_VERSION
 except:
     not_rlp = True
     logger.exception(f"T - {l("component_import_error")} RealTimeProtection")
 
 try:
-    from CM import CM, crowbar_menu_version
+    from CM import CM, CROWBAR_MENU_VERSION
 except:
     not_cm = True
     crowbar_menu_version = "error"
@@ -278,7 +281,7 @@ except:
     logger.exception(f"T - {l("component_import_error")} MountUnlocker")
 
 try:
-    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, other_function_version, CMD, decoy_mode, extract_filename_from_path, launch_ghost, documentation
+    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, OTHER_FUNCTION_VERSION, CMD, decoy_mode, extract_filename_from_path, launch_ghost, documentation
 except:
     not_of = True
     def restart_ca():
@@ -303,13 +306,13 @@ except:
     logger.exception(f"T - {l("component_import_error")} OtherFunction")
 
 try:
-    from PM import PM, process_manager_version
+    from PM import PM, PROCESS_MANAGER_VERSION
 except:
     not_pm = True
     logger.exception(f"T - {l("component_import_error")} ProcessManager")
 
 try:
-    from R import R, restart_version
+    from R import R, RESTART_VERSION
 except:
     not_r = True
     def R():
@@ -317,25 +320,25 @@ except:
     logger.exception(f"T - {l("component_import_error")} Restart")
 
 try:
-    from Run import Run, run_version
+    from Run import Run, RUN_VERSION
 except:
     not_run = True
     logger.exception(f"T - {l("component_import_error")} Run")
 
 try:
-    from SAU import SAU, settings_and_update_version
+    from SAU import SAU, SETTINGS_AND_UPDATE_VERSION
 except:
     not_sau = True
     logger.exception(f"T - {l("component_import_error")} SettingsAndUpdate")
 
 try:
-    from SP import SP, scarecrow_protection_version
+    from SP import SP, SCARECROW_PROTECTION_VERSION
 except:
     not_sp = True
     logger.exception(f"T - {l("component_import_error")} ScarecrowProtection")
 
 try:
-    from UA import UA, check_and_restore_fonts_if_needed, unlock_all_version
+    from UA import UA, check_and_restore_fonts_if_needed, UNLOCK_ALL_VERSION
 except:
     not_ua = True
     def check_and_restore_fonts_if_needed(a=None, b=None):
@@ -343,39 +346,39 @@ except:
     logger.exception(f"T - {l("component_import_error")} UnlockAll")
 
 try:
-    from UM import UM, users_manager_version
+    from UM import UM, USER_MANAGER_VERSION
 except:
     not_um = True
     logger.exception(f"T - {l("component_import_error")} UserManager")
 
 try:
-    from SIM import SIM, software_installation_manager
+    from SIM import SIM, SOFTWARE_INSTALLATION_MANAGER
 except:
     nor_sim = True
     logger.exception(f"T - {l("component_import_error")} SoftwareInstallationManager")
 
 try:
-    from RM import registry_monitor
+    from RM import REGISTRY_MONITOR_VERSION
 except:
     not_rm = True
     logger.exception(f"T - {l("component_import_error")} RegistryMonitor")
 
 # Импорт консоли разработчика
 try:
-    from Console import open_console, crowbar_console_version
+    from Console import open_console, CROWBAR_CONSOLE_VERSION
 except:
     not_console = True
     logger.exception(f"T - {l("component_import_error")} Console")
 
 # Импорт движка скриптов
 try:
-    from CASH import CASH, crowbar_antivirus_scripts_handler_version
+    from CASH import CASH, CROWBAR_ANTIVIRUS_SCRIPTS_HANDLER_VERSION
 except:
     not_cash = True
     logger.exception(f"T - {l("component_import_error")} CASH")
 
 try:
-    if not_pystray and not_cm and not not_tkinter:
+    if not_pystray and not_cm:
         broken_components = []
         c = l("component")
         li = l("library")
@@ -456,14 +459,13 @@ try:
 except:
     logger.exception(f"T - {l("checking_damage_error")}")
 
-global debug_mode
-font_trey = "Default"
-trey_version = "2.4.20 Beta"
-on_board_pc_version = l("not_stable")
-debug_mode = False
+global DEBUG_MODE
+TREY_VERSION = "2.4.22 Beta"
+ON_BOARD_PC_VERSION = l("not_stable")
+DEBUG_MODE = False
 
 def Crowbar():
-    if debug_mode:
+    if DEBUG_MODE:
         messagebox.showwarning(RS(), l("warning_debug_mode_on"))
 
     current_disc = None
@@ -475,17 +477,17 @@ def Crowbar():
 
     try:
         try:
-            run_in_recovery = check_is_recovery()
-            if run_in_recovery:
-                logger.warning(f"T - {l("run_in_recovery")}")
+            RUN_IN_RECOVERY = check_is_recovery()
+            if RUN_IN_RECOVERY:
+                logger.warning(f"T - {l("RUN_IN_RECOVERY")}")
             else:
                 logger.info(f"T - {l("run_in_normal")}")
         except:
-            run_in_recovery = True
+            RUN_IN_RECOVERY = True
             logger.exception(f"T - {l("environment_error")}")
 
-        if run_in_recovery:
-            current_disc, found_disc = get_current_disc(run_in_recovery)
+        if RUN_IN_RECOVERY:
+            current_disc, found_disc = get_current_disc(RUN_IN_RECOVERY)
             if found_disc:
                 logger.info(f"T - {l("load_bush")} {current_disc}...")
                 load_bush(current_disc)
@@ -495,12 +497,12 @@ def Crowbar():
         logger.exception(comment)
         messagebox.showerror(RS(), f"{comment}:\n{e}")
 
-    check_and_restore_fonts_if_needed(run_in_recovery, debug_mode)
+    check_and_restore_fonts_if_needed(RUN_IN_RECOVERY, DEBUG_MODE)
 
     # Основная программа
     try:
-        current_theme = theme[default_theme]
-        if not run_in_recovery:
+        current_theme = THEME[DEFAULT_THEME]
+        if not RUN_IN_RECOVERY:
             try:
                 _icon_buffer = None
 
@@ -534,7 +536,7 @@ def Crowbar():
                     return Image.open(_icon_buffer)
 
                 def start_icon():
-                    if run_in_recovery:
+                    if RUN_IN_RECOVERY:
                         # logger.warning("T - Режим восстановления: Трей отключен.")
                         return
                     try:
@@ -542,8 +544,8 @@ def Crowbar():
                     except:
                         logger.exception(f"T - {l("trey_error")}")
 
-                if run_in_recovery:
-                    current_disc_r, found_disc = get_current_disc(run_in_recovery)
+                if RUN_IN_RECOVERY:
+                    current_disc_r, found_disc = get_current_disc(RUN_IN_RECOVERY)
                 else:
                     current_disc_r = "C:\\"
 
@@ -556,31 +558,31 @@ def Crowbar():
                         return MenuItem(enabled_text, enabled_func)
 
                 def t_enable_debug_mode():
-                    global debug_mode
-                    debug_mode = enable_debug_mode()
+                    global DEBUG_MODE
+                    DEBUG_MODE = enable_debug_mode()
 
                 menu_items = [
-                    create_menu_item(not_arm, l("ARM"), lambda: run_component_process(ARM, run_in_recovery, current_theme, debug_mode), "ARM"),
-                    create_menu_item(not_pm, l("PM"), lambda: run_component_process(PM, run_in_recovery, current_theme, debug_mode), "PM"),
-                    create_menu_item(not_fm, l("FM"), lambda: run_component_process(FM, run_in_recovery, current_theme, debug_mode), "FM"),
-                    create_menu_item(not_fr, l("FR"), lambda: run_component(FR, run_in_recovery, current_theme, debug_mode), "FR"),
-                    create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, debug_mode), "UM"),
+                    create_menu_item(not_arm, l("ARM"), lambda: run_component_process(ARM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "ARM"),
+                    create_menu_item(not_pm, l("PM"), lambda: run_component_process(PM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "PM"),
+                    create_menu_item(not_fm, l("FM"), lambda: run_component_process(FM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "FM"),
+                    create_menu_item(not_fr, l("FR"), lambda: run_component(FR, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "FR"),
+                    create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, DEBUG_MODE), "UM"),
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE, None, current_theme), "FE"),
-                    # create_menu_item(not_b, l("B"), lambda: run_component(B, run_in_recovery), "B"),
-                    create_menu_item(not_sp, l("SP"),lambda: run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode), "SP"),
-                    create_menu_item(not_cc, l("CC"), lambda: run_component(CC, run_in_recovery), "CC"),
+                    # create_menu_item(not_b, l("B"), lambda: run_component(B, RUN_IN_RECOVERY), "B"),
+                    create_menu_item(not_sp, l("SP"),lambda: run_component(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE), "SP"),
+                    create_menu_item(not_cc, l("CC"), lambda: run_component(CC, RUN_IN_RECOVERY), "CC"),
                 ]
 
-                if debug_mode:
+                if DEBUG_MODE:
                     menu_items.append(
-                        create_menu_item(not_sim, l("SIM"), lambda: run_component(SIM, run_in_recovery, current_theme, debug_mode), "SIM"),
-                        create_menu_item(not_rlp, l("RLP"), lambda: run_component(RLP, run_in_recovery), "RLP"),
+                        create_menu_item(not_sim, l("SIM"), lambda: run_component(SIM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "SIM"),
+                        create_menu_item(not_rlp, l("RLP"), lambda: run_component(RLP, RUN_IN_RECOVERY), "RLP"),
                         create_menu_item(not_console, l("Console"), lambda: open_console({
                             "run_component": run_component,
                             "run_component_process": run_component_process,
-                            "run_in_recovery": run_in_recovery,
+                            "RUN_IN_RECOVERY": RUN_IN_RECOVERY,
                             "current_theme": current_theme,
-                            "debug_mode": debug_mode,
+                            "DEBUG_MODE": DEBUG_MODE,
                             "AP": AP,
                             "ARM": ARM,
                             "B": B,
@@ -617,7 +619,7 @@ def Crowbar():
                             "UA": UA,
                             "UM": UM,
                             "logger": logger,
-                        }, debug_mode), "Console"),
+                        }, DEBUG_MODE), "Console"),
                     )
 
                 menu_items.extend([
@@ -633,47 +635,47 @@ def Crowbar():
                 image = create_image(20, 20)
                 del(_icon_buffer)
                 menu = Menu(
-                    create_menu_item(not_cm, f"{l("open")} {l("CM")}", lambda: run_component(CM, run_in_recovery, current_theme, debug_mode), "CM"),
+                    create_menu_item(not_cm, f"{l("open")} {l("CM")}", lambda: run_component(CM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "CM"),
                     MenuItem(l("utilities"), unlocker_menu),
-                    create_menu_item(not_ua, l("UA"), lambda: UA(run_in_recovery, debug_mode), "UA"),
+                    create_menu_item(not_ua, l("UA"), lambda: UA(RUN_IN_RECOVERY, DEBUG_MODE), "UA"),
                     create_menu_item(not_run, l("Run"), lambda: run_component_process(Run, current_theme), "Run"),
                     create_menu_item(not_ap, l("AP"), lambda: run_component(AP,
-                        autorun_master_version,
-                        crowbar_antivirus_scripts_handler_version,
-                        clear_cache_version,
-                        crowbar_menu_version,
-                        crowbar_console_version,
-                        exit_version,
-                        edit_criticality_version,
-                        file_editor_version,
-                        file_manager_version,
-                        file_replacer_version,
-                        get_full_access_version,
-                        on_board_pc_version,
-                        other_function_version,
-                        process_manager_version,
-                        restart_version,
-                        real_time_protect_version,
-                        registry_monitor,
-                        random_string_version,
-                        run_version,
-                        settings_and_update_version,
-                        software_installation_manager,
-                        scarecrow_protection_version,
-                        trey_version,
-                        unlock_all_version,
-                        users_manager_version
+                        AUTORUN_MASTER_VERSION,
+                        CROWBAR_ANTIVIRUS_SCRIPTS_HANDLER_VERSION,
+                        CLEAR_CACHE_VERSION,
+                        CROWBAR_MENU_VERSION,
+                        CROWBAR_CONSOLE_VERSION,
+                        EXIT_VERSION,
+                        EDIT_CRITICALITY_VERSION,
+                        FILE_EDITOR_VERSION,
+                        FILE_MANAGER_VERSION,
+                        FILE_REPLACER_VERSION,
+                        GET_FULL_ACCESS_VERSION,
+                        ON_BOARD_PC_VERSION,
+                        OTHER_FUNCTION_VERSION,
+                        PROCESS_MANAGER_VERSION,
+                        RESTART_VERSION,
+                        REAL_TIME_PROTECT_VERSION,
+                        REGISTRY_MONITOR_VERSION,
+                        RANDOM_STRING_VERSION,
+                        RUN_VERSION,
+                        SETTINGS_AND_UPDATE_VERSION,
+                        SOFTWARE_INSTALLATION_MANAGER,
+                        SCARECROW_PROTECTION_VERSION,
+                        TREY_VERSION,
+                        UNLOCK_ALL_VERSION,
+                        USER_MANAGER_VERSION
                     ), "AP"),
                     # create_menu_item(not_b, l("documentation"), lambda: run_component(B, documentation_html), "B"),
                     create_menu_item(not_tkinter, l("documentation"), documentation, "B"),
                     create_menu_item(not_sau, l("SAU"), lambda: run_component(SAU, current_theme), "SAU"),
-                    create_menu_item(not_config, f"{l("pac")} - {program_authentication_clyth}", pac, "config"),
+                    create_menu_item(not_config, f"{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}", pac, "config"),
                     create_menu_item(not_e, l("E"), E, "Exit")
                 )
 
                 icon = pystray.Icon("Crowbar_Antivirus_Icon", image, "Crowbar Antivirus", menu)
 
-                if start_interface == "icon" or start_interface == "window":
+                if START_INTERFACE == "icon" or START_INTERFACE == "window":
                     try:
                         thread_icon = threading.Thread(target=icon.run)
                         thread_icon.daemon = True
@@ -682,16 +684,16 @@ def Crowbar():
                         start_icon()
                     except:
                         logger.exception(f"T - {l("icon_start_error")}!")
-                if start_lp:
+                if START_LP:
                     run_component(RLP)
 
-                if start_interface == "window" or start_interface == "only-windows":
-                    run_component(CM, run_in_recovery, current_theme)
+                if START_INTERFACE == "window" or START_INTERFACE == "only-windows":
+                    run_component(CM, RUN_IN_RECOVERY, current_theme)
 
-                if start_cash:
+                if START_CASH:
                     try:
-                        hcas_thread = threading.Thread(target=CASH, args=(run_in_recovery, debug_mode), daemon=True)
-                        hcas_thread.start()
+                        cash_thread = threading.Thread(target=CASH, args=(RUN_IN_RECOVERY, DEBUG_MODE), daemon=True)
+                        cash_thread.start()
                     except:
                         logger.exception(f"T - {l("start_cash_error")}!")
 
@@ -699,19 +701,19 @@ def Crowbar():
                     time.sleep(1)
             except:
                 logger.exception(f"T - {l("icon_start_error")}!")
-                CM(run_in_recovery, current_theme, current_disc)
+                CM(RUN_IN_RECOVERY, current_theme, current_disc)
 
-        if run_in_recovery:
-            CM(run_in_recovery, current_theme, current_disc)
+        if RUN_IN_RECOVERY:
+            CM(RUN_IN_RECOVERY, current_theme, current_disc)
 
     except:
         logger.exception(l("t_critical_error"))
-        CM(run_in_recovery, current_theme, current_disc)
+        CM(RUN_IN_RECOVERY, current_theme, current_disc)
     finally:
-        if run_in_recovery:
+        if RUN_IN_RECOVERY:
             logger.infof(f"T - {l("unload_bush")}")
 
-        if not run_in_recovery:
+        if not RUN_IN_RECOVERY:
             signal.signal(signal.SIGTERM, restart_ca)
 
 if __name__ == "__main__":

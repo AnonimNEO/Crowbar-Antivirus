@@ -123,13 +123,14 @@ except Exception as e:
     def UM(a=None):
         pass
 
-from config import program_authentication_clyth
+from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-crowbar_menu_version = "2.3.14 Beta"
+CROWBAR_MENU_VERSION = "2.3.16 Beta"
 
 # @logger.catch
-def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
+def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
+    """Главное окно программы"""
     try:
         # Обновляем размер шрифта и кнопок при изменении размера окна
         def on_window_resize(event):
@@ -235,22 +236,22 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         header_labels.append(label_comp)
 
         arm_btn = ttk.Button(tab_components, text=l("ARM"),
-                     command=lambda:run_component_process(ARM, run_in_recovery, current_theme, debug_mode))
+                     command=lambda:run_component_process(ARM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE))
         arm_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(arm_btn)
 
         pm_btn = ttk.Button(tab_components, text=l("PM"),
-                     command=lambda:run_component_process(PM, run_in_recovery, current_theme, debug_mode))
+                     command=lambda:run_component_process(PM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE))
         pm_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(pm_btn)
 
         fm_btn = ttk.Button(tab_components, text=l("FM"),
-                     command=lambda:run_component_process(FM, run_in_recovery, current_theme, debug_mode))
+                     command=lambda:run_component_process(FM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE))
         fm_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fm_btn)
 
         ua_btn = ttk.Button(tab_components, text=l("UA"),
-                     command=lambda:UA(run_in_recovery, debug_mode))
+                     command=lambda:UA(RUN_IN_RECOVERY, DEBUG_MODE))
         ua_btn.grid(row=2, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(ua_btn)
 
@@ -262,17 +263,17 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         header_labels.append(label_util)
 
         fr_btn = ttk.Button(tab_utilities, text=l("FR"),
-                     command=lambda:run_component(FR, run_in_recovery, current_theme, debug_mode))
+                     command=lambda:run_component(FR, RUN_IN_RECOVERY, current_theme, DEBUG_MODE))
         fr_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(fr_btn)
 
         cc_btn = ttk.Button(tab_utilities, text=l("CC"),
-                     command=lambda:CC(run_in_recovery))
+                     command=lambda:CC(RUN_IN_RECOVERY))
         cc_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(cc_btn)
 
         run_btn = ttk.Button(tab_utilities, text=l("Run"),
-                     command=lambda:run_component_process(Run, current_theme, debug_mode))
+                     command=lambda:run_component_process(Run, current_theme, DEBUG_MODE))
         run_btn.grid(row=2, column=0, columnspan=1, sticky="nsew", padx=5, pady=5)
         small_buttons.append(run_btn)
 
@@ -298,13 +299,13 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         label_prot.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
         header_labels.append(label_prot)
 
-        if debug_mode:
+        if DEBUG_MODE:
             try:
                 from RLP import RLP
             except:
                 logger.exception(f"CM - {import_error} RLP")
             rlp_btn = ttk.Button(tab_protect, text="Защита Нагрузки",
-                          command=lambda:run_component(RLP, run_in_recovery))
+                          command=lambda:run_component(RLP, RUN_IN_RECOVERY))
             rlp_btn.grid(row=1, column=1, sticky="nsew", padx=5, pady=5)
             regular_buttons.append(rlp_btn)
 
@@ -313,12 +314,12 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
             except:
                 logger.exception(f"CM - {import_error} SIM")
             sim_btn = ttk.Button(tab_protect, text="Менеджер Установки",
-                                 command=lambda: run_component(SIM, run_in_recovery, current_theme, debug_mode))
+                                 command=lambda: run_component(SIM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE))
             sim_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
             regular_buttons.append(sim_btn)
 
         sp_btn = ttk.Button(tab_protect, text=l("SP"),
-                      command=lambda:run_component(SP, run_in_recovery, current_disc_r, current_theme, debug_mode))
+                      command=lambda:run_component(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE))
         sp_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(sp_btn)
 
@@ -330,7 +331,7 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         header_labels.append(label_manage)
 
         um_btn = ttk.Button(tab_manage, text=l("UM"),
-                      command=lambda:run_component(UM, current_theme, debug_mode))
+                      command=lambda:run_component(UM, current_theme, DEBUG_MODE))
         um_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(um_btn)
 
@@ -340,7 +341,7 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
         regular_buttons.append(fe_btn)
 
         # b_btn = ttk.Button(tab_manage, text=l("B"),
-        #                     command=lambda: run_component(B, run_in_recovery))
+        #                     command=lambda: run_component(B, RUN_IN_RECOVERY))
         # b_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
         # regular_buttons.append(b_btn)
 
@@ -353,20 +354,20 @@ def CM(run_in_recovery=False, current_theme="dark", debug_mode=False):
             tab.rowconfigure(3, weight=1)
             tab.rowconfigure(4, weight=1)
 
-        if run_in_recovery:
-            current_disc_r, found_disc = get_current_disc(run_in_recovery)
+        if RUN_IN_RECOVERY:
+            current_disc_r, found_disc = get_current_disc(RUN_IN_RECOVERY)
         else:
             current_disc_r = "C:\\"
 
         tab_control.pack(fill="both", expand=True)
 
-        copyleft_label = ttk.Label(CM_GUI, text=f"{l("CM")} {crowbar_menu_version}", anchor="w")
+        copyleft_label = ttk.Label(CM_GUI, text=f"{l("CM")} {CROWBAR_MENU_VERSION}", anchor="w")
         copyleft_label.pack(side="bottom", anchor="w", padx=10, pady=10)
 
         # Создаём меню
-        create_menubar(CM_GUI, run_in_recovery, debug_mode=debug_mode)
+        create_menubar(CM_GUI, RUN_IN_RECOVERY, DEBUG_MODE=DEBUG_MODE)
 
-        # if run_in_recovery:
+        # if RUN_IN_RECOVERY:
         #     def change_user():
         #        user = simpledialog.askstring(title=RS(), prompt=f"Введите имя пользователя: ")
         #        load_bush(current_disc, user)

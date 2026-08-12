@@ -32,7 +32,7 @@ from languages import l
 from PM import action_process
 from RM import RegistryMonitor
 
-software_installation_manager = "0.1.12 Pre-Alpha"
+SOFTWARE_INSTALLATION_MANAGER = "0.1.13 Pre-Alpha"
 
 class SoftwareInstallManager:
     def __init__(self, SIM_GUI):
@@ -559,8 +559,8 @@ class SoftwareInstallManager:
             else:
                 label.pack_forget()
 
-def SIM(run_in_recovery=False, current_theme=False, debug_mode=False):
-    if run_in_recovery:
+def SIM(RUN_IN_RECOVERY=False, current_theme=False, DEBUG_MODE=False):
+    if RUN_IN_RECOVERY:
         if not messagebox.askyesno(RS(), "Тесты данного Компонента в среде восстановления не проводились\nЗапустить его?"):
             return
     SIM_GUI = tk.Tk()

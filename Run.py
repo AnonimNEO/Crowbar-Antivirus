@@ -24,20 +24,20 @@ import re
 
 from RS import RS
 from OF import pac, apply_global_theme, create_menubar
-from config import theme, default_theme, program_authentication_clyth, current_localization
+from config import THEME, DEFAULT_THEME, PROGRAM_AUTHENTICATION_CLYTH, CURRENT_LOCALIZATION
 from languages import l
 
-run_version = "1.1.7 Beta"
-run_width_window = 400
-run_height_window = 200
-run_size_window = f"{run_width_window}x{run_height_window}"
+RUN_VERSION = "1.1.8 Beta"
+RUN_WIDTH_WINDOW = 400
+RUN_HEIGHT_WINDOW = 200
+RUN_SIZE_WINDOW = f"{RUN_WIDTH_WINDOW}x{RUN_HEIGHT_WINDOW}"
 
 class Run_As_Admin:
     def __init__(self, RUN_GUI):
         self.RUN_GUI = RUN_GUI
         self.RUN_GUI.title(RS())
-        self.RUN_GUI.geometry(run_size_window)
-        self.RUN_GUI.minsize(run_width_window, run_height_window)
+        self.RUN_GUI.geometry(RUN_SIZE_WINDOW)
+        self.RUN_GUI.minsize(RUN_WIDTH_WINDOW, RUN_HEIGHT_WINDOW)
 
         # Пресеты
         self.presets = [
@@ -190,7 +190,7 @@ class Run_As_Admin:
             self.professional_frame.pack(fill=tk.BOTH, expand=True)
             self.simplified_frame.pack_forget()
             self.RUN_GUI.resizable(False, False)
-            self.RUN_GUI.geometry(run_size_window)
+            self.RUN_GUI.geometry(RUN_SIZE_WINDOW)
         else:
             self.RUN_GUI.minsize(600, 275)
             # self.RUN_GUI.geometry(run_)
@@ -277,15 +277,15 @@ class Run_As_Admin:
         self.log_text.see(tk.END)
 
 
-def Run(current_theme="dark", debug_mode=False):
+def Run(current_theme="dark", DEBUG_MODE=False):
     RUN_GUI = tk.Tk()
     apply_global_theme(RUN_GUI, current_theme)
     Run_As_Admin(RUN_GUI)
 
-    create_menubar(RUN_GUI, False, debug_mode=debug_mode)
+    create_menubar(RUN_GUI, False, DEBUG_MODE=DEBUG_MODE)
 
     RUN_GUI.mainloop()
 
 if __name__ == "__main__":
-    current_theme = theme[default_theme]
+    current_theme = THEME[DEFAULT_THEME]
     Run(current_theme)
