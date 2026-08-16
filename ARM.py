@@ -35,7 +35,7 @@ from languages import l
 from PM import action_process_by_name
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-AUTORUN_MASTER_VERSION = "3.7.19 Beta"
+AUTORUN_MASTER_VERSION = "3.7.20 Beta"
 
 # Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -187,7 +187,9 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                 (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Userinit"),
                 (winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon", "Taskman"),
                 (winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\Session Manager", "Bootshell"),
-                (winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\SafeBoot", "AlternateShell")
+                (winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\SafeBoot", "AlternateShell"),
+                (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Polices\System", "legalnoticecaption"),
+                (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Polices\System", "legalnoticetext")
             ],
             "AppInit_DLLs": [
                 (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows", "AppInit_DLLs",
@@ -331,6 +333,8 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                     return "0%"
                 elif value_name == "EnableCursorSuppression":
                     return "0%"
+                elif value_name == "legalnoticecaption" or value_name == "legalnoticetext":
+                    return "0%"
                 else:
                     return "50%"
 
@@ -350,7 +354,7 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                                 "value_type": reg_type
                             })
                         except FileNotFoundError:
-                            if key != "Taskman":
+                            if key != "Taskman" and key != "legalnoticecaption" and key != "legalnoticetext":
                                 logger.warning(f"ARM - {l("key_not_found")}: {full_path}\\{value_name}")
                         except:
                             logger.exception(f"ARM - {l("read_key_error")} {full_path}\\{value_name}")

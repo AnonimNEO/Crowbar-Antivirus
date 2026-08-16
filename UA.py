@@ -26,7 +26,7 @@ except:
 from OF import get_offline_reg_path, loaded_hive_names
 from languages import l
 
-UNLOCK_ALL_VERSION = "1.2.8 Beta"
+UNLOCK_ALL_VERSION = "1.2.9 Beta"
 
 # Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
@@ -43,7 +43,7 @@ def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
 
 
 # Восстанавливает шрифты в реестре на основе файлов из C:\Windows\Fonts
-def restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE=False):
+def restore_fonts(UA_GLOBALS, RUN_IN_RECOVERY, DEBUG_MODE=False):
     try:
         fonts_dir = r"C:\Windows\Fonts"
         registry_key = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
@@ -59,7 +59,7 @@ def restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE=False):
         final_hkey, final_subkey = get_offline_reg_path(
             winreg.HKEY_LOCAL_MACHINE,
             registry_key,
-            ua_globals,
+            UA_GLOBALS,
             RUN_IN_RECOVERY
         )
 
@@ -157,12 +157,23 @@ def restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE=False):
 
 
 # Сбрасывает указанные параметры в разделе реестра с учетом оффлайн-режима
-def reset_reg_values(hkey_const, chapter, params, ua_globals, is_exception, RUN_IN_RECOVERY):
+def reset_reg_values(hkey_const, chapter, params, UA_GLOBALS, is_exception, RUN_IN_RECOVERY):
+    """
+    Функция для сброса значений реестра
+
+    Аргументы:
+    :hkey_const - Куст реестра (например HKEY_LOCAL_MACHINE или HKEY_CURRENT_USER).
+    :chapter - путь к разделу реестра.
+    :params - Список имён параметров, если список пустой значит все параметры.
+    :UA_GLOBALS - Глобальная переменная офлайн путей к реестру.
+    :is_exception - Список params это исключения или включения?
+    :RUN_IN_RECOVERY - Код работает в среде восстановления?
+    """
     key_handle = None
-    hive_name = ua_globals["HKEY_MAP"].get(hkey_const, str(hkey_const))
+    hive_name = UA_GLOBALS["HKEY_MAP"].get(hkey_const, str(hkey_const))
 
     # Получаем корректный путь в зависимости от среды
-    final_hkey, final_subkey = get_offline_reg_path(hkey_const, chapter, ua_globals, RUN_IN_RECOVERY)
+    final_hkey, final_subkey = get_offline_reg_path(hkey_const, chapter, UA_GLOBALS, RUN_IN_RECOVERY)
 
     # logger.debug(f"UA - Обработка раздела: {hive_name}\\{chapter} (Режим исключений: {is_exception})")
 
@@ -284,7 +295,7 @@ def UA(RUN_IN_RECOVERY=False, DEBUG_MODE=False):
         software_hive = loaded_hive_names.get("SOFTWARE", "Offline_SOFTWARE")
         user_hive = loaded_hive_names.get("USER", "Offline_USER")
 
-        ua_globals = {
+        UA_GLOBALS = {
             "OFFLINE_HKEY_MAP": {
                 winreg.HKEY_LOCAL_MACHINE: (winreg.HKEY_LOCAL_MACHINE, software_hive, r"Software"),
                 winreg.HKEY_CURRENT_USER: (winreg.HKEY_LOCAL_MACHINE, user_hive, None)
@@ -297,25 +308,28 @@ def UA(RUN_IN_RECOVERY=False, DEBUG_MODE=False):
 
         # Список политик для сброса
         # Мышь
-        mouse_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Control Panel\Mouse", ["SwapMouseButtons"], ua_globals, False, RUN_IN_RECOVERY)
+        mouse_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Control Panel\Mouse", ["SwapMouseButtons"], UA_GLOBALS, False, RUN_IN_RECOVERY)
 
         # Ограничения проводника
-        explorer_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", [], ua_globals, True, RUN_IN_RECOVERY)
+        explorer_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", [], UA_GLOBALS, True, RUN_IN_RECOVERY)
 
         # Системные политики (HKCU)
-        user_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, RUN_IN_RECOVERY)
+        user_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], UA_GLOBALS, True, RUN_IN_RECOVERY)
 
         # Системные политики (HKLM)
-        system_restore_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], ua_globals, True, RUN_IN_RECOVERY)
+        system_restore_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], UA_GLOBALS, True, RUN_IN_RECOVERY)
 
         # Восстановление шрифтов
-        font_restore_success = restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE)
+        font_restore_success = restore_fonts(UA_GLOBALS, RUN_IN_RECOVERY, DEBUG_MODE)
 
         # файл hosts
         host_restore_success = process_hosts_with_exclusions()
 
-        restore_success = [mouse_restore_success, explorer_restore_success, user_restore_success, system_restore_success, font_restore_success, host_restore_success]
-        restore_text = [l("mouse"), l("explorer"), l("user"), l("systems"), l("fonts"), "IP"]
+        # Сообщение перед входом в систему
+        legal_text_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows\CurrentVersion\Polices\System", ["legalnoticecaption", "legalnoticetext"], UA_GLOBALS, False, RUN_IN_RECOVERY)
+
+        restore_success = [mouse_restore_success, explorer_restore_success, user_restore_success, system_restore_success, font_restore_success, host_restore_success, legal_text_success]
+        restore_text = [l("mouse"), l("explorer"), l("user"), l("systems"), l("fonts"), "IP", l("legal_notice")]
 
         i = 0
         ua_text = ""
@@ -343,11 +357,11 @@ def check_and_restore_fonts_if_needed(RUN_IN_RECOVERY, DEBUG_MODE=False):
     logger.info(f"UA - {l("check_fonts")}...")
 
     try:
-        # Инициализируем ua_globals для получения корректного пути реестра
+        # Инициализируем UA_GLOBALS для получения корректного пути реестра
         software_hive = loaded_hive_names.get("SOFTWARE", "Offline_SOFTWARE")
         user_hive = loaded_hive_names.get("USER", "Offline_USER")
 
-        ua_globals = {
+        UA_GLOBALS = {
             "OFFLINE_HKEY_MAP": {
                 winreg.HKEY_LOCAL_MACHINE: (winreg.HKEY_LOCAL_MACHINE, software_hive, r"Software"),
                 winreg.HKEY_CURRENT_USER: (winreg.HKEY_LOCAL_MACHINE, user_hive, None)
@@ -361,7 +375,7 @@ def check_and_restore_fonts_if_needed(RUN_IN_RECOVERY, DEBUG_MODE=False):
         final_hkey, final_subkey = get_offline_reg_path(
             winreg.HKEY_LOCAL_MACHINE, 
             registry_key, 
-            ua_globals, 
+            UA_GLOBALS,
             RUN_IN_RECOVERY
         )
 
@@ -413,7 +427,7 @@ def check_and_restore_fonts_if_needed(RUN_IN_RECOVERY, DEBUG_MODE=False):
             # Если проблемы обнаружены, запускаем восстановление
             if needs_restore:
                 logger.warning(f"UA - {l("font_problem_detect")}...")
-                restore_fonts(ua_globals, RUN_IN_RECOVERY, DEBUG_MODE)
+                restore_fonts(UA_GLOBALS, RUN_IN_RECOVERY, DEBUG_MODE)
                 return True
             else:
                 if DEBUG_MODE:

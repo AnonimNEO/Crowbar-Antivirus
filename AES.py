@@ -18,7 +18,7 @@ import hashlib
 import base64
 import os
 
-def AES(text, password, decrypt=False):
+def AES(text, password, decrypt=False, DEBUG_MODE=False):
     """
     Универсальная функция шифрования/расшифровки AES-256-CBC с PBKDF2
     text - Текст для шифрования ИЛИ зашифрованная текст для расшифровки
