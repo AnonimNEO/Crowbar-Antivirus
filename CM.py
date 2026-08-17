@@ -62,7 +62,7 @@ except Exception as e:
         pass
 
 try:
-    from OF import pac, run_component, run_component_process, open_with, get_current_disc, apply_global_theme, protect_window_from_moving, create_menubar, CMD
+    from OF import pac, run_component, run_component_process, open_with, get_current_disc, apply_global_theme, protect_window_from_moving, create_menubar
 except Exception as e:
     def pac():
         pass
@@ -78,8 +78,8 @@ except Exception as e:
         pass
     def create_menubar(a=None, b=None, c=None, d=None, e=None):
         pass
-    def CMD():
-        pass
+    #def CMD():
+    #    pass
 
 try:
     from PM import PM
@@ -126,7 +126,7 @@ except Exception as e:
 from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-CROWBAR_MENU_VERSION = "2.3.16 Beta"
+CROWBAR_MENU_VERSION = "2.3.17 Beta"
 
 # @logger.catch
 def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
@@ -277,10 +277,10 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         run_btn.grid(row=2, column=0, columnspan=1, sticky="nsew", padx=5, pady=5)
         small_buttons.append(run_btn)
 
-        cmd_btn = ttk.Button(tab_utilities, text="CMD",
-                     command=lambda:run_component(CMD))
-        cmd_btn.grid(row=2, column=1, columnspan=1, sticky="nsew", padx=5, pady=5)
-        small_buttons.append(cmd_btn)
+        #cmd_btn = ttk.Button(tab_utilities, text="CMD",
+        #             command=lambda:run_component(CMD))
+        #cmd_btn.grid(row=2, column=1, columnspan=1, sticky="nsew", padx=5, pady=5)
+        #small_buttons.append(cmd_btn)
 
         r_btn = ttk.Button(tab_utilities, text=l("R"),
                      command=R)
@@ -382,6 +382,6 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         logger.exception(l("cm_critical_error"))
 
 if __name__ == "__main__":
-    from config import theme, default_theme
-    current_theme = theme[default_theme]
+    from config import THEME, DEFAULT_THEME
+    current_theme = THEME[DEFAULT_THEME]
     CM(False, current_theme)

@@ -35,7 +35,7 @@ from languages import l
 from config import ENCRYPT_LOGS, PROGRAM_AUTHENTICATION_CLYTH, LOG_PATH, T_LOG_TXT
 
 global load_bush
-OTHER_FUNCTION_VERSION = "0.14.5 Beta"
+OTHER_FUNCTION_VERSION = "0.14.7 Beta"
 
 # Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -493,7 +493,7 @@ def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, co
         custom = 0
     elif component == "PM":
         actions_menu = tk.Menu(menubar, tearoff=0)
-        actions_menu.add_command(label=l("search"), accelerator="Ctrl+F", command=lambda: component_func(elements))
+        actions_menu.add_command(label=l("search"), accelerator="Ctrl+F", command=lambda: component_func(elements, DEBUG_MODE))
         actions_menu.add_command(label=l("cancel_search"), accelerator="Esc", command=lambda: component_func2(elements))
         menubar.add_cascade(label=l("actions"), menu=actions_menu)
         custom = 0
@@ -526,11 +526,11 @@ def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, co
     else:
         custom = 0
 
-    theme_menu = Menu(menubar, tearoff=0)
-    themes = [("dark", "dark"), ("white", "white"), ("red", "red"), ("green", "lime"), ("contrast", "black"), ("gray", "gray"), ("orange", "orange")]
-    for label, theme_name in themes:
-        theme_menu.add_checkbutton(label=l(label), command=lambda tn=theme_name: restart_gui_for_theme(GUI, tn))
-    menubar.add_cascade(label=l("themes"), menu=theme_menu)
+    #theme_menu = Menu(menubar, tearoff=0)
+    #themes = [("dark", "dark"), ("white", "white"), ("red", "red"), ("green", "lime"), ("contrast", "black"), ("gray", "gray"), ("orange", "orange")]
+    #for label, theme_name in themes:
+    #    theme_menu.add_checkbutton(label=l(label), command=lambda tn=theme_name: restart_gui_for_theme(GUI, tn))
+    #menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
     # Переменные состояния
     higher = tk.BooleanVar(value=not RUN_IN_RECOVERY)
@@ -878,56 +878,59 @@ def decoy_mode(cycle=False, debug=True):
 
 
 # CMD
-def CMD():
-    cmd = tk.Tk()
-    cmd.title(RS())
-    cmd.geometry("700x450")
-    from config import theme, default_theme
-    current_theme = theme[default_theme]
-    apply_global_theme(cmd, current_theme)
-
-    # Создаем виджет для вывода
-    console_text = scrolledtext.ScrolledText(cmd, wrap=tk.WORD, font=("Default", 10))
-    console_text.pack(fill="both", expand=True, padx=5, pady=5)
-
-    # Создаем рамку для ввода команд и кнопки
-    input_frame = tk.Frame(cmd)
-    input_frame.pack(fill="x", padx=5, pady=5)
-
-    command_entry = tk.Entry(input_frame, font=("Default", 10))
-    command_entry.pack(side="left", fill="x", expand=True, padx=(0, 5))
-
-    def print_to_console(msg):
-        console_text.insert(tk.END, msg + "\n")
-        console_text.see(tk.END)
-
-    def execute_command():
-        cmd = command_entry.get().strip()
-        if not cmd:
-            return
-        print_to_console(f"> {cmd}")
-        command_entry.delete(0, tk.END)
-
-        # Обработка команд
-        try:
-            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding="cp866")
-            output = result.stdout if result.stdout else result.stderr
-            print_to_console(output.strip())
-        except Exception as e:
-            logger.exception(f"OF/CMD - {l("error")}")
-            print_to_console(f"{l("error")}:\n{e}")
-
-    execute_button = tk.Button(input_frame, text=l("execute"), command=execute_command)
-    execute_button.pack(side="right")
-
-    # Обработка нажатия Enter в поле ввода
-    def on_enter(event):
-        execute_command()
-
-    command_entry.bind("<Return>", on_enter)
-
-    # Возвращаем функцию для вывода сообщений
-    return print_to_console
+##def CMD():
+##    try:
+##        CMD_GUI = tk.Tk()
+##        CMD_GUI.title(RS())
+##        CMD_GUI.geometry("700x450")
+##        from config import THEME, DEFAULT_THEME
+##        current_theme = THEME[DEFAULT_THEME]
+##        apply_global_theme(CMD_GUI, current_theme)
+##
+##        # Создаем виджет для вывода
+##        console_text = scrolledtext.ScrolledText(CMD_GUI, wrap=tk.WORD, font=("Default", 10))
+##        console_text.pack(fill="both", expand=True, padx=5, pady=5)
+##
+##        # Создаем рамку для ввода команд и кнопки
+##        input_frame = tk.Frame(CMD_GUI)
+##        input_frame.pack(fill="x", padx=5, pady=5)
+##
+##        command_entry = tk.Entry(input_frame, font=("Default", 10))
+##        command_entry.pack(side="left", fill="x", expand=True, padx=(0, 5))
+##
+##        def print_to_console(msg):
+##            console_text.insert(tk.END, msg + "\n")
+##            console_text.see(tk.END)
+##
+##        def execute_command():
+##            CMD_GUI = command_entry.get().strip()
+##            if not CMD_GUI:
+##                return
+##            print_to_console(f"> {CMD_GUI}")
+##            command_entry.delete(0, tk.END)
+##
+##            # Обработка команд
+##            try:
+##                result = subprocess.run(CMD_GUI, shell=True, capture_output=True, text=True, encoding="cp866")
+##                output = result.stdout if result.stdout else result.stderr
+##                print_to_console(output.strip())
+##            except Exception as e:
+##                logger.exception(f"OF/CMD - {l("error")}")
+##                print_to_console(f"{l("error")}:\n{e}")
+##
+##        execute_button = tk.Button(input_frame, text=l("execute"), command=execute_command)
+##        execute_button.pack(side="right")
+##
+##        # Обработка нажатия Enter в поле ввода
+##        def on_enter(event):
+##            execute_command()
+##
+##        command_entry.bind("<Return>", on_enter)
+##
+##        # Возвращаем функцию для вывода сообщений
+##        return print_to_console
+##    except:
+##        logger.exception(f"OF/CMD - {l("error")}")
 
 
 

@@ -25,12 +25,12 @@ import webbrowser
 import os
 
 # Импорт Компонентов
-from config import *
+from config import IMAGES_PATH, PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 from RS import RS
 
 #global about_program_version
-ABOUT_PROGRAM_VERSION = "0.3.8 Beta"
+ABOUT_PROGRAM_VERSION = "0.3.9 Beta"
 image_references = {}
 er = l("error")
 
@@ -41,7 +41,7 @@ def AP(AUTORUN_MASTER_VERSION=er,
        CROWBAR_CONSOLE_VERSION=er,
        EXIT_VERSION=er,
        EDIT_CRITICALITY_VERSION=er,
-       file_editor_version=er,
+       FILE_EDITOR_VERSION=er,
        file_manager_version=er,
        FILE_REPLACER_VERSION=er,
        GET_FULL_ACCESS_VERSION=er,
@@ -58,7 +58,7 @@ def AP(AUTORUN_MASTER_VERSION=er,
        SCARECROW_PROTECTION_VERSION=er,
        TREY_VERSION=er,
        UNLOCK_ALL_VERSION=er,
-       USER_MANAGER=er):
+       USERS_MANAGER_VERSION=er):
     """Показ данных об программе, принимает в качестве аргументов версии Компонентов"""
     try:
         # Загрузка изображений
@@ -67,14 +67,14 @@ def AP(AUTORUN_MASTER_VERSION=er,
             image_files = [] # Список найденных файлов изображений
 
             # Проверяем существование каталога
-            if not os.path.isdir(images_path):
+            if not os.path.isdir(IMAGES_PATH):
                 return image_labels_container
 
             # Получаем список файлов в каталоге
             try:
-                image_files = [f for f in os.listdir(images_path) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
+                image_files = [f for f in os.listdir(IMAGES_PATH) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
             except Exception as e:
-                logger.exception(f"AP - {l("read_dir_error")} {images_path}")
+                logger.exception(f"AP - {l("read_dir_error")} {IMAGES_PATH}")
                 return image_labels_container
 
             # Проверяем наличие файлов
@@ -87,7 +87,7 @@ def AP(AUTORUN_MASTER_VERSION=er,
 
             # Загружаем изображения и создаем метки
             for image_file in image_files:
-                img_path = os.path.join(images_path, image_file)
+                img_path = os.path.join(IMAGES_PATH, image_file)
                 try:
                     img = Image.open(img_path)
                     # Изменение размера изображения
@@ -120,13 +120,13 @@ def AP(AUTORUN_MASTER_VERSION=er,
                 f"{l("PM")}: {PROCESS_MANAGER_VERSION}\n"
                 f"{l("FM")}: {file_manager_version}\n"
                 f"{l("UA")}: {UNLOCK_ALL_VERSION}\n"
-                f"{l("FE")}: {file_editor_version}\n"
-                f"{l("RLP")}: {real_time_protect_version}\n"
+                f"{l("FE")}: {FILE_EDITOR_VERSION}\n"
+                f"{l("RLP")}: {REAL_TIME_PROTECT_VERSION}\n"
                 f"{l("SIM")}: {SOFTWARE_INSTALLATION_MANAGER}\n"
                 f"{l("RM")}: {REGISTRY_MONITOR_VERSION}\n"
                 f"---{l("mini_component")}---\n"
                 f"{l("CM")}: {CROWBAR_MENU_VERSION}\n"
-                f"{l("UM")}: {USER_MANAGER_VERSION}\n"
+                f"{l("UM")}: {USERS_MANAGER_VERSION}\n"
                 f"{l("FR")}: {FILE_REPLACER_VERSION}\n"
                 f"{l("SP")}: {SCARECROW_PROTECTION_VERSION}\n"
                 f"{l("CC")}: {CLEAR_CACHE_VERSION}\n"
@@ -155,41 +155,14 @@ def AP(AUTORUN_MASTER_VERSION=er,
 
 
         def open_website(event):
-            webbrowser.open("https://anonimneo.github.io/NEO-Organization//")
+            webbrowser.open("https://anonimneo.github.io/NEO-Organization/")
 
 
 
-        def donate_window(event):
-            def open_donationalerts(event):
-                webbrowser.open_new("https://www.donationalerts.com/r/anonimneo")
-
-            def open_trade_on_steam(event):
+        def open_trade_on_steam(event):
                 webbrowser.open_new("https://steamcommunity.com/tradeoffer/new/?partner=1842324943&token=xPAad4EP")
 
-            donate_window = tk.Tk()
-            donate_window.title(RS())
-            donate_window.configure(bg="black")
-            donate_window.resizable(False, False)
 
-            # Создаем фрейм для центрирования элементов
-            frame = tk.Frame(donate_window, bg="black")
-            frame.pack(expand=True, padx=20, pady=20)
-
-            label = tk.Label(frame, text=l("support_text"), fg="white", bg="black", font=("Arial", 12))
-            label.pack(pady=(0, 10))
-
-            link1 = tk.Label(frame, text="DonationAlerts", fg="red", bg="black", cursor="hand2", font=("Arial", 12, "underline"))
-            link1.pack()
-            link1.bind("<Button-1>", open_donationalerts)
-
-            label2 = tk.Label(frame, text=l("steam_trade_text"), fg="white", bg="black", font=("Arial", 12))
-            label2.pack(pady=(10, 0))
-
-            link2 = tk.Label(frame, text="Steam", fg="red", bg="black", cursor="hand2", font=("Arial", 12, "underline"))
-            link2.pack()
-            link2.bind("<Button-1>", open_trade_on_steam)
-
-            donate_window.mainloop()
 
         about_window = tk.Tk()
         about_window.title(RS())
@@ -205,9 +178,9 @@ def AP(AUTORUN_MASTER_VERSION=er,
         version_link.pack(pady=10)
         version_link.bind("<Button-1>", show_component_versions)
 
-        donationalerts_link = tk.Label(about_window, text=l("donation_alerts_text"), bg="black", fg="red", cursor="hand2", font=("ComicSans", 16))
+        donationalerts_link = tk.Label(about_window, text=l("donation_steam_text"), bg="black", fg="red", cursor="hand2", font=("ComicSans", 16))
         donationalerts_link.pack(pady=10)
-        donationalerts_link.bind("<Button-1>", donate_window)
+        donationalerts_link.bind("<Button-1>", open_trade_on_steam)
 
         gpl_link = tk.Label(about_window, text=f"{l("license")} GPL v3.0", bg="red", fg="white", cursor="hand2", font=("ComicSans", 16))
         gpl_link.pack(pady=10)

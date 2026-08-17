@@ -26,7 +26,7 @@ from OF import apply_global_theme, run_component
 from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-EXIT_VERSION = "1.1.8 Beta"
+EXIT_VERSION = "1.1.9 Beta"
 DYRACHOK_PATH = r"C:\ProgramData\dyrachok.txt"
 
 # @logger.catch
@@ -101,13 +101,13 @@ def E():
         # Это костыль, чтобы тема применялась к диалоговым окнам
         root = tk.Tk()
         root.title(RS())
-        from config import theme
-        current_theme = theme["dark"]
+        from config import THEME, DEFAULT_THEME
+        current_theme = THEME[DEFAULT_THEME]
         from OF import apply_global_theme
         apply_global_theme(root, current_theme)
         root.withdraw()
         if check_access_file():
-            if messagebox.askyesno(RS(), f"{l("pac")} - {program_authentication_clyth}\n\n{l("want_exit?")}"):
+            if messagebox.askyesno(RS(), f"{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}\n\n{l("want_exit?")}"):
                 logger.info(f"E - {l("attempting_to_exit")}.")
                 captcha_window()
             else:
@@ -115,3 +115,6 @@ def E():
         root.mainloop()
     except:
         logger.exception(f"E - {l("e_critical_error")}")
+
+if __name__ == "__main__":
+    E()

@@ -30,7 +30,7 @@ except:
     from OF import Psutil
     psutil = Psutil()
 
-PROCESS_MANAGER_VERSION = "1.9.6 Beta"
+PROCESS_MANAGER_VERSION = "1.9.7 Beta"
 
 # Действие с процессами
 def action_process(PM_GUI_ELEMENTS=False, action="suspend", process_ids=None, RUN_IN_RECOVERY=False, DEBUG_MODE=False):
@@ -488,6 +488,7 @@ def load_current_tab_data(PM_GUI_ELEMENTS, DEBUG_MODE=False):
 def PM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
     from OF import pac, Psutil, apply_global_theme, extract_filename_from_path, create_menubar
     from RS import RS
+    from config import TIME_TO_UPDATE_PROCESS_LIST
     search_dialog_open = False
 
     PM_GUI_ELEMENTS = {
@@ -498,7 +499,7 @@ def PM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         "vsb": None,
         "current_tab": l("all_process"),
         "treeview_data": [],
-        "update_interval": time_to_update_process_list * 1000,
+        "update_interval": TIME_TO_UPDATE_PROCESS_LIST * 1000,
         "sort_column": "PID",
         "sort_direction": "asc",
         "search_query": "",
@@ -526,7 +527,7 @@ def PM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
 
 
         # Диалог Поиска
-        def open_search_dialog(PM_GUI_ELEMENTS, DEBUG_MODE):
+        def open_search_dialog(PM_GUI_ELEMENTS, DEBUG_MODE=False):
             nonlocal search_dialog_open
             search_dialog_open = True
             manager = PM_GUI_ELEMENTS["manager"]
@@ -689,5 +690,5 @@ def PM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
 
 if __name__ == "__main__":
     from config import THEME, DEFAULT_THEME
-    current_theme = THEME[DEFAUL_THEME]
+    current_theme = THEME[DEFAULT_THEME]
     PM(False, current_theme)

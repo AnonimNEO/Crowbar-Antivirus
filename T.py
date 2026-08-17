@@ -281,7 +281,7 @@ except:
     logger.exception(f"T - {l("component_import_error")} MountUnlocker")
 
 try:
-    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, OTHER_FUNCTION_VERSION, CMD, decoy_mode, extract_filename_from_path, launch_ghost, documentation
+    from OF import pac, apply_global_theme, get_offline_reg_path, Psutil, run_component, run_component_process, get_user_name, restart_ca, reg_file, run_command, open_with, get_current_disc, load_bush, unload_bush, enable_debug_mode, OTHER_FUNCTION_VERSION, decoy_mode, extract_filename_from_path, launch_ghost, documentation
 except:
     not_of = True
     def restart_ca():
@@ -293,8 +293,8 @@ except:
         pass
     def pac():
         messagebox.showerror(RS(), f"{l("pac")} {l("not_available")}!")
-    def CMD():
-        pass
+    #def CMD():
+    #    pass
     def decoy_mode(a=None, b=None):
         pass
     def extract_filename_from_path(a=None, b=None):
@@ -460,7 +460,7 @@ except:
     logger.exception(f"T - {l("checking_damage_error")}")
 
 global DEBUG_MODE
-TREY_VERSION = "2.4.23 Beta"
+TREY_VERSION = "2.4.24 Beta"
 ON_BOARD_PC_VERSION = l("not_stable")
 DEBUG_MODE = False
 
@@ -623,7 +623,7 @@ def Crowbar():
                     )
 
                 menu_items.extend([
-                    create_menu_item(not_of, "CMD", lambda: run_component(CMD), "OF"),
+                    #create_menu_item(not_of, "CMD", lambda: run_component(CMD), "OF"),
                     create_menu_item(not_of, l("open_with"), open_with, "OF"),
                     create_menu_item(not_of, l("enable_debug_mode"), t_enable_debug_mode, "OF"),
                     create_menu_item(not_r, l("R"), R, "R")

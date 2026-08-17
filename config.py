@@ -79,6 +79,8 @@ RESTART_WINDOWS_BAT = "restart_windows.bat"
 # Имя пользователя по умолчанию
 DEFAULT_USER_THEME = "Admin"
 
+TIME_TO_UPDATE_PROCESS_LIST = 5
+
 # (НЕ РЕДАКТИРОВАТЬ) Документация
 DOCUMENTATION_HTML = """
 <!DOCTYPE html>
