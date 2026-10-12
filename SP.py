@@ -8,7 +8,7 @@
 # Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 # Coded by AnonimNEO (Github)
 
-SCARECROW_PROTECTION_VERSION = "0.3.19 Beta"
+SCARECROW_PROTECTION_VERSION = "0.3.20 Beta"
 
 def SP(RUN_IN_RECOVERY=False, current_disc_r=False, current_theme=False, DEBUG_MODE=False):
     # Интерфейс
@@ -256,18 +256,15 @@ def SP(RUN_IN_RECOVERY=False, current_disc_r=False, current_theme=False, DEBUG_M
                 master.geometry("300x215")
                 master.resizable(True, True)
 
-                # Фрейм для кнопок
                 self.button_frame = ttk.Frame(master)
                 self.button_frame.pack(side=tk.BOTTOM, pady=10)
 
-                # Кнопки
                 self.run_button = tk.Button(self.button_frame, text=l("simulation"), command=self.run_simulation)
                 self.run_button.pack(side=tk.LEFT, padx=10)
 
                 self.delete_button = tk.Button(self.button_frame, text=l("removal"), command=self.delete_simulation)
                 self.delete_button.pack(side=tk.LEFT, padx=10)
 
-                # Фрейм для чекбоксов со скроллбаром
                 self.checkbox_frame = ttk.Frame(master)
                 self.checkbox_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=10)
 
@@ -291,7 +288,6 @@ def SP(RUN_IN_RECOVERY=False, current_disc_r=False, current_theme=False, DEBUG_M
                 self.checkbox_vars = {}
                 self.checkboxes = {}
 
-                # Создаем чекбоксы в два столбца
                 self.create_checkboxes()
 
 
@@ -299,14 +295,13 @@ def SP(RUN_IN_RECOVERY=False, current_disc_r=False, current_theme=False, DEBUG_M
             def create_checkboxes(self):
                 programs = list(PROGRAM_INFO.keys())
                 num_programs = len(programs)
-                half_programs = (num_programs + 1) // 2 # Рассчитываем середину, округляя вверх
+                half_programs = (num_programs + 1) // 2
 
                 for i in range(num_programs):
                     program = programs[i]
                     var = tk.BooleanVar(value=False)
                     checkbox = ttk.Checkbutton(self.scrollable_frame, text=program, variable=var)
 
-                    # Размещение чекбоксов в два стола
                     if i < half_programs:
                         checkbox.grid(row=i, column=0, sticky="w", padx=1, pady=2)
                     else:
@@ -329,7 +324,7 @@ def SP(RUN_IN_RECOVERY=False, current_disc_r=False, current_theme=False, DEBUG_M
             def create_file(self, path):
                 try:
                     with open(path, "w"):
-                        pass # Создаём пустой файл
+                        pass
                     logger.info(f'SP - {l("create_file")}: {path}')
                 except OSError as e:
                     logger.error(f'SP - {l("create_file_error")} {path}:\n{e}')

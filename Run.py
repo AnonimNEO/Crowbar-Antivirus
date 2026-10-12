@@ -27,7 +27,7 @@ from OF import pac, apply_global_theme, create_menubar
 from config import THEME, DEFAULT_THEME, PROGRAM_AUTHENTICATION_CLYTH, CURRENT_LOCALIZATION
 from languages import l
 
-RUN_VERSION = "1.1.8 Beta"
+RUN_VERSION = "1.1.9 Beta"
 RUN_WIDTH_WINDOW = 400
 RUN_HEIGHT_WINDOW = 200
 RUN_SIZE_WINDOW = f"{RUN_WIDTH_WINDOW}x{RUN_HEIGHT_WINDOW}"
@@ -71,12 +71,10 @@ class Run_As_Admin:
         # Переключение на профессиональный режим по умолчанию
         self.switch_mode(l("professional"))
 
-        # Привязка события изменения размера окна
         self.RUN_GUI.bind("<Configure>", self.on_window_resize)
 
 
 
-    # Создание меню с выбором режима
     def create_menu(self):
         menu_frame = tk.Frame(self.RUN_GUI, height=40)
         menu_frame.pack(side=tk.TOP, fill=tk.X)
@@ -100,7 +98,6 @@ class Run_As_Admin:
 
 
     def create_professional_mode(self):
-        # Поле для ввода команды
         input_frame = tk.Frame(self.professional_frame)
         input_frame.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
@@ -116,7 +113,6 @@ class Run_As_Admin:
         )
         ok_button.pack(side=tk.LEFT)
 
-        # Меню пресетов
         self.preset_combo = ttk.Combobox(
             self.professional_frame,
             values=[p["name"] for p in self.presets],
@@ -126,7 +122,6 @@ class Run_As_Admin:
         self.preset_combo.pack(fill=tk.X, padx=5, pady=5)
         self.preset_combo.bind("<<ComboboxSelected>>", self.on_preset_selected)
 
-        # Текстовое поле для отображения ошибок
         log_frame = tk.Frame(self.professional_frame)
         log_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
@@ -143,7 +138,6 @@ class Run_As_Admin:
         self.log_text.pack(fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.log_text.yview)
 
-        # Блокируем изменение размера окна в профессиональном режиме
         self.RUN_GUI.resizable(False, False)
 
 
@@ -151,7 +145,6 @@ class Run_As_Admin:
     def create_simplified_mode(self):
         self.simplified_frame.pack_propagate(False)
 
-        # Очистка предыдущего интерфейса
         for widget in self.simplified_frame.winfo_children():
             widget.destroy()
 
@@ -184,7 +177,6 @@ class Run_As_Admin:
 
 
 
-    # Переключаем режим
     def switch_mode(self, mode):
         if mode == l("professional"):
             self.professional_frame.pack(fill=tk.BOTH, expand=True)
@@ -193,7 +185,7 @@ class Run_As_Admin:
             self.RUN_GUI.geometry(RUN_SIZE_WINDOW)
         else:
             self.RUN_GUI.minsize(600, 275)
-            # self.RUN_GUI.geometry(run_)
+            #self.RUN_GUI.geometry(run_)
             self.professional_frame.pack_forget()
             self.simplified_frame.pack(fill=tk.BOTH, expand=True)
             self.RUN_GUI.resizable(True, True)
@@ -210,7 +202,6 @@ class Run_As_Admin:
 
 
 
-    # Проверяем является ли текст командой или путём к файлу
     def is_command_or_dir(self, text):
         # Если начинается с буквы и двоеточия, то это путь
         if re.match(r"^[A-Za-z]:", text):
@@ -219,7 +210,6 @@ class Run_As_Admin:
 
 
 
-    # Выполняем команду или запускаем файл
     def run_command(self):
         command = self.input_field.get().strip()
         if command == "" or command == None:
@@ -227,11 +217,9 @@ class Run_As_Admin:
 
         try:
             if self.is_command_or_dir(command):
-                # Это команда
                 subprocess.Popen(command, shell=True)
                 logger.info(f'Run - {l("launch")} {l("commands")}: {command}')
             else:
-                # Это путь к файлу
                 if os.path.exists(command):
                     os.startfile(command)
                     logger.info(f'Run - {l("launch")} {l("file2")}: {command}')
@@ -246,7 +234,6 @@ class Run_As_Admin:
 
 
 
-    # Выполняем команду кнопки
     def run_command_from_button(self, command):
         if command == "":
             return
@@ -260,7 +247,6 @@ class Run_As_Admin:
 
     def on_window_resize(self, event=None):
         if self.mode.get() == l("simplified"):
-            # Динамическое изменение размера шрифта в зависимости от размера окна
             width = self.RUN_GUI.winfo_width()
             height = self.RUN_GUI.winfo_height()
 
@@ -271,7 +257,6 @@ class Run_As_Admin:
 
 
 
-    # Отображение ошибок в интерфейсе
     def log(self, message):
         self.log_text.insert(tk.END, message + "\n")
         self.log_text.see(tk.END)

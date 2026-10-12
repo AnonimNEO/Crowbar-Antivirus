@@ -26,7 +26,7 @@ from languages import l
 from OF import pac, apply_global_theme, create_menubar
 from RS import RS
 
-USER_MANAGER_VERSION = "0.3.12 Beta"
+USER_MANAGER_VERSION = "0.3.13 Beta"
 
 class UserManager:
     def run_net_command(self, args):
@@ -88,13 +88,12 @@ class UserManager:
                 "Select-Object -ExpandProperty Name\""
             )
 
-            # Выполняем команду PowerShell
             try:
                 result = subprocess.check_output(
                     cmd, 
                     shell=True, 
-                    stderr=subprocess.DEVNULL,  # Игнорируем stderr вместо захвата
-                    encoding='utf-8'
+                    stderr=subprocess.DEVNULL,
+                    encoding="utf-8"
                 )
                 lines = result.strip().splitlines()
             except:
@@ -207,7 +206,6 @@ class UserManager:
             messagebox.showwarning(RS(), l("select_user"))
             return
 
-        # Диалог для ввода нового пароля
         password_dialog = tk.Toplevel(self.UM_GUI)
         password_dialog.title(RS())
         password_dialog.geometry("250x120")

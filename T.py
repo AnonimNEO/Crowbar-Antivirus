@@ -165,7 +165,6 @@ not_rm = False
 not_sim = False
 
 # Импорт Компонентов
-# from OBPC import OBPC, on_board_pc_version
 
 try:
     from AES import AES
@@ -195,13 +194,13 @@ except:
     not_rs = True
     logger.exception(f'T - {l("component_import_error")} RandomString')
 
-# try:
-#     from B import B, browser_version
-# except:
-#     not_b = True
-#     def B(a=None, b=None, c=None, d=None, e=None):
-#         pass
-#     logger.exception(f"T - {l("component_import_error")} Browser")
+#try:
+#    from B import B, browser_version
+#except:
+#    not_b = True
+#    def B(a=None, b=None, c=None, d=None, e=None):
+#        pass
+#    logger.exception(f"T - {l("component_import_error")} Browser")
 
 try:
     from CC import CC, CLEAR_CACHE_VERSION
@@ -405,7 +404,7 @@ except:
     logger.exception(f'T - {l("checking_damage_error")}')
 
 global DEBUG_MODE
-TREY_VERSION = "2.4.27 Beta"
+TREY_VERSION = "2.4.28 Beta"
 ON_BOARD_PC_VERSION = l("not_stable")
 DEBUG_MODE = False
 
@@ -473,7 +472,6 @@ def Crowbar():
                     text_position = (width // 2 - text_width // 2, height // 2 - text_height // 2)
                     square.text(text_position, text, fill=(255, 0, 0), font=font)
 
-                    # Сохраняем буфер в глобальной переменной
                     _icon_buffer = BytesIO()
                     icon_trey.save(_icon_buffer, format="PNG")
                     _icon_buffer.seek(0)
@@ -482,7 +480,7 @@ def Crowbar():
 
                 def start_icon():
                     if RUN_IN_RECOVERY:
-                        # logger.warning("T - Режим восстановления: Трей отключен.")
+                        #logger.warning("T - Режим восстановления: Трей отключен.")
                         return
                     try:
                         icon.visible = True
@@ -513,7 +511,7 @@ def Crowbar():
                     create_menu_item(not_fr, l("FR"), lambda: run_component(FR, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "FR"),
                     create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, DEBUG_MODE), "UM"),
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE, None, current_theme), "FE"),
-                    # create_menu_item(not_b, l("B"), lambda: run_component(B, RUN_IN_RECOVERY), "B"),
+                    #create_menu_item(not_b, l("B"), lambda: run_component(B, RUN_IN_RECOVERY), "B"),
                     create_menu_item(not_sp, l("SP"), lambda: run_component(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE), "SP"),
                     create_menu_item(not_cc, l("CC"), lambda: run_component(CC, RUN_IN_RECOVERY), "CC"),
                 ]
@@ -611,7 +609,7 @@ def Crowbar():
                         UNLOCK_ALL_VERSION,
                         USER_MANAGER_VERSION
                     ), "AP"),
-                    # create_menu_item(not_b, l("documentation"), lambda: run_component(B, documentation_html), "B"),
+                    #create_menu_item(not_b, l("documentation"), lambda: run_component(B, documentation_html), "B"),
                     create_menu_item(not_tkinter, l("documentation"), documentation, "B"),
                     create_menu_item(not_sau, l("SAU"), lambda: run_component(SAU, current_theme), "SAU"),
                     create_menu_item(not_config, f'{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}', pac, "config"),

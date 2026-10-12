@@ -23,14 +23,10 @@ import os
 from languages import l
 from config import RESTART_WINDOWS, RESTART_WINDOWS_BAT
 
-#global restart_windows_bat
-RESTART_VERSION = "0.9.6 Beta"
+RESTART_VERSION = "0.9.7 Beta"
 
-# @logger.catch
 def R():
-    #global error
     error = 0
-    #global restart_windows
     try:
         if RESTART_WINDOWS == "win32com":
             logger.info(f'R - {l("attempt_to_reboot")} WMI (win32com)')
@@ -42,8 +38,6 @@ def R():
             os_instance = wmi.ExecQuery("Select * from Win32_OperatingSystem")[0]
 
             # Вызываем метод Reboot (0 - успешный код, 2 - перезагрузка)
-            # В отличие от InitiateSystemShutdown, этот метод не принимает таймаут напрямую,
-            # но это более надёжный способ для win32com/WMI.
             os_instance.Reboot()
         elif RESTART_WINDOWS == "os":
             logger.info(f'R - {l("attempt_to_reboot")} os.system("shutdown /r /t {time_to_restart}")')

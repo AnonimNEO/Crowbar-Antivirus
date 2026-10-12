@@ -8,7 +8,7 @@
 # Copyleft 🄯 NEO Organization, Departament K 2024 - 2026
 # Coded by AnonimNEO (Github)
 
-FILE_REPLACER_VERSION = "0.4.10 Beta"
+FILE_REPLACER_VERSION = "0.4.11 Beta"
 
 def FR(RUN_IN_RECOVERY=False, current_theme=False, DEBUG_MODE=False):
     # Интерфейс
@@ -135,7 +135,6 @@ def FR(RUN_IN_RECOVERY=False, current_theme=False, DEBUG_MODE=False):
         f'Explorer ({l("explorer")})': r"C:\Windows\explorer.exe"
     }
 
-    # GUI элементы
     tk.Label(FR_GUI, text=f'1){l("what_to_replace")}:').pack(anchor="w", padx=10, pady=(10, 0))
     src_frame = tk.Frame(FR_GUI)
     src_frame.pack(fill="x", padx=10)
@@ -153,7 +152,6 @@ def FR(RUN_IN_RECOVERY=False, current_theme=False, DEBUG_MODE=False):
     tk.Entry(tgt_frame, textvariable=target_path).pack(side="left", expand=True, fill="x")
     tk.Button(tgt_frame, text=l("review"), command=lambda: browse_target(target_path)).pack(side="right", padx=5)
 
-    # Кнопки действий
     btn_frame = tk.Frame(FR_GUI)
     btn_frame.pack(pady=15)
 

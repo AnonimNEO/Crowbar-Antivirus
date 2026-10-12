@@ -27,9 +27,7 @@ def AES(text, password, decrypt=False, DEBUG_MODE=False):
     return - Текст или None при ошибке
     """
     try:
-        # Расшифровка
         if decrypt:
-            # Декодируем base64
             text = text.strip()
             encrypted_data = base64.b64decode(text)
             if DEBUG_MODE:
@@ -43,10 +41,8 @@ def AES(text, password, decrypt=False, DEBUG_MODE=False):
             iv = encrypted_data[16:32]
             ciphertext = encrypted_data[32:]
 
-            # Генерируем ключ из пароля
             key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000)
 
-            # Расшифровываем
             cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
             decryptor = cipher.decryptor()
             padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
@@ -63,26 +59,20 @@ def AES(text, password, decrypt=False, DEBUG_MODE=False):
             logger.debug(f"AES - Расшифровано успешно: {len(result)} символов")
             return result
 
-        # Шифрования
         else:
-            # Генерируем соль и IV
             salt = os.urandom(16)
             iv = os.urandom(16)
 
-            # Генерируем ключ из пароля
             key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000)
 
-            # Добавляем PKCS7 паддинг
             plaintext = text.encode("utf-8")
             padding_length = 16 - (len(plaintext) % 16)
             padded_plaintext = plaintext + bytes([padding_length] * padding_length)
 
-            # Шифруем
             cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
             encryptor = cipher.encryptor()
             ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize()
 
-            # Объединяем и кодируем в base64
             encrypted_data = salt + iv + ciphertext
             result = base64.b64encode(encrypted_data).decode("utf-8")
             if DEBUG_MODE:

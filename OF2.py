@@ -16,7 +16,7 @@ from loguru import logger
 import winreg
 
 global load_bush
-OTHER_FUNCTION2_VERSION = "0.6.5 Beta"
+OTHER_FUNCTION2_VERSION = "0.6.6 Beta"
 
 # Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -27,15 +27,16 @@ HIVE_MAP = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": 
 # Список для отслеживания загруженных кустов
 active_loaded_hives = []
 
-# Заглушка, библиотеки psutil которая всегда возвращает False/None.
 class Psutil:
+    """Заглушка библиотеки psutil которая всегда возвращает False/None
+    используйте её когда RUN_IN_RECOVERY = True"""
     def cpu_percent(self, *args, **kwargs):
         return 0.0
 
     def virtual_memory(self, *args, **kwargs):
         class MemStub:
             percent = 0.0
-            total = 1024 * 1024 # Имитируем 1МБ ОЗУ, чтобы не падал RLP.py
+            total = 1024 * 1024 # Имитируем 1МБ ОЗУ, чтобы не падал LP.py
 
         return MemStub()
 
@@ -57,8 +58,6 @@ class Psutil:
 
 
 
-# Получаем оффлайн-пути реестра
-# @logger.catch()
 def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY):
     if RUN_IN_RECOVERY:
         psutil = Psutil()

@@ -18,7 +18,6 @@ except:
     from loguru import logger
 import datetime
 # Работа с ОС и файлами
-import getpass
 import shutil
 import os
 
@@ -27,27 +26,21 @@ from OF import get_user_name, get_current_disc
 from RS import RS
 from config import LOG_PATH, CLEAR_TEMP_LOG
 
-#global log_path, clear_temp_log
-CLEAR_CACHE_VERSION = "0.7.9 Beta"
+CLEAR_CACHE_VERSION = "0.7.10 Beta"
 
-# @logger.catch
 def CC(RUN_IN_RECOVERY):
     """Очистка кэша (%Temp%)"""
     try:
         logger.info(f'CC - {l("start_clean")}...')
-        # Получаем имя пользователя
-        username = get_user_name()
         if RUN_IN_RECOVERY:
             current_disc = get_current_disc()
         else:
             current_disc = "C:\\"
-        temp_path = f"{current_disc}\\Users\\{username}\\AppData\\Local\\Temp\\"
+        temp_path = f"{current_disc}\\Users\\{get_user_name()}\\AppData\\Local\\Temp\\"
 
-        # Переменные для логирования
         files_not_deleted = []
         files_deleted = []
 
-        # Проходим по содержимому папки Temp
         for item in os.listdir(temp_path):
             item_path = os.path.join(temp_path, item)
             try:
@@ -61,7 +54,6 @@ def CC(RUN_IN_RECOVERY):
                 files_not_deleted.append(item)
                 #logger.exception(f"CC - {l("file_delete_error")} {l("from")} %Temp% - {item}")
 
-        # Получаем текущее время и дату для имени лог-файла
         current_time = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
         log_filename = f"{LOG_PATH}\\{CLEAR_TEMP_LOG}_{current_time}.txt"
         if not os.path.exists(LOG_PATH):

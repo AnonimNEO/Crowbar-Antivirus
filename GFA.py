@@ -17,12 +17,10 @@ except:
 import subprocess
 import os
 
-# from RS import RS
 from languages import l
 
-GET_FULL_ACCESS_VERSION = "0.4.9 Alpha"
+GET_FULL_ACCESS_VERSION = "0.4.10 Alpha"
 
-# Проверяем, является ли путь ключом реестра
 def is_registry_path(path):
     registry_prefixes = [
         "HKEY_LOCAL_MACHINE", "HKLM",
@@ -35,7 +33,6 @@ def is_registry_path(path):
 
 
 
-# Устанавливаем полные права на файл или каталог
 def grant_file_access(path, username):
     if not os.path.exists(path):
         logger.error(f'GFA - {l("not_dir")}: {path}')
@@ -58,7 +55,6 @@ def grant_file_access(path, username):
 
 
 
-# Устанавливаем полные права на ключ реестра
 def grant_registry_access(path, full_username):
     try:
         import win32security
@@ -72,7 +68,6 @@ def grant_registry_access(path, full_username):
     try:
         registry_path = normalize_registry_path(path)
 
-        # Разбираем путь на корневой ключ и под-путь
         parts = registry_path.split("\\", 1)
         root_key_name = parts[0].upper()
         subkey_path = parts[1] if len(parts) > 1 else ""
@@ -86,7 +81,7 @@ def grant_registry_access(path, full_username):
         }
 
         if root_key_name not in root_keys:
-            # logger.error(f"GFA - Неизвестный ключ реестра: {root_key_name}")
+            #logger.error(f"GFA - Неизвестный ключ реестра: {root_key_name}")
             return False
 
         root_key = root_keys[root_key_name]
@@ -134,7 +129,7 @@ def grant_registry_access(path, full_username):
         try:
             dacl.AddAccessAllowedAceEx(
                 win32security.ACL_REVISION,
-                con.CONTAINER_INHERIT_ACE | con.OBJECT_INHERIT_ACE,  #  Правильные флаги наследования
+                con.CONTAINER_INHERIT_ACE | con.OBJECT_INHERIT_ACE,
                 con.GENERIC_ALL,
                 sid
             )
@@ -188,17 +183,14 @@ def normalize_registry_path(path):
 
 
 
-# Получаем полные права на файл, каталог или ключ реестра
 def GFA(path, RUN_IN_RECOVERY=False):
-    """
-    Универсальная функция для получения полных прав на каталог, файл или ключ реестра
+    """Универсальная функция для получения полных прав на каталог, файл или ключ реестра
     path - путь к каталогу, файлу или ключ реестра
     RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
-    return - False при ошибке, True при удачном завершении операции
-    """
-    # if RUN_IN_RECOVERY:
-    #     messagebox.showwarning(RS(), "Невозможно получить права в среде восстановления.")
-    #     return False
+    return - False при ошибке, True при удачном завершении операции"""
+    #if RUN_IN_RECOVERY:
+    #    messagebox.showwarning(RS(), "Невозможно получить права в среде восстановления.")
+    #    return False
 
     try:
         username = os.getenv("USERNAME")

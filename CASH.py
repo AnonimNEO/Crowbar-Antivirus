@@ -174,11 +174,10 @@ except:
     def UM(a=None, b=None):
         pass
 
-CROWBAR_ANTIVIRUS_SCRIPTS_HANDLER_VERSION = "0.4.10 Beta"
+CROWBAR_ANTIVIRUS_SCRIPTS_HANDLER_VERSION = "0.4.11 Beta"
 
 current_theme = THEME[DEFAULT_THEME]
 
-# Получаем настройки скрипта
 def get_script_config(code):
     """Получаем конфигурацию скрипта (опции запуска)"""
     config = {
@@ -235,7 +234,7 @@ def CASH(RUN_IN_RECOVERY, DEBUG_MODE=False):
                 logger.debug(f'CASH - {l("file_transferred")}: {file_path}')
             # Получаем расширение файла
             _, file_extension = os.path.splitext(file_path)
-            f_e = file_extension.lower() # Преобразуем в нижний регистр
+            f_e = file_extension.lower()
             if f_e == ".txt" or f_e == ".md" or f_e == ".py":
                 FE(file_path)
                 break
@@ -261,7 +260,7 @@ def CASH(RUN_IN_RECOVERY, DEBUG_MODE=False):
 
                 # Создаём контекст выполнения с доступными функциями программы
                 exec_globals = {
-                    # "__builtins__": __builtins__,
+                    #"__builtins__": __builtins__,
                     "logger": logger,
                     "sys": sys,
                     "os": os,
@@ -310,7 +309,6 @@ def CASH(RUN_IN_RECOVERY, DEBUG_MODE=False):
                     logger.exception(f'CASH - {l("exec_script_error")} {file_path}')
                     messagebox.showerror(RS(), f'{l("exec_script_error")}:\n{e}')
 
-                # Используем полученную конфигурацию
                 delete_script_after_exec = config["delete_script_after_exec"]
                 launch_when_program_starts = config["launch_when_program_starts"]
                 enable_while = config["enable_while"]
@@ -323,10 +321,8 @@ def CASH(RUN_IN_RECOVERY, DEBUG_MODE=False):
                     except:
                         logger.exception(f'CASH - {l("script_deleted_error")}: {file_path}')
 
-                # Выходим из цикла
                 if not enable_while:
                     break
-                # Если enable_while=True, цикл продолжится и скрипт выполнится снова
                 if not enable_while:
                     logger.success(f'CASH - {l("execution_completed")}.')
             else:

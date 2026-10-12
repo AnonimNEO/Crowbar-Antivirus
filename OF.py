@@ -28,7 +28,6 @@ from collections import deque
 import random
 import webbrowser
 
-# from OBPC import OBPC
 try:
     from AES import AES
 except:
@@ -39,7 +38,7 @@ from languages import l
 from config import ENCRYPT_LOGS, PROGRAM_AUTHENTICATION_CLYTH, LOG_PATH, T_LOG_TXT, THEME
 
 global load_bush
-OTHER_FUNCTION_VERSION = "0.14.9 Beta"
+OTHER_FUNCTION_VERSION = "0.14.10 Beta"
 
 # Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -50,10 +49,8 @@ HIVE_MAP = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": 
 # Список для отслеживания загруженных кустов
 active_loaded_hives = []
 
-# Логирование Ошибок
 from loguru import logger as l_logger
 
-# Логирование с шифрованием
 if ENCRYPT_LOGS:
     class Logger:
         def debug(self, message):
@@ -83,7 +80,7 @@ if ENCRYPT_LOGS:
         def add(self, *args, **kwargs):
             l_logger.add(f"{LOG_PATH}\\{T_LOH_TXT}", format="{time} {level} {message}", rotation="10 MB", compression="zip")
 else:
-    #  Создаём класс-обёртку для l_logger, чтобы он был вызываемым
+    # Создаём класс-обёртку для l_logger, чтобы он был вызываемым
     class Logger:
         def __init__(self):
             self._logger = l_logger
@@ -123,12 +120,9 @@ try:
 except:
     logger = l_logger
 
-# Заглушка, библиотеки psutil которая всегда возвращает False/None.
 class Psutil:
-    """
-    Заглушка библиотеки psutil которая всегда возвращает False/None
-    используйте её когда RUN_IN_RECOVERY = True
-    """
+    """Заглушка библиотеки psutil которая всегда возвращает False/None
+    используйте её когда RUN_IN_RECOVERY = True"""
     def cpu_percent(self, *args, **kwargs):
         return 0.0
 
@@ -168,7 +162,6 @@ def documentation():
 
 
 
-# @logger.catch()
 def run_component(func, *args):
     """
     Данная функция запускает переданную функцию с переданными аргументами в отдельном потоке
@@ -187,7 +180,6 @@ def run_component(func, *args):
 
 
 
-# @logger.catch()
 def run_component_process(func, *args):
     """
     Данная функция запускает переданную функцию с переданными аргументами в отдельном процессе
@@ -208,7 +200,6 @@ def run_component_process(func, *args):
 
 
 
-# @logger.catch()
 def restart_ca():
     """
     Данная функция перезапускает программу
@@ -219,28 +210,6 @@ def restart_ca():
 
 
 
-
-# def run_obpc(RUN_IN_RECOVERY):
-#     fail_start_obpc = 0
-#     if not start_obpc:
-#         try:
-#             thread_obpc = threading.Thread(target=lambda: OBPC(RUN_IN_RECOVERY))
-#             thread_obpc.daemon = True
-#             thread_obpc.start()
-#         except Exception as e:
-#             logger.critical(f"OF/run_obpc - Ошибка при работе потока Компонента OnBoardPC:\n{e}")
-#             fail_start_obpc += 1
-#             if fail_start_obpc > 3:
-#                 messagebox.showerror(RS(), "Произошла фатальная ошибка при работе с потоком Компонента OnBoardPC!\nПодробнее в лог-файле")
-#                 return
-#             logger.info(f"OF/run_obpc - Перезапуск OnBoardPC, попытка №{fail_start_obpc}...")
-#             run_lp(RUN_IN_RECOVERY)
-#     else:
-#         messagebox.showwarning(RS(), "Компонент Голосовое Управление был запущен при запуске программы.")
-
-
-
-# @logger.catch()
 def apply_global_theme(window, current_theme):
     """
     Функция для применения темы к окну tkinter
@@ -346,10 +315,8 @@ def apply_global_theme(window, current_theme):
 
 
 
-# Защищаем окно от подозрительно частого или резкого перемещения
 def protect_window_from_moving(GUI, enable=True, DEBUG_MODE=False, MAX_MOVES_PER_SECOND=15, MAX_PIXEL_JUMP=250, DETECTION_WINDOW=1.5, LOCK_DURATION=0.6):
-    """
-    Главная функция AutoRunMaster
+    """Функция для защиты от перемещений окна
     RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
     current_theme - Текущая тема для интерфейса (не сам кортеж, а название кортежа)
     DEBUG_MODE - включить режим отладки (если True будет больше логов)
@@ -400,21 +367,17 @@ def protect_window_from_moving(GUI, enable=True, DEBUG_MODE=False, MAX_MOVES_PER
         while state["move_timestamps"] and current_time - state["move_timestamps"][0] > DETECTION_WINDOW:
             state["move_timestamps"].popleft()
 
-        # Вычисляем расстояние от последней позиции
         dx = abs(current_x - state["last_x"])
         dy = abs(current_y - state["last_y"])
         max_jump = max(dx, dy)
 
-        # проверка на атаку
         is_attack = False
         attack_reason = ""
 
-        # Слишком много перемещений в секунду
         if len(state["move_timestamps"]) > MAX_MOVES_PER_SECOND:
             is_attack = True
             attack_reason = f'{l("excessive_movements")} ({len(state["move_timestamps"])} {l("for2")} {DETECTION_WINDOW} {l("second")})'
 
-        # Резкий скачок позиции
         if max_jump > MAX_PIXEL_JUMP and (current_time - state["last_time"]) < 0.05:
             is_attack = True
             attack_reason = f'{l("sharp_jump")}: {max_jump}px {l("for2")} {(current_time - state["last_time"])*1000:.1f} {l("milliseconds")}'
@@ -427,20 +390,18 @@ def protect_window_from_moving(GUI, enable=True, DEBUG_MODE=False, MAX_MOVES_PER
             # Возвращаем окно в безопасную позицию
             GUI.geometry(f'+{state["safe_x"]}+{state["safe_y"]}')
             if DEBUG_MODE:
-                logger.debug(f'protect_window_from_moving - {l("attack")} # {state["attack_count"]}: {attack_reason}')
+                logger.debug(f'protect_window_from_moving - {l("attack")} #{state["attack_count"]}: {attack_reason}')
                 logger.debug(f'protect_window_from_moving - {l("window_block")} {LOCK_DURATION} {l("second")}')
 
         # Обновляем безопасную позицию при нормальном движении
-        # state["last_x"] = current_x
-        # state["last_y"] = current_y
-        # state["last_time"] = current_time
-        # state["safe_x"] = current_x
-        # state["safe_y"] = current_y
+        #state["last_x"] = current_x
+        #state["last_y"] = current_y
+        #state["last_time"] = current_time
+        #state["safe_x"] = current_x
+        #state["safe_y"] = current_y
 
-    # Привязываем событие к окну
     GUI.bind("<Configure>", on_window_move)
 
-    # Вкл/Выкл защиты
     def toggle_protection(new_state):
         state["is_protected"] = new_state
         if new_state:
@@ -470,10 +431,8 @@ def restart_gui_for_theme(GUI, user_theme):
 
 
 
-# Создаём пункты в панели
 def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, component_func2=None, elements=None, DEBUG_MODE=False, component_func3=None, component_func4=None, component_func5=None, component_func6=None):
-    """
-    Функция для создания стандартной верхней панели
+    """Функция для создания стандартной верхней панели
     GUI - окно tkinter
     RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
     component (str) - Название Компонента (Абривиатура).
@@ -485,8 +444,7 @@ def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, co
     component_func4 - 4 Функция компонента которая будет вызываться из панели.
     component_func5 - 5 Функция компонента которая будет вызываться из панели.
     component_func6 - 6 Функция компонента которая будет вызываться из панели.
-    return - функция ничего не возвращает!
-    """
+    return - функция ничего не возвращает!"""
     menubar = Menu(GUI)
 
     if component == "FM":
@@ -535,11 +493,9 @@ def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, co
         theme_menu.add_checkbutton(label=l(label), command=lambda tn=theme_name: restart_gui_for_theme(GUI, tn))
     menubar.add_cascade(label=l("themes"), menu=theme_menu)
 
-    # Переменные состояния
     higher = tk.BooleanVar(value=not RUN_IN_RECOVERY)
     protect = tk.BooleanVar(value=not RUN_IN_RECOVERY)
 
-    # Сохраняем индексы с учётом смещения
     topmost_index = (menubar.index("end") + 1 if menubar.index("end") else 1) + custom
     menubar.add_command(label=f'{l("topmost")}: {l("on2")}')
 
@@ -549,7 +505,6 @@ def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, co
     pac_index = (menubar.index("end") + 1) + custom
     menubar.add_command(label=f'{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}')
 
-    # Функции переключения
     def toggle_topmost():
         higher.set(not higher.get())
         GUI.attributes("-topmost", higher.get())
@@ -562,7 +517,6 @@ def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, co
         status = l("on2") if protect.get() else l("off2")
         menubar.entryconfig(protect_index, label=f'Защита окна: {status}')
 
-    # Присваиваем команды
     menubar.entryconfig(topmost_index, command=toggle_topmost)
     menubar.entryconfig(protect_index, command=toggle_protect)
     menubar.entryconfig(pac_index, command=pac)
@@ -576,8 +530,6 @@ def create_menubar(GUI, RUN_IN_RECOVERY, component=None, component_func=None, co
 
 
 
-# Получаем оффлайн-пути реестра
-# @logger.catch()
 def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOVERY):
     if RUN_IN_RECOVERY:
         psutil = Psutil()
@@ -602,7 +554,7 @@ def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOV
         if subkey_path.lower().startswith(r"software"):
             new_hkey, temp_name, _ = offline_map[hkey_const]
             # Удаляем "Software" из начала subkey_path и добавляем имя загруженного куста
-            path_after_software = subkey_path[len("Software"):].strip('\\')
+            path_after_software = subkey_path[len("Software"):].strip("\\")
             # Путь: HKEY_LOCAL_MACHINE\Offline_SOFTWARE\{путь_после_Software}
             new_subkey_path = f"{temp_name}\\{path_after_software}"
             return new_hkey, new_subkey_path
@@ -611,11 +563,8 @@ def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOV
 
 
 
-# Получаем диск с установленной шиндовс
-# @logger.catch()
 def get_current_disc(RUN_IN_RECOVERY=False):
-    """
-    Функция для получения диска с установленной шиндовс
+    """Функция для получения диска с установленной шиндовс
     RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
     return - "[Буква_диска]:\\"
     """
@@ -642,15 +591,12 @@ def get_current_disc(RUN_IN_RECOVERY=False):
 
 
 
-# Загрузка кустов реестра
-# @logger.catch()
 def load_bush(current_disc, user=False):
     global active_loaded_hives
 
     if user:
         user_name = user
     else:
-        # Формируем пути к файлам
         if not os.path.isdir(f"{current_disc}\\Users\\{default_user_name}\\"):
             user_name = simpledialog.askstring(title=RS(), prompt=f'{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}:')
         else:
@@ -669,12 +615,10 @@ def load_bush(current_disc, user=False):
             logger.critical(f'OF/load_bush - {l("bush_not_found")}: {path}')
             continue
 
-        # Если куст уже в списке активных, пропустим
         if name in active_loaded_hives:
             continue
 
         try:
-            # Загрузка куста реестра
             winreg.LoadKey(winreg.HKEY_LOCAL_MACHINE, name, path)
 
             active_loaded_hives.append(name)
@@ -688,8 +632,6 @@ def load_bush(current_disc, user=False):
 
 
 
-# Выгружаем кусты реестра
-# @logger.catch()
 def unload_bush():
     global active_loaded_hives
 
@@ -703,8 +645,6 @@ def unload_bush():
 
 
 
-# Получаем Имя текущего пользователя
-# @logger.catch()
 def get_user_name():
     try:
         user_name = os.getlogin()
@@ -715,7 +655,6 @@ def get_user_name():
 
 
 
-# Извлекаем имя файла из пути и/или удаляя аргументы командной строки
 def extract_filename_from_path(path_with_args, get_path=False):
     if not path_with_args:
         return ""
@@ -750,7 +689,6 @@ def extract_filename_from_path(path_with_args, get_path=False):
 
 
 
-# Фейковая Активность
 def decoy_mode(cycle=False, debug=True):
     c = 1
     while c > 0:
@@ -760,7 +698,6 @@ def decoy_mode(cycle=False, debug=True):
         fake_dirs = []
         fake_files = []
 
-        # Генерируем IP, пинги, команды и ключи реестра
         for i in range(5):
             fake_ips.append(f'{RS("ip")}.{RS("ip")}.{RS("ip")}.{RS("ip")}')
             fake_pings.append(f'ping {RS("ping")}.{RS("ping")}.{RS("ping")}.{RS("ping")}')
@@ -770,15 +707,12 @@ def decoy_mode(cycle=False, debug=True):
         try:
             for i in range(0, 3):
                 subprocess.Popen(f"ipconfig /flushdns && nslookup {fake_ips[i]}", stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
-
-            # Создаём директории
             for d in fake_dirs:
                 if not os.path.exists(d):
                     if debug:
                         logger.debug(f"create dir - {d}")
                     os.makedirs(d)
 
-            # Создаём файлы в директориях
             for d in fake_dirs:
                 for j in range(3):
                     file_path = RS("file", d)
@@ -791,15 +725,12 @@ def decoy_mode(cycle=False, debug=True):
                     except:
                         logger.exception(f'{l("create_file_error")}: {file_path}')
 
-            # Пинги
             for p in fake_pings:
                 subprocess.Popen(p, stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
             for i in range(3, 5):
                 subprocess.Popen(f"ipconfig /flushdns && nslookup {fake_ips[i]}", stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
 
-            # реестр
             try:
-                # Генерируем и создаём ключи в реестре
                 for i in range(3):
                     key_name = f"Software\\{RS(10)}"
                     registry_keys.append(key_name)
@@ -809,7 +740,6 @@ def decoy_mode(cycle=False, debug=True):
                         if debug:
                             logger.debug(f'{l("create_reg_key")} - {key_name}')
 
-                        # Создаём параметры с информацией о "сборе данных"
                         params = {
                             "UserName": get_random_username(),
                             "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -823,7 +753,6 @@ def decoy_mode(cycle=False, debug=True):
                             "CollectionData": RS("data")
                         }
 
-                        # Записываем параметры в реестр
                         for param_name, param_value in params.items():
                             winreg.SetValueEx(key, param_name, 0, winreg.REG_SZ, param_value)
                             if debug:
@@ -840,7 +769,6 @@ def decoy_mode(cycle=False, debug=True):
             for cmd in fake_cmds:
                 subprocess.Popen(cmd, stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
 
-            # удаление ключей
             for key_name in registry_keys:
                 try:
                     winreg.DeleteKey(winreg.HKEY_CURRENT_USER, key_name)
@@ -852,7 +780,6 @@ def decoy_mode(cycle=False, debug=True):
             for cmd in fake_cmds:
                 subprocess.Popen(cmd, stdout=subprocess.DEVNULL, shell=True, stderr=subprocess.DEVNULL, creationflags=0x08000000)
 
-            # Удаляем файлы и директории
             for f in fake_files:
                 try:
                     if os.path.exists(f):
@@ -937,7 +864,6 @@ def decoy_mode(cycle=False, debug=True):
 
 
 
-# Запуск в скрытом режиме
 def launch_ghost(exe_path=False):
     if not exe_path:
         exe_path = filedialog.askopenfilename(title=RS(), filetypes=[('Все файлы', '*.*')])
@@ -962,8 +888,6 @@ def launch_ghost(exe_path=False):
 
 
 
-# Открыть С помощью
-# @logger.catch()
 def open_with():
     target_file_path = filedialog.askopenfilename(title=RS(), filetypes=[('Все файлы', '*.*')])
     if target_file_path and os.path.isfile(target_file_path): # Проверка, что файл выбран и существует
@@ -978,16 +902,14 @@ def open_with():
 
 
 def enable_debug_mode():
-    """
-    Функция для включения тестового режима (режима отладки)
+    """Функция для включения тестового режима (режима отладки)
     Если её выполнить то все Компоненты будут запускаться с DEBUG_MODE=True
-    Что приведёт к увелечиному числу логов, с большим количеством информации
-    Также будут разблокированы тестовый Компоненты (эксперементальные)
+    Что приведёт к увеличенному числу логов, с большим количеством информации
+    Также будут разблокированы тестовый Компоненты (экспериментальные)
     Важно: Для уже запущенных компонентов DEBUG_MODE - не поменяется на True - для этого потребуется перезапуск Компонента
     Тоже самое касается и меню в иконке из-за чего новые пункты появятся только в Главном меню
     Важно2: После перезапуска программы DEBUG_MODE вновь будет раен False
-    return - функция ничего не возвращает!
-    """
+    return - функция ничего не возвращает!"""
     if askyesno(RS(), l("enable_debug_mode_text")):
         logger.warning(f'OF/enable_debug_mode - {l("debug_mode_on")}.')
         return True
@@ -995,7 +917,6 @@ def enable_debug_mode():
 
 
 
-# @logger.catch()
 def reg_file(reg_file, reg_code):
     with open(reg_file, "w") as reg:
         reg.write(reg_code)
@@ -1006,10 +927,8 @@ def reg_file(reg_file, reg_code):
 
 
 
-# @logger.catch()
 def run_command(command):
     try:
-        # Запускает команду и ждём её завершения
         process = subprocess.run(command, shell=True)
         return process.returncode
     except:

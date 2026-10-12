@@ -25,7 +25,7 @@ from languages import l
 from RS import RS
 import config
 
-CROWBAR_CONSOLE_VERSION = "0.1.9 Pre-Alpha"
+CROWBAR_CONSOLE_VERSION = "0.1.10 Pre-Alpha"
 
 class CrowbarConsole:
     """Консоль разработчика (python консоль вместе с доступом к функциям программы)"""
@@ -40,12 +40,11 @@ class CrowbarConsole:
         self.CC_GUI.title(RS())
         self.CC_GUI.geometry("650x400")
 
-        # Вывод консоли
         self.output_text = scrolledtext.ScrolledText(
             self.CC_GUI,
             wrap=tk.WORD,
-            bg="# 1e1e1e",
-            fg="# 00ff00",
+            bg="#1e1e1e",
+            fg="#00ff00",
             font=("Default", 10),
             height=20
         )
@@ -56,17 +55,16 @@ class CrowbarConsole:
 
         self.output_text.config(state=tk.DISABLED)
 
-        # Поле ввода
         input_frame = tk.Frame(self.CC_GUI)
         input_frame.pack(fill=tk.X, padx=5, pady=5)
 
-        tk.Label(input_frame, text=">>>", fg="# 00ff00", bg="black").pack(side=tk.LEFT, padx=5)
+        tk.Label(input_frame, text=">>>", fg="#00ff00", bg="black").pack(side=tk.LEFT, padx=5)
 
         self.input_entry = tk.Entry(
             input_frame,
             font=("Default", 10),
-            bg="# 1e1e1e",
-            fg="# 00ff00",
+            bg="#1e1e1e",
+            fg="#00ff00",
             insertbackground="black"
         )
         self.input_entry.pack(fill=tk.X, expand=True, padx=5)
@@ -94,7 +92,6 @@ class CrowbarConsole:
             self.output_text.config(state=tk.DISABLED)
             return
 
-        # Вывод команды
         self.output_text.config(state=tk.NORMAL)
         self.output_text.insert(tk.END, f"> {command}\n")
         self.output_text.config(state=tk.DISABLED)
@@ -104,10 +101,8 @@ class CrowbarConsole:
             old_stdout = sys.stdout
             sys.stdout = StringIO()
 
-            # Выполняем команду
             exec(command, self.globals_dict)
 
-            # Получаем вывод
             output = sys.stdout.getvalue()
             sys.stdout = old_stdout
 
@@ -132,7 +127,6 @@ class CrowbarConsole:
         finally:
             sys.stdout = old_stdout
 
-        # Прокручиваем в конец
         self.output_text.config(state=tk.NORMAL)
         self.output_text.see(tk.END)
         self.output_text.config(state=tk.DISABLED)

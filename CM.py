@@ -25,11 +25,11 @@ except Exception as e:
     def ARM(a=None, b=None):
         pass
 
-# try:
-#     from B import B
-# except Exception as e:
-#     def B(a=None, b=None, c=None, d=None, e=None):
-#         pass
+#try:
+#    from B import B
+#except Exception as e:
+#    def B(a=None, b=None, c=None, d=None, e=None):
+#        pass
 
 try:
     from CC import CC
@@ -126,26 +126,22 @@ except Exception as e:
 from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-CROWBAR_MENU_VERSION = "2.3.18 Beta"
+CROWBAR_MENU_VERSION = "2.3.19 Beta"
 
-# @logger.catch
 def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
     """Главное окно программы"""
     try:
         # Обновляем размер шрифта и кнопок при изменении размера окна
         def on_window_resize(event):
-            # Проверяем, что событие вызвано именно окном CM_GUI
             if event.widget != CM_GUI:
                 return
 
             width = event.width
             height = event.height
 
-            # Базовые размеры
             base_width = 750
             base_height = 300
 
-            # Вычисляем коэффициенты
             scale_w = width / base_width
             scale_h = height / base_height
 
@@ -159,12 +155,9 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
             if scale > 1.2:
                 scale = 1.2 + (scale - 1.2) * 0.5
 
-            # Рассчитываем новые размеры шрифтов
             header_font_size = int(32 * scale)
             button_font_size = int(18 * scale)
             small_button_font_size = int(10 * scale)
-
-            # Применяем шрифты с лимитом сверху
             update_fonts(
                 min(48, max(14, header_font_size)), 
                 min(24, max(10, button_font_size)), 
@@ -172,7 +165,8 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                 scale
             )
 
-        # Обновляем шрифты всех элементов интерфейса
+
+
         def update_fonts(header_size, button_size, small_size, scale):
             try:
                 # Шрифт для заголовков
@@ -192,7 +186,7 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                 for btn in small_buttons:
                     btn.configure(font=small_f)
 
-                # Версия внизу
+                # Версия
                 copyleft_label.configure(font=("Default", max(8, int(10 * scale))))
             except:
                 pass
@@ -225,7 +219,6 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         tab_protect.configure(style="TFrame")
         tab_manage.configure(style="TFrame")
 
-        # Списки для отслеживания элементов при изменении размера
         header_labels = []
         regular_buttons = []
         small_buttons = []
@@ -364,17 +357,15 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         copyleft_label = ttk.Label(CM_GUI, text=f'{l("CM")} {CROWBAR_MENU_VERSION}', anchor="w")
         copyleft_label.pack(side="bottom", anchor="w", padx=10, pady=10)
 
-        # Создаём меню
         create_menubar(CM_GUI, RUN_IN_RECOVERY, DEBUG_MODE=DEBUG_MODE)
 
-        # if RUN_IN_RECOVERY:
-        #     def change_user():
-        #        user = simpledialog.askstring(title=RS(), prompt=f"Введите имя пользователя: ")
-        #        load_bush(current_disc, user)
+        #if RUN_IN_RECOVERY:
+        #    def change_user():
+        #       user = simpledialog.askstring(title=RS(), prompt=f"Введите имя пользователя: ")
+        #       load_bush(current_disc, user)
 
-        #     menubar.add_command(label=f"Пользователь: {user_name}", command=lambda:change_user)
+        #    menubar.add_command(label=f"Пользователь: {user_name}", command=lambda:change_user)
 
-        # Привязываем событие изменения размера окна
         CM_GUI.bind("<Configure>", on_window_resize)
 
         CM_GUI.mainloop()

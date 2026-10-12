@@ -29,7 +29,7 @@ from config import IMAGES_PATH, PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 from RS import RS
 
-ABOUT_PROGRAM_VERSION = "0.3.11 Beta"
+ABOUT_PROGRAM_VERSION = "0.3.12 Beta"
 image_references = {}
 er = l("error")
 
@@ -60,31 +60,25 @@ def AP(AUTORUN_MASTER_VERSION=er,
        USERS_MANAGER_VERSION=er):
     """Показ данных об программе, принимает в качестве аргументов версии Компонентов"""
     try:
-        # Загрузка изображений
         def load_images(master):
             image_labels_container = [] # Список для хранения ссылок на метки изображений
             image_files = [] # Список найденных файлов изображений
 
-            # Проверяем существование каталога
             if not os.path.isdir(IMAGES_PATH):
                 return image_labels_container
 
-            # Получаем список файлов в каталоге
             try:
                 image_files = [f for f in os.listdir(IMAGES_PATH) if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif"))]
             except Exception as e:
                 logger.exception(f'AP - {l("read_dir_error")} {IMAGES_PATH}')
                 return image_labels_container
 
-            # Проверяем наличие файлов
             if not image_files:
                 return image_labels_container
 
-            # Если каталог существует и файлы найдены, создаем фрейм для них
             image_frame = tk.Frame(master, bg="black")
             image_frame.pack(pady=20)
 
-            # Загружаем изображения и создаем метки
             for image_file in image_files:
                 img_path = os.path.join(IMAGES_PATH, image_file)
                 try:
@@ -93,7 +87,6 @@ def AP(AUTORUN_MASTER_VERSION=er,
                     img.thumbnail((100, 100))
                     img_tk = ImageTk.PhotoImage(img)
 
-                    # Используем image_frame для создания Label
                     label = tk.Label(image_frame, image=img_tk, bg="black")
                     # Сохраняем ссылку на ImageTk.PhotoImage, чтобы избежать сборки мусора
                     image_references[img_path] = img_tk
@@ -101,11 +94,11 @@ def AP(AUTORUN_MASTER_VERSION=er,
                     label.pack(side=tk.LEFT, padx=5)
                     image_labels_container.append(label)
 
-                except Exception as e:
+                except:
                     logger.exception(f'AP - {l("read_image_error")} {image_file}')
-                    continue # если одно изображение не загрузилось, продолжаем с другими
+                    continue
 
-            return image_labels_container # Возвращаем список загруженных меток, чтобы знать, создался ли фрейм
+            return image_labels_container
 
         def show_component_versions(event):
             version_component_text = (
@@ -166,7 +159,6 @@ def AP(AUTORUN_MASTER_VERSION=er,
         about_window.title(RS())
         about_window.configure(bg="black")
 
-        # Текст
         label = tk.Label(about_window, text=l("about_program_text"), bg="black", fg="white", font=("ComicSans", 16))
         label.pack(pady=20)
 

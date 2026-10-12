@@ -22,13 +22,12 @@ import psutil
 from OF import Psutil
 from languages import l
 
-EDIT_CRITICALITY_VERSION = "0.4.10 Beta"
+EDIT_CRITICALITY_VERSION = "0.4.11 Beta"
 
 # Загрузка необходимых библиотек windows
 KERNEL32 = ctypes.WinDLL("kernel32", use_last_error=True)
 NTDLL = ctypes.WinDLL("ntdll", use_last_error=True)
 
-# Определение структур и констант
 PROCESS_QUERY_INFORMATION = 0x0400
 PROCESS_SET_INFORMATION = 0x0200
 STATUS_SUCCESS = 0
@@ -37,7 +36,6 @@ STATUS_SUCCESS = 0
 # Значение (ULONG): 1 - критический, 0 - некритический
 PROCESS_INFORMATION_CLASS_CRITICAL = 0x1D
 
-# Определяем функции windows API
 def define_functions():
     # kernel32.OpenProcess
     KERNEL32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
@@ -56,7 +54,7 @@ def define_functions():
     NTDLL.NtQueryInformationProcess.restype = wintypes.LONG
 
 
-# Получаем имя процесса
+
 def get_process_name(process_id):
     try:
         process = psutil.Process(process_id)
@@ -65,7 +63,7 @@ def get_process_name(process_id):
         return f"Unknown_PID_{process_id}"
 
 
-# Получаем текущий статус критичности процесса
+
 def get_process_critical_status(process_id, DEBUG_MODE=False):
     process_handle = None
     try:
@@ -80,11 +78,9 @@ def get_process_critical_status(process_id, DEBUG_MODE=False):
                 logger.error(f'EC - {l("open_process_error")} (pid: {process_id}). {l("error_code")}: {error_code}')
             return None
 
-        # Переменная для хранения результата
         critical_value = ctypes.c_ulong(0)
         return_length = ctypes.c_ulong(0)
 
-        # Вызываем NtQueryInformationProcess с классом 0x1D
         result = NTDLL.NtQueryInformationProcess(process_handle, PROCESS_INFORMATION_CLASS_CRITICAL, ctypes.byref(critical_value), ctypes.sizeof(critical_value), ctypes.byref(return_length))
 
         if result == STATUS_SUCCESS:
@@ -104,7 +100,7 @@ def get_process_critical_status(process_id, DEBUG_MODE=False):
             KERNEL32.CloseHandle(process_handle)
 
 
-# Меняем значение критичности на процессе
+
 def set_process_critical(process_id, critical):
     process_handle = None
     try:
@@ -122,7 +118,6 @@ def set_process_critical(process_id, critical):
         # Значение 1 для True (критический), 0 для False (некритический)
         critical_value = ctypes.c_ulong(1 if critical else 0)
 
-        # Вызываем NtSetInformationProcess с классом 0x1D
         result = NTDLL.NtSetInformationProcess(process_handle, PROCESS_INFORMATION_CLASS_CRITICAL, ctypes.byref(critical_value), ctypes.sizeof(critical_value))
 
         if result == STATUS_SUCCESS:

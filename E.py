@@ -26,10 +26,9 @@ from OF import apply_global_theme, run_component
 from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-EXIT_VERSION = "1.1.10 Beta"
+EXIT_VERSION = "1.1.11 Beta"
 DYRACHOK_PATH = r"C:\ProgramData\dyrachok.txt"
 
-# @logger.catch
 def check_access_file():
     try:
         with open(DYRACHOK_PATH, "r") as f:
@@ -39,14 +38,13 @@ def check_access_file():
             messagebox.showwarning(RS(), l("dyrachok_test_text"))
             return False
         else:
-            # logger.success("E - Проверка на дурочка прошла успешно.")
+            #logger.success("E - Проверка на дурочка прошла успешно.")
             return True
     except FileNotFoundError:
         return True
 
 
 
-# @logger.catch
 def tiktok_question():
     if messagebox.askyesno(RS(), l("watch_tiktok?")):
         try:
@@ -74,7 +72,7 @@ def math_window():
     number_input = tk.simpledialog.askinteger(RS(), f'{l("enter_result_example")}: √({n} * {n})')
 
     if number_input == n:
-        # logger.info("E - ввод примера верен.")
+        #logger.info("E - ввод примера верен.")
         tiktok_question()
     else:
         logger.critical(f'E - {l("bad_result_example")}.')
@@ -87,7 +85,7 @@ def captcha_window():
     captcha_input = tk.simpledialog.askinteger(RS(), f'{l("enter_number")}: {n}')
 
     if captcha_input == n:
-        # logger.info("E - ввод числа верен.")
+        #logger.info("E - ввод числа верен.")
         math_window()
     else:
         logger.critical(f'E - {l("bad_enter_number")}')
