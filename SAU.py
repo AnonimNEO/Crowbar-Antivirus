@@ -41,7 +41,7 @@ from OF import run_command, apply_global_theme
 # Случайные заголовки
 from RS import RS
 
-SETTINGS_AND_UPDATE_VERSION = "1.2.7 Beta"
+SETTINGS_AND_UPDATE_VERSION = "1.2.8 Beta"
 
 def compiling_crowbar():
     global COMPILING_COMMAND
@@ -89,7 +89,6 @@ def save_settings(settings_data, config_comments=None):
 
 
 
-# Резервное копирование настроек
 def backup_settings(export=False):
     try:
         global SETTINGS_BACKUP_PREFIX
@@ -113,7 +112,6 @@ def backup_settings(export=False):
 
 
 
-# Распаковки архива
 def extract_archive(ARCHIVE_PATH):
     try:
         if not os.path.exists(ARCHIVE_PATH):
@@ -138,7 +136,6 @@ def extract_archive(ARCHIVE_PATH):
 
 
 def move_all_files(src_folder, dest_folder):
-    # Перемещает все содержимое указанной папки в другую папку
     try:
         for item in os.listdir(src_folder):
             src_path = os.path.join(src_folder, item)
@@ -201,22 +198,19 @@ def copy_files():
     return True
 
 
-# Создаём Ярлык
+
 def create_lnk(target_path, shortcut_name):
     try:
-        # Получаем путь к рабочему столу
         desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
 
         shortcut_path = os.path.join(desktop_path, f"{shortcut_name}.lnk")
 
-        # Создаем объект Shell
         shell = win32com.client.Dispatch("WScript.Shell")
 
-        # Создаем ярлык
         shortcut = shell.CreateShortCut(shortcut_path)
         shortcut.TargetPath = target_path
         shortcut.WorkingDirectory = os.path.dirname(target_path) # Рабочий каталог ярлыка
-        shortcut.save() # Сохраняем ярлык
+        shortcut.save()
 
         logger.info(f'SAU - {l("create_lnk_success")}.')
     except Exception as e:
@@ -224,16 +218,12 @@ def create_lnk(target_path, shortcut_name):
 
 
 
-# Добавляем программу в автозапуск
 def add_to_autorun(target_path):
     try:
-        # Открываем ключ реестра для редактирования
         registry_key = reg.OpenKey(reg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\", 0, reg.KEY_WRITE)
 
-        # Заменяем значение
         reg.SetValueEx(registry_key, "Userinit", 0, reg.REG_SZ, f"C:\\Windows\\System32\\userinit.exe, {target_path}")
 
-        # Закрываем ключ реестра
         reg.CloseKey(registry_key)
         logger.info(f'{l("meaning")} Userinit {l("successfully_changed_to")} C:\\Windows\\System32\\userinit.exe, {target_path}')
 
@@ -244,7 +234,6 @@ def add_to_autorun(target_path):
 
 
 
-# Подготовка к перекомпиляции
 def preparing_for_recompilation(settings_data, config_comments):
     backup_filepath = backup_settings()
     if not backup_filepath:
@@ -281,7 +270,6 @@ def preparing_for_recompilation(settings_data, config_comments):
 
 
 
-# Проверка является ли путь строкой
 def validate_path(path):
     if not isinstance(path, str):
         return False, l("path_must_string")
@@ -289,7 +277,6 @@ def validate_path(path):
 
 
 
-# Проверка на превышение значения в переменной
 def validate_int_with_limit(value, max_value):
     try:
         num = int(value)
@@ -302,7 +289,6 @@ def validate_int_with_limit(value, max_value):
 
 
 
-# Проверка правильного синтаксиса списков
 def validate_string_list(value):
     if not isinstance(value, str):
         return False, l("enter_string")
@@ -333,7 +319,6 @@ def validate_string_list(value):
 
 
 
-# Проверка на то что значение является строкой
 def validate_string(value):
     if not isinstance(value, str):
         return False, l("enter_string")
@@ -341,7 +326,6 @@ def validate_string(value):
 
 
 
-# Проверка на то что значение является словарём
 def validate_dict_config(value):
     if not isinstance(value, dict):
         return False, l("must_be_dictionary")
@@ -351,7 +335,6 @@ def validate_dict_config(value):
 
 
 
-# Создание виджета для ввода данных
 def create_input_widget(frame, variable_name, variable_type, default_value, row_num):
     label = ttk.Label(frame, text=variable_name)
     label.grid(row=row_num, column=0, padx=3, pady=1, sticky=tk.W)
@@ -423,7 +406,6 @@ def create_input_widget(frame, variable_name, variable_type, default_value, row_
 
 
 
-# Чтение комментариев
 def read_config(user_config=False):
     comments = {}
     current_comment = ""
@@ -464,9 +446,7 @@ def read_config(user_config=False):
 
 
 
-# Главное Окно
 def crowbar_settings(current_theme):
-    # Считываем комментарии из config.py
     config_comments = read_config()
 
     SAU_GUI = tk.Tk()
@@ -477,7 +457,6 @@ def crowbar_settings(current_theme):
 
     apply_global_theme(SAU_GUI, current_theme)
 
-    # Создание скроллбара
     main_frame = ttk.Frame(SAU_GUI)
     main_frame.pack(fill="both", expand=True, padx=5, pady=5)
 
@@ -488,7 +467,6 @@ def crowbar_settings(current_theme):
     scrollbar.pack(side=tk.RIGHT, fill="y")
 
     canvas.configure(yscrollcommand=scrollbar.set)
-    # Используем bind_all для реакции на колесо мыши
     canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
 
     frame = ttk.Frame(canvas)
@@ -499,7 +477,6 @@ def crowbar_settings(current_theme):
     def on_canvas_configure(event):
         # Используем ID для установки ширины внутреннего фрейма равной ширине холста
         canvas.itemconfig(canvas_window_id, width=event.width)
-        # Обновляем область прокрутки
         canvas.configure(scrollregion=canvas.bbox("all"))
 
     canvas.bind("<Configure>", on_canvas_configure)
@@ -507,11 +484,9 @@ def crowbar_settings(current_theme):
     notebook = ttk.Notebook(frame)
     notebook.pack(fill="both", expand=True, padx=5, pady=5)
 
-    # Создаем вкладки
     general_tab = ttk.Frame(notebook)
     notebook.add(general_tab, text=f'{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}')
 
-    # Раздел для общих настроек
     general_frame = ttk.Frame(general_tab)
     general_frame.pack(padx=0, pady=0, fill="x")
 
@@ -519,10 +494,8 @@ def crowbar_settings(current_theme):
     general_frame.grid_columnconfigure(1, weight=1)
     general_frame.grid_columnconfigure(2, weight=0)
 
-    # Словарь для хранения виджетов
     widgets = {}
 
-    # Функция для определения типа переменной
     def get_variable_type(var_name, var_value):
         type_mapping = {
             "str_path": ["settings_path", "log_path", "images_path"],
@@ -533,7 +506,6 @@ def crowbar_settings(current_theme):
             "str_list": ["bad_process", "exception_process", "black_theme", "dark_theme", "white_theme", "red_theme", "gray_theme", "orange_theme", "lime_theme", "theme"],
         }
 
-        # Проверяем если значение - это словарь с типом
         if isinstance(var_value, dict) and "type" in var_value:
             return var_value["type"], var_value.get("name", var_name)
 
@@ -579,7 +551,6 @@ def crowbar_settings(current_theme):
         # Увеличиваем счетчик на 1 или 2, в зависимости от того, есть ли метка ошибки снизу
         row_counter += row_increment_step
 
-    # Удаляем объект
     def delete_item(path):
         try:
             if os.path.isdir(path):
@@ -596,7 +567,6 @@ def crowbar_settings(current_theme):
 
 
 
-    # Сохранение настроек
     def apply_settings():
         settings_data = {}
         config_comments_to_save = {}
@@ -661,15 +631,12 @@ def crowbar_settings(current_theme):
 
         def run_compilation():
             try:
-                # Бэкап
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=l("create_backup")), progress_bar.config(value=10)])
                 if not backup_settings(): raise Exception(l("create_backup_error"))
 
-                # Сохранение настроек
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=l("save_settings")), progress_bar.config(value=25)])
                 if not save_settings(settings_data, config_comments_to_save): raise Exception(l("save_settings_error"))
 
-                # Распаковка исходного кода
                 SAU_GUI.after(0, lambda: (compilation_label.config(text=l("unpacking_source_code")), progress_bar.config(value=40)))
                 if not extract_archive(ARCHIVE_PATH): raise Exception(l("unpacking_source_code_error"))
 
@@ -684,10 +651,8 @@ def crowbar_settings(current_theme):
                     if not os.path.exists(f"{PROGRAM_NAME}.py"):
                         raise Exception(f'{l("file")} T.py {l("not_found")} {l("in")} {l("archive")}!')
 
-                # Компиляция
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=f'{l("compilation")} {l("in")} EXE...'), progress_bar.config(value=60)])
                 if not compiling_crowbar(): raise Exception(f'{l("error")} {l("during_recompilation")}')
-                # Копирование файлов
                 SAU_GUI.after(0, lambda: [compilation_label.config(text=l("copying_files")), progress_bar.config(value=90)])
 
                 def finalize():
@@ -710,7 +675,6 @@ def crowbar_settings(current_theme):
                 progress_bar.config(value=0)
                 set_ui_state("normal")
 
-        # Запуск потока
         threading.Thread(target=run_compilation, daemon=True).start()
 
     def delete_cache():
@@ -824,7 +788,7 @@ def SAU(current_theme):
     if messagebox.askyesno(RS(), l("sau_start_text")):
         global PROGRAM_NAME, ARCHIVE_PASSWORD
         SETTINGS_BACKUP_PREFIX = "settings_backup"
-        # ARCHIVE_PATH = "crowbar_code.zip"
+        #ARCHIVE_PATH = "crowbar_code.zip"
         ARCHIVE_PASSWORD = b"0000"
         PROGRAM_NAME = simpledialog.askstring(title=RS(), prompt=l("enter_program_name"))
         if not os.path.isfile("icon\\T_icon.ico"):
