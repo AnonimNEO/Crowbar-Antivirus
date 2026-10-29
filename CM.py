@@ -126,7 +126,7 @@ except Exception as e:
 from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-CROWBAR_MENU_VERSION = "2.3.19 Beta"
+CROWBAR_MENU_VERSION = "2.3.20 Beta"
 
 def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
     """Главное окно программы"""
@@ -324,7 +324,7 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         header_labels.append(label_manage)
 
         um_btn = ttk.Button(tab_manage, text=l("UM"),
-                      command=lambda:run_component(UM, current_theme, DEBUG_MODE))
+                      command=lambda:run_component_process(UM, current_theme, DEBUG_MODE))
         um_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(um_btn)
 

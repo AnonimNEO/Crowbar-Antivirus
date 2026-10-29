@@ -35,7 +35,7 @@ from languages import l
 from PM import action_process_by_name
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-AUTORUN_MASTER_VERSION = "3.7.24 Beta"
+AUTORUN_MASTER_VERSION = "3.7.25 Beta"
 
 # Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -166,8 +166,8 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         else:
             user_startup = fr"C:\Users\{default_user_name}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
 
-    c_v = "Software\Microsoft\Windows\CurrentVersion"
-    wow64 = "SOFTWARE\WOW6432Node\Microsoft"
+    c_v = r"Software\Microsoft\Windows\CurrentVersion"
+    wow64 = r"SOFTWARE\WOW6432Node\Microsoft"
     ARM_CORE_GLOBALS = {
         "user_startup_path": user_startup,
         "REG_KEYS": {

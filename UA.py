@@ -148,7 +148,6 @@ def restore_fonts(UA_GLOBALS, RUN_IN_RECOVERY, DEBUG_MODE=False):
 
 def reset_reg_values(hkey_const, chapter, params, UA_GLOBALS, is_exception, RUN_IN_RECOVERY):
     """Функция для сброса значений реестра
-
     Аргументы:
     hkey_const - Куст реестра (например HKEY_LOCAL_MACHINE или HKEY_CURRENT_USER).
     chapter - путь к разделу реестра.

@@ -25,7 +25,8 @@ from languages import l
 from RS import RS
 import config
 
-CROWBAR_CONSOLE_VERSION = "0.1.10 Pre-Alpha"
+CROWBAR_CONSOLE_VERSION = "0.1.11 Pre-Alpha"
+DEBUG_MODE = True
 
 class CrowbarConsole:
     """Консоль разработчика (python консоль вместе с доступом к функциям программы)"""
@@ -49,7 +50,7 @@ class CrowbarConsole:
             height=20
         )
         self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        self.output_text.insert(tk.END, f'=== {l("crowbar_console")} {crowbar_console_version} ===\n')
+        self.output_text.insert(tk.END, f'=== {l("crowbar_console")} {CROWBAR_CONSOLE_VERSION} ===\n')
         self.output_text.insert(tk.END, f'{l("pac")} - {PROGRAM_AUTHENTICATION_CLYTH}\n')
         self.output_text.insert(tk.END, l("crowbar_console_text"))
 
@@ -69,7 +70,7 @@ class CrowbarConsole:
         )
         self.input_entry.pack(fill=tk.X, expand=True, padx=5)
         self.input_entry.bind("<Return>", self.execute_command)
-        self.input_entry.focus()
+        #self.input_entry.focus()
 
         create_menubar(self.CC_GUI, False, None, DEBUG_MODE=DEBUG_MODE)
 
@@ -89,6 +90,16 @@ class CrowbarConsole:
             comment = f'{l("exit_with_console_text")}\n'
             logger.info(f"Console - {comment}")
             self.output_text.insert(tk.END, comment)
+            self.output_text.config(state=tk.DISABLED)
+            return
+        elif "from T" in command:
+            self.output_text.config(state=tk.NORMAL)
+            self.output_text.insert(tk.END, "Импорт из ядра программы - запрещён! Это может привести к неконтролируемой рекурсии.\n")
+            self.output_text.config(state=tk.DISABLED)
+            return
+        elif "crowbar" in command.lower():
+            self.output_text.config(state=tk.NORMAL)
+            self.output_text.insert(tk.END, "Запуск Ядра программы - запрещён!\n")
             self.output_text.config(state=tk.DISABLED)
             return
 

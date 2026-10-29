@@ -404,7 +404,7 @@ except:
     logger.exception(f'T - {l("checking_damage_error")}')
 
 global DEBUG_MODE
-TREY_VERSION = "2.4.29 Beta"
+TREY_VERSION = "2.4.30 Beta"
 ON_BOARD_PC_VERSION = l("not_stable")
 DEBUG_MODE = False
 
@@ -509,7 +509,7 @@ def Crowbar():
                     create_menu_item(not_pm, l("PM"), lambda: run_component_process(PM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "PM"),
                     create_menu_item(not_fm, l("FM"), lambda: run_component_process(FM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "FM"),
                     create_menu_item(not_fr, l("FR"), lambda: run_component(FR, RUN_IN_RECOVERY, current_theme, DEBUG_MODE), "FR"),
-                    create_menu_item(not_um, l("UM"), lambda: run_component(UM, current_theme, DEBUG_MODE), "UM"),
+                    create_menu_item(not_um, l("UM"), lambda: run_component_process(UM, current_theme, DEBUG_MODE), "UM"),
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE, None, current_theme), "FE"),
                     #create_menu_item(not_b, l("B"), lambda: run_component(B, RUN_IN_RECOVERY), "B"),
                     create_menu_item(not_sp, l("SP"), lambda: run_component(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE), "SP"),
@@ -528,7 +528,7 @@ def Crowbar():
                             "DEBUG_MODE": DEBUG_MODE,
                             "AP": AP,
                             "ARM": ARM,
-                            "B": B,
+                            #"B": B,
                             "CC": CC,
                             "AES": AES,
                             "CM": CM,
