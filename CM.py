@@ -126,7 +126,7 @@ except Exception as e:
 from config import PROGRAM_AUTHENTICATION_CLYTH
 from languages import l
 
-CROWBAR_MENU_VERSION = "2.3.20 Beta"
+CROWBAR_MENU_VERSION = "2.3.21 Beta"
 
 def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
     """Главное окно программы"""
@@ -305,14 +305,16 @@ def CM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
             try:
                 from SIM import SIM
             except:
-                logger.exception(f"CM - {import_error} SIM")
+                logger.exception(f'CM - {l("import_error")} SIM')
+                def SIM(a=None, b=None, c=None):
+                    messagebox.showerror(RS(), l("import_error"))
             sim_btn = ttk.Button(tab_protect, text="Менеджер Установки",
                                  command=lambda: run_component(SIM, RUN_IN_RECOVERY, current_theme, DEBUG_MODE))
             sim_btn.grid(row=2, column=0, sticky="nsew", padx=5, pady=5)
             regular_buttons.append(sim_btn)
 
         sp_btn = ttk.Button(tab_protect, text=l("SP"),
-                      command=lambda:run_component(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE))
+                      command=lambda:run_component_process(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE))
         sp_btn.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
         regular_buttons.append(sp_btn)
 

@@ -35,7 +35,7 @@ from languages import l
 from PM import action_process_by_name
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-AUTORUN_MASTER_VERSION = "3.7.25 Beta"
+AUTORUN_MASTER_VERSION = "3.7.27 Beta"
 
 # Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -167,28 +167,31 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
             user_startup = fr"C:\Users\{default_user_name}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
 
     c_v = r"Software\Microsoft\Windows\CurrentVersion"
+    c_s = r"SYSTEM\CurrentControlSet\Control"
+    c_wl = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
     wow64 = r"SOFTWARE\WOW6432Node\Microsoft"
     ARM_CORE_GLOBALS = {
         "user_startup_path": user_startup,
         "REG_KEYS": {
             l("custom"): None, # Для файлов
             l("registry"): [
-                (winreg.HKEY_CURRENT_USER, rf"{c_v}\Run", "Run"),
-                (winreg.HKEY_CURRENT_USER, rf"{c_v}\RunOnce", "RunOnce"),
-                (winreg.HKEY_LOCAL_MACHINE, rf"{wow64}\Windows\CurrentVersion\Run", "Run")
+                (winreg.HKEY_CURRENT_USER, rf"{c_v}\Run", None),
+                (winreg.HKEY_CURRENT_USER, rf"{c_v}\RunOnce", None),
+                (winreg.HKEY_LOCAL_MACHINE, rf"{wow64}\Windows\CurrentVersion\Run", None)
             ],
             l("system"): [
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Winlogon", "Shell"),
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Winlogon", "Userinit"),
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Winlogon", "Taskman"),
-                (winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\Session Manager", "Bootshell"),
-                (winreg.HKEY_LOCAL_MACHINE, r"SYSTEM\CurrentControlSet\Control\SafeBoot", "AlternateShell"),
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Polices\System", "legalnoticecaption"),
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Polices\System", "legalnoticetext")
+                (winreg.HKEY_LOCAL_MACHINE, c_wl, "Shell"),
+                (winreg.HKEY_LOCAL_MACHINE, c_wl, "Userinit"),
+                (winreg.HKEY_LOCAL_MACHINE, c_wl, "Taskman"),
+                (winreg.HKEY_LOCAL_MACHINE, rf"{c_s}\BootExecute", None),
+                (winreg.HKEY_LOCAL_MACHINE, rf"{c_s}\Session Manager", "Bootshell"),
+                (winreg.HKEY_LOCAL_MACHINE, rf"{c_s}\SafeBoot", "AlternateShell"),
+                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Policies\System", "legalnoticecaption"),
+                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Policies\System", "legalnoticetext")
             ],
             "AppInit_DLLs": [
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Windows", "AppInit_DLLs", "x64"),
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Windows", "LoadAppInit_DLLs", "x64"),
+                (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows", "AppInit_DLLs", "x64"),
+                (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows", "LoadAppInit_DLLs", "x64"),
                 (winreg.HKEY_LOCAL_MACHINE, rf"{wow64}\Windows NT\CurrentVersion\Windows", "AppInit_DLLs", "x32"),
                 (winreg.HKEY_LOCAL_MACHINE, rf"{wow64}\Windows NT\CurrentVersion\Windows", "LoadAppInit_DLLs", "x32"),
             ],
@@ -332,28 +335,29 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                             ARM_data.append({
                                 f'{l("name")} {l("parameter")}': value_name,
                                 f'{l("meaning")} {l("parameter")}': str(value),
-                                l('danger'): check_value(value_name, value),
+                                l("danger"): check_value(value_name, value),
                                 f'{l("type")} {l("parameter")}': REG_TYPE_MAP.get(reg_type),
-                                f'{l("path")} {l("parameter")}': full_path,
-                                'hkey': hkey_const,
-                                'subkey': subkey_path,
-                                'value_type': reg_type
-                            })
-                        except FileNotFoundError:
-                            if key != "Taskman" and key != "legalnoticecaption" and key != "legalnoticetext":
-                                logger.warning(f'ARM - {l("key_not_found")}: {full_path}\\{value_name}')
-                        except:
-                            logger.exception(f'ARM - {l("read_key_error")} {full_path}\\{value_name}')
-                            ARM_data.append({
-                                f'{l("name")} {l("parameter")}': value_name,
-                                f'{l("meaning")} {l("parameter")}': l("error"),
-                                l('danger'): check_value(value_name, value),
-                                f'{l("type")} {l("parameter")}': l("error"),
                                 f'{l("path")} {l("parameter")}': full_path,
                                 "hkey": hkey_const,
                                 "subkey": subkey_path,
-                                "value_type": winreg.REG_NONE
+                                "value_type": reg_type
                             })
+                        except FileNotFoundError:
+                            if value_name is not None and value_name not in ("Taskman", "legalnoticecaption", "legalnoticetext"):
+                                logger.warning(f'ARM - {l("key_not_found")}: {full_path}\\{value_name}')
+                        except:
+                            if value_name is not None:
+                                logger.exception(f'ARM - {l("read_key_error")} {full_path}\\{value_name}')
+                                ARM_data.append({
+                                    f'{l("name")} {l("parameter")}': value_name,
+                                    f'{l("meaning")} {l("parameter")}': l("error"),
+                                    l('danger'): check_value(value_name, ""),
+                                    f'{l("type")} {l("parameter")}': l("error"),
+                                    f'{l("path")} {l("parameter")}': full_path,
+                                    "hkey": hkey_const,
+                                    "subkey": subkey_path,
+                                    "value_type": winreg.REG_NONE
+                                })
                     else:
                         i = 0
                         while True:
@@ -387,8 +391,20 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                                     "value_type": winreg.REG_NONE
                                 })
             except FileNotFoundError:
-                if value_name != "Taskman" and value_name != "legalnoticecaption" and value_name != "legalnoticetext":
-                    logger.warning(f'ARM - {l("key_not_found")}: {full_path}')
+                if value_name is not None and value_name not in ("Taskman", "legalnoticecaption", "legalnoticetext"):
+                    logger.warning(f'ARM - {l("key_not_found")}: {full_path}\\{value_name}')
+                # Добавляем параметр с пустым значением, чтобы он отображался в интерфейсе
+                if value_name is not None:
+                    ARM_data.append({
+                        f'{l("name")} {l("parameter")}': value_name,
+                        f'{l("meaning")} {l("parameter")}': "",
+                        l("danger"): "0%",
+                        f'{l("type")} {l("parameter")}': l("not_found"),
+                        f'{l("path")} {l("parameter")}': full_path,
+                        "hkey": hkey_const,
+                        "subkey": subkey_path,
+                        "value_type": winreg.REG_NONE
+                    })
             except:
                 logger.exception(f'ARM - {l("read_key_error")} {full_path}')
             return ARM_data
@@ -1021,7 +1037,7 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                 columns = [f'{l("name")} {l("file2")}', f'{l("date")} {l("creation")}', l('danger'), f'{l("date")} {l("changes")}', f'{l("date")} {l("discoveries")}']
             elif current_tab == l("registry"):
                 ARM_GUI_ELEMENTS['treeview_data'] = get_registry_startup(ARM_CORE_GLOBALS)
-                columns = [f'{l("name")}, {l("parameter")}', f'{l("meaning")} {l("parameter")}', l('danger'), f'{l("type")} {l("parameter")}', f'{l("path")} {l("parameter")}']
+                columns = [f'{l("name")} {l("parameter")}', f'{l("meaning")} {l("parameter")}', l('danger'), f'{l("type")} {l("parameter")}', f'{l("path")} {l("parameter")}']
             elif current_tab == l("system"):
                 ARM_GUI_ELEMENTS["treeview_data"] = get_system_startup(ARM_CORE_GLOBALS)
                 columns = [f'{l("name")} {l("parameter")}', f'{l("meaning")} {l("parameter")}', l('danger'), f'{l("type")} {l("parameter")}', f'{l("path")} {l("parameter")}']

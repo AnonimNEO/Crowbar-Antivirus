@@ -404,7 +404,7 @@ except:
     logger.exception(f'T - {l("checking_damage_error")}')
 
 global DEBUG_MODE
-TREY_VERSION = "2.4.30 Beta"
+TREY_VERSION = "2.4.31 Beta"
 ON_BOARD_PC_VERSION = l("not_stable")
 DEBUG_MODE = False
 
@@ -512,7 +512,7 @@ def Crowbar():
                     create_menu_item(not_um, l("UM"), lambda: run_component_process(UM, current_theme, DEBUG_MODE), "UM"),
                     create_menu_item(not_fe, l("FE"), lambda: run_component(FE, None, current_theme), "FE"),
                     #create_menu_item(not_b, l("B"), lambda: run_component(B, RUN_IN_RECOVERY), "B"),
-                    create_menu_item(not_sp, l("SP"), lambda: run_component(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE), "SP"),
+                    create_menu_item(not_sp, l("SP"), lambda: run_component_process(SP, RUN_IN_RECOVERY, current_disc_r, current_theme, DEBUG_MODE), "SP"),
                     create_menu_item(not_cc, l("CC"), lambda: run_component(CC, RUN_IN_RECOVERY), "CC"),
                 ]
 
