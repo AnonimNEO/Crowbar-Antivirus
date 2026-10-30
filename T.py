@@ -404,7 +404,7 @@ except:
     logger.exception(f'T - {l("checking_damage_error")}')
 
 global DEBUG_MODE
-TREY_VERSION = "2.4.31 Beta"
+TREY_VERSION = "2.4.33 Beta"
 ON_BOARD_PC_VERSION = l("not_stable")
 DEBUG_MODE = False
 
@@ -665,19 +665,37 @@ if __name__ == "__main__":
     except:
         logger.exception(f'T - {l("multiprocessing_error")}')
 
+    admin_mode = False
     try:
         if ctypes.windll.shell32.IsUserAnAdmin():
-            try:
-                Crowbar()
-            except Exception as e:
-                comment = f'T - {l("t_critical_error")}'
-                logger.exception(comment)
-                if messagebox.askyesno(RS(), f'{comment}:\n{e}\n\n{l("restart_program")}?'):
-                    Crowbar()
+            admin_mode = True
         else:
-            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+            # Проверка, запущено ли из IDLE или интерпретатора
+            if '__file__' not in globals() or 'idlelib' in sys.modules:
+                # Если запущено из IDLE, не повышаем привилегии
+                logger.warning('Программа запущена из IDLE без прав администратора')
+                messagebox.showwarning(RS(), f'{l("admin_error")}: Запустите программу напрямую exe-файлом')
+            else:
+                try:
+                    # Нормальный запуск - повышаем привилегии
+                    exe_path = sys.argv[0]
+                    ctypes.windll.shell32.ShellExecuteW(None, "runas", exe_path, None, None, 1)
+                    sys.exit()
+                except Exception as e:
+                    # Если не удалось получить права, продолжаем работу без них
+                    logger.warning(f'T - Не удалось повысить привилегии: {e}')
+                    messagebox.showwarning(RS(), f'{l("admin_error")}: Программа продолжит работу без прав администратора')
     except Exception as e:
         admin_error = f'T - {l("admin_error")}'
         logger.exception(admin_error)
         messagebox.showerror(RS(), f'{admin_error}:\n{e}')
-        restart_ca()
+    
+    # Программа продолжает работу в любом случае
+    try:
+        Crowbar()
+    except Exception as e:
+        comment = f'T - {l("t_critical_error")}'
+        logger.exception(comment)
+        if messagebox.askyesno(RS(), f'{comment}:\n{e}\n\n{l("restart_program")}?'):
+            Crowbar()
+

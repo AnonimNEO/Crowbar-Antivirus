@@ -290,10 +290,24 @@ def UA(RUN_IN_RECOVERY=False, DEBUG_MODE=False):
         explorer_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\Explorer", [], UA_GLOBALS, True, RUN_IN_RECOVERY)
 
         # Системные политики (HKCU)
-        user_restore_success = reset_reg_values(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], UA_GLOBALS, True, RUN_IN_RECOVERY)
+        user_restore_success = reset_reg_values(
+            winreg.HKEY_CURRENT_USER, 
+            r"Software\Microsoft\Windows\CurrentVersion\Policies\System", 
+            ["EnableLUA"],  # Исключаем UAC из сброса
+            UA_GLOBALS, 
+            True,  # is_exception = True (это исключения)
+            RUN_IN_RECOVERY
+        )
 
         # Системные политики (HKLM)
-        system_restore_success = reset_reg_values(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Policies\System", [], UA_GLOBALS, True, RUN_IN_RECOVERY)
+        system_restore_success = reset_reg_values(
+            winreg.HKEY_LOCAL_MACHINE, 
+            r"Software\Microsoft\Windows\CurrentVersion\Policies\System", 
+            ["EnableLUA"],  # Исключаем UAC из сброса
+            UA_GLOBALS, 
+            True,  # is_exception = True (это исключения)
+            RUN_IN_RECOVERY
+        )
 
         # Восстановление шрифтов
         font_restore_success = restore_fonts(UA_GLOBALS, RUN_IN_RECOVERY, DEBUG_MODE)
