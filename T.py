@@ -404,7 +404,7 @@ except:
     logger.exception(f'T - {l("checking_damage_error")}')
 
 global DEBUG_MODE
-TREY_VERSION = "2.4.33 Beta"
+TREY_VERSION = "2.4.34 Beta"
 ON_BOARD_PC_VERSION = l("not_stable")
 DEBUG_MODE = False
 

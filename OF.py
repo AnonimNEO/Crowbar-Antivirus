@@ -38,7 +38,7 @@ from languages import l
 from config import ENCRYPT_LOGS, PROGRAM_AUTHENTICATION_CLYTH, LOG_PATH, T_LOG_TXT, THEME
 
 global load_bush
-OTHER_FUNCTION_VERSION = "0.14.10 Beta"
+OTHER_FUNCTION_VERSION = "0.15.0 Beta"
 
 # Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -563,6 +563,37 @@ def get_offline_reg_path(hkey_const, subkey_path, ARM_CORE_GLOBALS, RUN_IN_RECOV
 
 
 
+def select_disk_dialog(drives):
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+
+    dialog = tk.Toplevel(root)
+    dialog.title(RS())
+    dialog.geometry("300x120")
+    dialog.attributes("-topmost", True)
+
+    tk.Label(dialog, text=l("select_disk_dialog")).pack(pady=10)
+
+    var = tk.StringVar(value=drives[0])
+    combo = ttk.Combobox(dialog, textvariable=var, values=drives, state="readonly", width=20)
+    combo.pack(pady=10)
+
+    selected = [None]
+
+    def on_ok():
+        selected[0] = var.get()
+        dialog.destroy()
+        root.destroy()
+
+    tk.Button(dialog, text=l("ok"), command=on_ok).pack(side="left", padx=5, pady=10)
+    tk.Button(dialog, text=l("cancel2"), command=lambda: dialog.destroy() or root.destroy()).pack(side="right", padx=5, pady=10)
+
+    root.mainloop()
+    return selected[0]
+
+
+
 def get_current_disc(RUN_IN_RECOVERY=False):
     """Функция для получения диска с установленной шиндовс
     RUN_IN_RECOVERY - Код работает в среде восстановления? Тогда True
@@ -572,18 +603,29 @@ def get_current_disc(RUN_IN_RECOVERY=False):
         if RUN_IN_RECOVERY:
             # В WinPE ищем диск с каталогом Windows, отличный от X:
             drives = [f"{d}:\\" for d in "ABCDEFGHIJKLMNOPQRSTUVWYZ"]
-            for drive in drives:
-                if os.path.exists(os.path.join(drive, 'Windows')):
-                    logger.info(f'OF - {l("system_found")} {drive}')
-                    return drive, True
+            found_drives = [drive for drive in drives if os.path.exists(os.path.join(drive, 'Windows'))]
+
+            if len(found_drives) == 1:
+                logger.info(f'OF - {l("system_found")} {found_drives[0]}')
+                return found_drives[0], True
+            elif len(found_drives) > 1:
+                selected = select_disk_dialog(found_drives)
+                if selected:
+                    logger.info(f'OF - {l("system_found")} {selected}')
+                    return selected, True
             return "X:\\", False
 
         import psutil
         # Для обычной среды
         partitions = psutil.disk_partitions()
-        for p in partitions:
-            if "fixed" in p.opts and os.path.exists(os.path.join(p.mountpoint, "Windows")):
-                return p.mountpoint, True
+        found_drives = [p.mountpoint for p in partitions if "fixed" in p.opts and os.path.exists(os.path.join(p.mountpoint, "Windows"))]
+
+        if len(found_drives) == 1:
+            return found_drives[0], True
+        elif len(found_drives) > 1:
+            selected = select_disk_dialog(found_drives)
+            if selected:
+                return selected, True
         return "C:\\", False
     except:
         logger.exception(f'OF\\get_current_disc - {l("unknown_error")}')

@@ -33,9 +33,10 @@ from GFA import GFA
 from RS import RS
 from languages import l
 from PM import action_process_by_name
+from config import DEFAULT_USER_THEME
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-AUTORUN_MASTER_VERSION = "3.7.27 Beta"
+AUTORUN_MASTER_VERSION = "3.7.28 Beta"
 
 # Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -151,7 +152,7 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
     # Путь к каталогу автозагрузки пользователя
     if RUN_IN_RECOVERY:
         current_disc, found_disc = get_current_disc(RUN_IN_RECOVERY)
-        if not os.path.isfile(f"{current_disc}\\Users\\{default_user_name}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
+        if not os.path.isfile(f"{current_disc}\\Users\\{DEFAULT_USER_THEME}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
             user_name = simpledialog.askstring(title=RS(), prompt=f'{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}: ')
         else:
             user_name = default_user_name
