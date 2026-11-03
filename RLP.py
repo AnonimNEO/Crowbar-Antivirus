@@ -13,124 +13,60 @@
 # ДАННЫЙ КОМПОНЕНТ НЕ ДОДЕЛАН, НЕ ГАРАНТИРОВАН ДАЖЕ ЗАПУСК
 
 
-
+# Интерфейс
 from tkinter import messagebox
-from RS import RS
+# Логирование
 from loguru import logger
+# работал с каталогами
+from pathlib import Path
+# Работа с процессами
 import psutil
 
-# from EC import get_process_critical_status
-def get_process_critical_status(a=None,b=None,c=None):
-    pass
+from RS import RS
+from EC import get_process_critical_status
+from PM import action_process, get_process_name, get_process_info, get_process_list
 
-REAL_TIME_PROTECT_VERSION = "0.1.4 Pre-Alpha"
+REAL_TIME_PROTECT_VERSION = "0.1.7 Pre-Alpha"
 
-# Действие с процессами
-def action_process(action, process_ids):
-    if not isinstance(process_ids, (list, tuple)):
-        process_ids = [process_ids]
-
-    for pid in process_ids:
-        try:
-            proc = psutil.Process(int(pid))
-
-            if action == "kill":
-                proc.terminate()
-            elif action == "suspend":
-                proc.suspend()
-            elif action == "resume":
-                proc.resume()
-            elif action == "edit_critical_to_false":
-                EC(int(pid), False)
-            elif action == "edit_critical_to_true":
-                EC(int(pid), True)
-
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
-        except Exception as e:
-            logger.critical(f"RLP - Ошибка при {action} для PID {pid}:\n{e}")
-
-# Получаем имя процесса
-def get_process_name(process_id):
-    process = psutil.Process(process_id)
-    return process.name()
-
-# Получаем информацию о процессе
-def get_process_info(proc, RUN_IN_RECOVERY):
-    try:
-        status = "Заморожен" if proc.status() == psutil.STATUS_STOPPED else "Запущен"
-
-        # РЕАЛИЗОВАТЬ ПРОВЕРКУ НА АДМИНИСТРАТОРА
-        is_elevated = False
-
-        return {
-            "PID": proc.pid,
-            "Имя Процесса": proc.name(),
-            "Путь к файлу": proc.exe() if proc.exe() else "Н/Д",
-            "Пользователь": proc.username() if proc.username() else "Н/Д",
-            "Критичность": get_process_critical_status(proc.pid, RUN_IN_RECOVERY),
-            "Статус": status,
-            "Администратор": is_elevated,
-        }
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
-        return None
-    except Exception as e:
-        process_name = get_process_name(proc.pid)
-        logger.error(f"PM - Ошибка при получении информации о процессе {process_name} (pid:{proc.pid}):\n{e}")
-        return None
-
-# Получаем список процессов
-def get_process_list(list_type, RUN_IN_RECOVERY):
-    all_processes = []
-    for proc in psutil.process_iter(["pid", "name", "exe", "username", "status"]):
-        info = get_process_info(proc, RUN_IN_RECOVERY)
-        if info:
-            all_processes.append(info)
-
-    if list_type == "all_list":
-        return all_processes
-    elif list_type == "critical_list":
-        return [p for p in all_processes if p["Критичность"]]
-    elif list_type == "suspend_list":
-        return [p for p in all_processes if p["Статус"] == "Заморожен"]
-    return []
-
-def RLP(RUN_IN_RECOVERY=False):
-    SUSPEND_PROCESS = []
-    system_name_process = (
-        ("cmd.exe", r"C:\Windows\System32\cmd.exe"),
-        ("notepad.exe", r"C:\Windows\notepad.exe"),
-        ("calc.exe", r"C:\Windows\System32\calc.exe"),
-        ("explorer.exe", r"C:\Windows\explorer.exe"),
-        ("powershell.exe", r"C:\Windows\System32\powershell.exe"),
-        ("taskmgr.exe", r"C:\Windows\System32\taskmgr.exe"),
-        ("regedit.exe", r"C:\Windows\regedit.exe"),
-        ("mspaint.exe", r"C:\Windows\System32\mspaint.exe"),
-    )
-    system_exception = [r"C:\Users\Adminus\Desktop\calc.exe"]
-
+def RLP(RUN_IN_RECOVERY=False, DEBUG_MODE=False):
     if RUN_IN_RECOVERY:
         messagebox.showwarning(RS(), "RealTimeProtect невозможно запустить в среде восстановления")
 
+    SUSPEND_PROCESS = []
+    SYSTEM_PROCESS = (
+        (r"C:\Windows\System32\cmd.exe", 0),
+        (r"C:\Windows\notepad.exe", 0),
+        (r"C:\Windows\System32\calc.exe", 0),
+        (r"C:\Windows\explorer.exe", 0),
+        (r"C:\Windows\System32\powershell.exe", 0),
+        (r"C:\Windows\System32\taskmgr.exe", 0),
+        (r"C:\Windows\regedit.exe", 0),
+        (r"C:\Windows\System32\mspaint.exe", 0),
+    )
+    EXCEPTION = [[r"C:\Users\Adminus\Desktop\calc.exe", 0], [r"C:\Windows\explorer.exe", 0]]
+
     def warning_dialog(cause, p):
         if cause == "fake_system":
-            cause_text = f'Процесс {p["Имя Процесса"]}({p["PID"]}), притворяется системным.\nТак как его файл расположен в: {p["Путь к файлу"]}'
+            cause_text = f'Процесс {p["Имя Процесса"]}({p["PID"]}), притворяется системным с помощью имению, но его файл расположен в: {p["Путь к файлу"]} и поэтому был замрожен'
 
+  
     def stop_process(cause, p):
         action_process("suspend", p["PID"])
         SUSPEND_PROCESS.append(p["PID"])
         warning_dialog(cause, p)
 
     def check_system_process(PROCESS_LIST):
-        logger.info("RLP - Проверка системных процессов...")
+        if DEBUG_MODE:
+            logger.debug("RLP - Проверка системных процессов...")
         for p in PROCESS_LIST:
             p_name = p["Имя"]
             p_exe = p["Путь к файлу"]
 
-            for sys_name, sys_exe in system_name_process:
+            for sys_exe, sys_byte in system_name_process:
+                sys_name = Path(p_exe).name
                 if p_name == sys_name:
                     if p_exe != sys_exe:
-                        stop_process(p)
+                        stop_process("fake_system", p)
 
     def filter_process_for_exception(PROCESS_LIST):
         for p in PROCESS_LIST:
@@ -148,4 +84,4 @@ def RLP(RUN_IN_RECOVERY=False):
         check_system_process(PROCESS_LIST)
 
 if __name__ == "__main__":
-    RLP(RUN_IN_RECOVERY=False)
+    RLP(False, True)
