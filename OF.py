@@ -35,10 +35,10 @@ except:
         return a
 from RS import RS
 from languages import l
-from config import ENCRYPT_LOGS, PROGRAM_AUTHENTICATION_CLYTH, LOG_PATH, T_LOG_TXT, THEME
+from config import ENCRYPT_LOGS, PROGRAM_AUTHENTICATION_CLYTH, LOG_PATH, T_LOG_TXT, THEME, DEFAULT_USER_NAME
 
 global load_bush
-OTHER_FUNCTION_VERSION = "0.15.0 Beta"
+OTHER_FUNCTION_VERSION = "0.15.2 Beta"
 
 # Глобальные имена загруженных кустов
 loaded_hive_names = {"SYSTEM": "Offline_SYSTEM", "SOFTWARE": "Offline_SOFTWARE", "USER": "Offline_USER"}
@@ -639,10 +639,10 @@ def load_bush(current_disc, user=False):
     if user:
         user_name = user
     else:
-        if not os.path.isdir(f"{current_disc}\\Users\\{default_user_name}\\"):
-            user_name = simpledialog.askstring(title=RS(), prompt=f'{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}:')
+        if not os.path.isdir(f"{current_disc}\\Users\\{DEFAULT_USER_NAME}\\"):
+            user_name = simpledialog.askstring(title=RS(), prompt=f'{l("user_not_found")} {DEFAULT_USER_NAME}\n{l("enter_user_name")}:')
         else:
-            user_name = default_user_name
+            user_name = DEFAULT_USER_NAME
 
     hive_paths = {
         HIVE_MAP["SYSTEM"]: os.path.join(current_disc, "Windows", "System32", "config", "SYSTEM"),
@@ -693,7 +693,7 @@ def get_user_name():
         return user_name
     except:
         logger.exception(f'OF/get_user_name - {l("get_user_name_error")}!')
-        return default_user_name
+        return DEFAULT_USER_NAME
 
 
 

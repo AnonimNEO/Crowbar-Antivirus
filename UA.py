@@ -22,10 +22,10 @@ try:
 except:
     from loguru import logger
 
-from OF import get_offline_reg_path, loaded_hive_names
+from OF import get_offline_reg_path, loaded_hive_names, get_current_disc
 from languages import l
 
-UNLOCK_ALL_VERSION = "1.2.11 Beta"
+UNLOCK_ALL_VERSION = "1.2.12 Beta"
 
 # Возвращает безопасное "нулевое" значение для сброса параметра
 def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
@@ -44,7 +44,11 @@ def get_new_value_for_type(reg_type: int) -> Tuple[Any, int]:
 def restore_fonts(UA_GLOBALS, RUN_IN_RECOVERY, DEBUG_MODE=False):
     """Восстанавливает шрифты в реестре на основе файлов из C:\Windows\Fonts"""
     try:
-        fonts_dir = r"C:\Windows\Fonts"
+        if RUN_IN_RECOVERY:
+            disc, _s = get_current_disc(RUN_IN_RECOVERY)
+            fonts_dir = rf"{disc}Windows\Fonts"
+        else:
+            fonts_dir = r"C:\Windows\Fonts"
         registry_key = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
 
         logger.info(f'UA - {l("start_recovery_font")}...')

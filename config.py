@@ -77,7 +77,7 @@ FORCE_SOFTWARE = True
 RESTART_WINDOWS_BAT = "restart_windows.bat"
 
 # Имя пользователя по умолчанию
-DEFAULT_USER_THEME = "Admin"
+DEFAULT_USER_NAME = "Admin"
 
 TIME_TO_UPDATE_PROCESS_LIST = 5
 

@@ -20,7 +20,7 @@ except:
 import queue
 import winreg
 
-REGISTRY_MONITOR_VERSION = "0.2.11 Pre-Alpha"
+REGISTRY_MONITOR_VERSION = "0.2.12 Pre-Alpha"
 
 # Загрузка библиотеки
 ADVAPI32 = ctypes.WinDLL("advapi32", use_last_error=True)
@@ -144,7 +144,7 @@ def define_functions():
 
 
 # Мониторинг ключа реестра
-class RegistryMonitor(threading.Thread):
+class RegistryMonitor(threading.Thread, DEBUG_MODE=True):
     def __init__(self, hive, key_path, watch_subtree=True, event_queue=None, DEBUG_MODE=False):
         # hive: Куст реестра
         # key_path: Путь к ключу реестра

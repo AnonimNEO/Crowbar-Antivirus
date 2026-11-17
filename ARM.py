@@ -33,10 +33,10 @@ from GFA import GFA
 from RS import RS
 from languages import l
 from PM import action_process_by_name
-from config import DEFAULT_USER_THEME
+from config import DEFAULT_THEME, DEFAULT_USER_NAME
 from OF import pac, get_current_disc, get_offline_reg_path, loaded_hive_names, apply_global_theme, extract_filename_from_path, create_menubar
 
-AUTORUN_MASTER_VERSION = "3.7.28 Beta"
+AUTORUN_MASTER_VERSION = "3.7.30 Beta"
 
 # Класс для взаимодействия с Планировщиком Задач в обычной среде
 class TaskSchedulerManager:
@@ -152,10 +152,10 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
     # Путь к каталогу автозагрузки пользователя
     if RUN_IN_RECOVERY:
         current_disc, found_disc = get_current_disc(RUN_IN_RECOVERY)
-        if not os.path.isfile(f"{current_disc}\\Users\\{DEFAULT_USER_THEME}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
-            user_name = simpledialog.askstring(title=RS(), prompt=f'{l("user_not_found")} {default_user_name}\n{l("enter_user_name")}: ')
+        if not os.path.isfile(f"{current_disc}\\Users\\{DEFAULT_USER_NAME}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"):
+            user_name = simpledialog.askstring(title=RS(), prompt=f'{l("user_not_found")} {DEFAULT_USER_NAME}\n{l("enter_user_name")}: ')
         else:
-            user_name = default_user_name
+            user_name = DEFAULT_USER_NAME
         # Путь к каталогу автозагрузки оффлайн-системы
         user_startup_path_str = f"{current_disc}\\Users\\{user_name}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"
         user_startup = Path(user_startup_path_str)
@@ -165,7 +165,7 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
         if appdata_path is not None:
             user_startup = Path(appdata_path) / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Startup"
         else:
-            user_startup = fr"C:\Users\{default_user_name}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
+            user_startup = fr"C:\Users\{DEFAULT_USER_NAME}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
 
     c_v = r"Software\Microsoft\Windows\CurrentVersion"
     c_s = r"SYSTEM\CurrentControlSet\Control"
@@ -184,7 +184,8 @@ def ARM(RUN_IN_RECOVERY=False, current_theme="dark", DEBUG_MODE=False):
                 (winreg.HKEY_LOCAL_MACHINE, c_wl, "Shell"),
                 (winreg.HKEY_LOCAL_MACHINE, c_wl, "Userinit"),
                 (winreg.HKEY_LOCAL_MACHINE, c_wl, "Taskman"),
-                (winreg.HKEY_LOCAL_MACHINE, rf"{c_s}\BootExecute", None),
+                (winreg.HKEY_LOCAL_MACHINE, rf"SYSTEM\ControlSet001\Control\Session Manager", "BootExecute"),
+                (winreg.HKEY_LOCAL_MACHINE, rf"SYSTEM\ControlSet001\Control\Session Manager", "Bootshell"),
                 (winreg.HKEY_LOCAL_MACHINE, rf"{c_s}\Session Manager", "Bootshell"),
                 (winreg.HKEY_LOCAL_MACHINE, rf"{c_s}\SafeBoot", "AlternateShell"),
                 (winreg.HKEY_LOCAL_MACHINE, rf"{c_v}\Policies\System", "legalnoticecaption"),

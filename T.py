@@ -11,6 +11,7 @@
 # Локализация
 from languages import l
 
+import winreg
 import ctypes
 import time
 import sys
@@ -164,8 +165,32 @@ not_console = False
 not_rm = False
 not_sim = False
 
-# Импорт Компонентов
+global RUN_IN_RECOVERY
 
+# Получаем информацию о текущей среде
+def check_is_recovery():
+    try:
+        with winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            r"SYSTEM\CurrentControlSet\Control\MiniNT"
+        ):
+            return True
+    except FileNotFoundError:
+        return False
+
+RUN_IN_RECOVERY = False
+
+try:
+    RUN_IN_RECOVERY = check_is_recovery()
+    if RUN_IN_RECOVERY:
+        logger.warning(f'T - {l("RUN_IN_RECOVERY")}')
+    else:
+        logger.info(f'T - {l("run_in_normal")}')
+except:
+    RUN_IN_RECOVERY = True
+    logger.exception(f'T - {l("environment_error")}')
+
+# Импорт Компонентов
 try:
     from AES import AES
 except:
@@ -229,7 +254,8 @@ except:
     not_ec = True
     def EC():
         pass
-    logger.exception(f'T - {l("component_import_error")} EditCritical')
+    if not RUN_IN_RECOVERY:
+        logger.exception(f'T - {l("component_import_error")} EditCritical')
 
 try:
     from FE import FE, FILE_EDITOR_VERSION
@@ -260,7 +286,8 @@ try:
     from RLP import RLP, REAL_TIME_PROTECT_VERSION
 except:
     not_rlp = True
-    logger.exception(f'T - {l("component_import_error")} RealTimeProtection')
+    if not RUN_IN_RECOVERY:
+        logger.exception(f'T - {l("component_import_error")} RealTimeProtection')
 
 try:
     from CM import CM, CROWBAR_MENU_VERSION
@@ -300,7 +327,8 @@ try:
     from PM import PM, PROCESS_MANAGER_VERSION
 except:
     not_pm = True
-    logger.exception(f'T - {l("component_import_error")} ProcessManager')
+    if not RUN_IN_RECOVERY:
+        logger.exception(f'T - {l("component_import_error")} ProcessManager')
 
 try:
     from R import R, RESTART_VERSION
@@ -346,13 +374,15 @@ try:
     from SIM import SIM, SOFTWARE_INSTALLATION_MANAGER
 except:
     nor_sim = True
-    logger.exception(f'T - {l("component_import_error")} SoftwareInstallationManager')
+    if not RUN_IN_RECOVERY:
+        logger.exception(f'T - {l("component_import_error")} SoftwareInstallationManager')
 
 try:
     from RM import REGISTRY_MONITOR_VERSION
 except:
     not_rm = True
-    logger.exception(f'T - {l("component_import_error")} RegistryMonitor')
+    if not RUN_IN_RECOVERY:
+        logger.exception(f'T - {l("component_import_error")} RegistryMonitor')
 
 # Импорт консоли разработчика
 try:
@@ -404,7 +434,7 @@ except:
     logger.exception(f'T - {l("checking_damage_error")}')
 
 global DEBUG_MODE
-TREY_VERSION = "2.4.34 Beta"
+TREY_VERSION = "2.4.40 Beta"
 ON_BOARD_PC_VERSION = l("not_stable")
 DEBUG_MODE = False
 
@@ -414,22 +444,7 @@ def Crowbar():
 
     current_disc = None
 
-    def check_is_recovery():
-        if os.environ.get("WINPE") == "1":
-            return True
-        return False
-
     try:
-        try:
-            RUN_IN_RECOVERY = check_is_recovery()
-            if RUN_IN_RECOVERY:
-                logger.warning(f'T - {l("RUN_IN_RECOVERY")}')
-            else:
-                logger.info(f'T - {l("run_in_normal")}')
-        except:
-            RUN_IN_RECOVERY = True
-            logger.exception(f'T - {l("environment_error")}')
-
         if RUN_IN_RECOVERY:
             current_disc, found_disc = get_current_disc(RUN_IN_RECOVERY)
             if found_disc:
@@ -439,7 +454,7 @@ def Crowbar():
     except:
         comment = f'T - {l("runtime_error")}'
         logger.exception(comment)
-        messagebox.showerror(RS(), f'{comment}:\n{e}')
+        messagebox.showerror(RS(), f'{comment}')
 
     check_and_restore_fonts_if_needed(RUN_IN_RECOVERY, DEBUG_MODE)
 
