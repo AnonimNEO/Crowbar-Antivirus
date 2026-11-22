@@ -373,6 +373,7 @@ except:
 try:
     from SIM import SIM, SOFTWARE_INSTALLATION_MANAGER
 except:
+    SOFTWARE_INSTALLATION_MANAGER = l("error")
     nor_sim = True
     if not RUN_IN_RECOVERY:
         logger.exception(f'T - {l("component_import_error")} SoftwareInstallationManager')
@@ -380,6 +381,7 @@ except:
 try:
     from RM import REGISTRY_MONITOR_VERSION
 except:
+    REGISTRY_MONITOR_VERSION = l("error")
     not_rm = True
     if not RUN_IN_RECOVERY:
         logger.exception(f'T - {l("component_import_error")} RegistryMonitor')
